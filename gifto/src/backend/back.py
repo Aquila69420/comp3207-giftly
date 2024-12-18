@@ -4,6 +4,7 @@ import os
 from werkzeug.utils import secure_filename
 import gpt_req
 import image_analyzer
+import products
 
 app = Flask(__name__)
 CORS(app)
@@ -17,14 +18,12 @@ def product_text():
 
     output = gpt_req.llm_suggestion(input_value)
 
+    # run get_products(output)
+    # return the get_products output
+
     print(f"GPT Response: {output}")
 
-    return jsonify({"message": "Input received!", "input": output})
-
-UPLOAD_FOLDER = 'uploads'
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
+    return jsonify({"response": output}), 200
 
 @app.route('/product_img', methods=['POST'])
 def product_img():
@@ -52,16 +51,40 @@ def product_img():
         brands = response[0]
         objects = response[1]
 
-        return jsonify({'message': response}), 200
+        print(f"Image Analyzer Response: {response}")
+
+        # run get_products(output)
+        # return the get_products output
+
+        return jsonify({'response': response}), 200
 
     return jsonify({'error': 'File type not allowed'}), 400
 
+@app.route('/product_types', methods=['POST'])
+def product_types():
+    data = request.get_json()
+    occassions = [item.strip() for item in data['Occasions'].split(",")]
+    recipient = data['Recipient'].strip()
+    price = data['Price'].strip()
+    themes = [item.strip() for item in data['Themes'].split(",")]
+
+    input = "I want a gift for my {recipient} that matches ocassions {ocassions}, that suits the themes of {themes}."
+
+    print(f"Gift selections submitted: {input}")
+
+    output = gpt_req.llm_suggestion(input)
+
+    # run get_products_with_price_limitation(output, price)
+    # return the get_products output
+
+    print(f"GPT Response: {output}")
+
+    return jsonify({"response": output}), 200
 
 def get_products(products):
 
     # call products.py
     return None
-
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -20,6 +20,4 @@ def searching_item(access_token, item):
 
 def fetch_item(item):
     try: searching_item(getting_auth(), item)
-    except Exception as e : return e 
-
-searching_item(getting_auth(), "football")
+    except Exception as e : return e
