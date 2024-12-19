@@ -1,13 +1,16 @@
 from openai import AzureOpenAI #type:ignore 
+import os
 
-OPENAPI_END_POINT = "https://amcp1u21-openai-quiplash.openai.azure.com/"
-OPENAPI_KEY = "466cb690aa3c4ddfa1b1654c1d505123"
+OPENAPI_END_POINT = os.getenv("OpenAIEndPoint")
+OPENAPI_KEY = os.getenv("OpenAIKey")
 
 client = AzureOpenAI(
     azure_endpoint = OPENAPI_END_POINT, 
     api_key = OPENAPI_KEY,  
     api_version="2024-02-01"
 )
+
+# get the user's previous prompts from the respective container: container_player = database.get_container_client(os.getenv("PlayerContainerName"))
 
 def llm_suggestion(keyword):
 

@@ -18,7 +18,6 @@ function DropdownSelection() {
     { value: 'valentines', label: 'valentines' },
     { value: 'housewarming', label: 'housewarming' },
     { value: 'baby shower', label: 'baby shower' },
-    { value: 'promotion', label: 'promotion' },
     { value: 'corporate party', label: 'corporate party' },
     { value: "mother's day", label: "mother's day" },
     { value: "father's day", label: "father's day" },

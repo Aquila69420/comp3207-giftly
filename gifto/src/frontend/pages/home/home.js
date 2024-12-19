@@ -2,6 +2,7 @@ import React from 'react';
 import TextInput from './components/TextInput';
 import ImageInput from './components/ImageInput';
 import DropdownSelection from './components/DropdownSelection';
+import UserLoginRegister from './components/UserLoginRegister';
 
 function Home() {
   return (
@@ -11,6 +12,7 @@ function Home() {
         <TextInput/>
         <ImageInput/>
         <DropdownSelection/>
+        <UserLoginRegister/>
       </header>
     </div>
   );
