@@ -16,11 +16,30 @@ function UserLoginRegister({ setUsername }) {
       const result = await response.json();
       console.log('Login Response:', result);
 
-      if (result.success) {
+      if (result.response == "User successfully logged in.") {
         setUsername(localUsername);
       }
     } catch (error) {
       console.error('Error during login:', error);
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: localUsername, password }),
+      });
+      const result = await response.json();
+      console.log('Register Response:', result);
+      if (result.response == "User successfully registered.") {
+        setUsername(localUsername);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
     }
   };
 
@@ -78,6 +97,20 @@ function UserLoginRegister({ setUsername }) {
           }}
         >
           Login
+        </button>
+        <button
+          onClick={handleRegister}
+          style={{
+            padding: '10px 20px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            borderRadius: '5px',
+            backgroundColor: '#2196F3',
+            color: 'white',
+            border: 'none',
+          }}
+        >
+          Register
         </button>
       </div>
     </div>

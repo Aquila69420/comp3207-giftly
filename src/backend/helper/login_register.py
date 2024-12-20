@@ -27,7 +27,8 @@ def register_user(username, password, container):
 
         return "User successfully registered."
     except Exception as e:
-        return e
+        logging.info(f"Register error: {e}")
+        return "database error"
 
 def login_user(username, password, container):
     logging.info(f"Trying to login: {username}, {password}")
@@ -41,7 +42,7 @@ def login_user(username, password, container):
 
         # If passoword doens't exist then user doesn't exist
         if len(real_password_data) == 0: 
-            logging("Username or password incorrect")
+            logging.info("Username or password incorrect")
             return "Username or password incorrect"
 
         # Get the password value
@@ -49,10 +50,11 @@ def login_user(username, password, container):
 
         # Compare true vs inputted password value
         if password == real_password: 
-            logging("Username successfully logged in.")
+            logging.info("Username successfully logged in.")
             return "User successfully logged in."
         else: 
-            logging("Username or password incorrect")
+            logging.info("Username or password incorrect")
             return "Username or password incorrect"
     except Exception as e:
-        return e
+        logging.info(f"Login error: {e}")
+        return "database error"

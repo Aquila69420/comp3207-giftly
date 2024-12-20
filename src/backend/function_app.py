@@ -50,7 +50,7 @@ def login(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="product_text")
-@app.route(route='/product_text', methods=[func.HttpMethod.POST])
+@app.route(route='product_text', methods=[func.HttpMethod.POST])
 def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
@@ -72,7 +72,7 @@ def allowed_file(file):
         dimensions = False #must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels
 
 @app.function_name(name="product_img")
-@app.route(route='/product_img', methods=[func.HttpMethod.POST])
+@app.route(route='product_img', methods=[func.HttpMethod.POST])
 def product_img(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
@@ -117,7 +117,7 @@ def product_img(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="product_types")
-@app.route(route='/product_types', methods=[func.HttpMethod.POST])
+@app.route(route='product_types', methods=[func.HttpMethod.POST])
 def product_types(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['Username'].strip()
