@@ -6,13 +6,16 @@ import os, json, logging
 from helper import gpt_req
 from helper import image_analyzer
 from helper import login_register
+from helper import wishlist
+from helper import cart
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
 suggestion_container = database.get_container_client(os.getenv("SuggestionContainer"))
-
+wishlist_container = database.get_container_client(os.getenv("WishListContainer"))
+cart_container = database.get_container_client(os.getenv("CartContainer"))
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -20,12 +23,134 @@ def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
+@app.function_name(name="wishlist_get")
+@app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
+def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    output = wishlist.get(username, wishlist_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="wishlist_update")
+@app.route(route='wishlist_update', methods=[func.HttpMethod.POST])
+def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    gift = data['gift']
+    output = wishlist.add(username, gift, wishlist_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="wishlist_remove")
+@app.route(route='wishlist_remove', methods=[func.HttpMethod.POST])
+def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    gift = data['gift']
+    output = wishlist.remove(username, gift, wishlist_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="save_cart")
+@app.route(route="save_cart", methods=[func.HttpMethod.POST])
+def save_cart(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    cart_name = data['cart_name']
+    cart_content = data['cart_content']
+    username = data['username']
+    output = cart.save(username, cart_name, cart_content, cart_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="load_cart")
+@app.route(route="load_cart", methods=[func.HttpMethod.POST])
+def load_cart(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    cart_name = data['cart_name']
+    username = data['username']
+    output = cart.load(username, cart_name, cart_container)
+    if output==f"{username} does not have stored cart named {cart_name}" or output==f"{username} does not have any carts stored":
+        response = func.HttpResponse(
+            body=json.dumps({"response": "failed", "message": output}),
+            mimetype="application/json",
+            status_code=200
+        )
+    else:
+        response = func.HttpResponse(
+            body=json.dumps({"response": output}),
+            mimetype="application/json",
+            status_code=200
+        )
+    return add_cors_headers(response) 
+
+@app.function_name(name="delete_cart")
+@app.route(route="delete_cart", methods=[func.HttpMethod.POST])
+def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    cart_name = data['cart_name']
+    username = data['username']
+    output = cart.delete(username, cart_name, cart_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="find_user_autocomplete")
+@app.route(route="find_user_autocomplete", methods=[func.HttpMethod.POST])
+def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        data = req.get_json()
+        query = data.get('query', '')
+        if not query:
+            return func.HttpResponse(json.dumps({"usernames": []}), status_code=200, mimetype="application/json")
+
+        # Replace with your database query to find matching usernames
+        matching_usernames = [
+            user['username'] for user in user_container.query_items(
+                query="SELECT c.username FROM c WHERE STARTSWITH(c.username, @query)",
+                parameters=[{'name': '@query', 'value': query}],
+                enable_cross_partition_query=True
+            )
+        ]
+
+        return func.HttpResponse(
+            json.dumps({"usernames": matching_usernames}),
+            status_code=200,
+            mimetype="application/json"
+        )
+    except Exception as e:
+        logging.error(f"Autocomplete error: {e}")
+        return func.HttpResponse("Error processing request", status_code=500)
+
 @app.function_name(name="register")
 @app.route(route='register', methods=[func.HttpMethod.POST])
 def register(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
+    logging.info(f"Register info: {data}")
     username = data['username']
     password = data['password']
+    email = data['email']
+    phone = data['phone']
+    notifications = data['notifications']
     output = login_register.register_user(username, password, user_container)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
