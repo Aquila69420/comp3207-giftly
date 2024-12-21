@@ -1,7 +1,7 @@
 import uuid, json, os, logging
 import azure.functions as func
 
-def register_user(username, password, container):
+def register_user(username, password, container, email, phone, notifications, email_verification_code):
     # add username reqs
     # add pass reqs
 
@@ -21,6 +21,10 @@ def register_user(username, password, container):
             'id': str(uuid.uuid4()),
             'username': username,
             'password': password,
+            'email': email,
+            'phone': phone,
+            'notifications': notifications, 
+            'email_verification_code': email_verification_code
         })
 
         logging.info("User registered.")
@@ -58,3 +62,34 @@ def login_user(username, password, container):
     except Exception as e:
         logging.info(f"Login error: {e}")
         return "database error"
+    
+def email_verification(username, code, container):
+    try:
+        user_data = list(container.query_items(
+            query="SELECT c.email_verification_code FROM c WHERE c.username=@username",
+            parameters=[{'name': '@username', 'value': username}],
+            enable_cross_partition_query=True
+        ))
+        logging.info(f"user data: {user_data} {code}")
+        user_email_verification_code = user_data[0]['email_verification_code']
+        if code == user_email_verification_code:
+            return "Verification successful."
+        else:
+            return "Verification failed."
+    except Exception as e:
+        logging.info(f"Email verification error: {e}")
+        return "database error"
+    
+def get_user_details(email, container):
+    try:
+        results = list(container.query_items(
+            query="SELECT * FROM c WHERE c.email = @email",
+            parameters=[{'name': '@email', 'value': email}],
+            enable_cross_partition_query=True
+        ))
+        if results:
+            return {"username": results[0].get("username"), "password": results[0].get("password")}
+        else: return "fail"
+    except Exception as e:
+        logging.info(f"Failed to get user details: {e}")
+        return "Database error"

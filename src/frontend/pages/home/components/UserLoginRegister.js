@@ -8,6 +8,40 @@ function UserLoginRegister({ setUsername }) {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [notifications, setNotifications] = useState('');
+  const [emailVerificationCode, setEmailVerificationCode] = useState('');
+
+  const handleForgot = async() => {
+    // IMPORTANT: using usernameLogin text box as email input needed to send user their username and password. Create a new input box and const initialization (const [forgotEmail, setForgotEmail] = useState(''))
+    try {
+      const response = await fetch('http://localhost:5000/fetch_user_details', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: usernameLogin }),
+      });
+      const result = await response.json();
+      console.log('Details Response:', result); 
+    } catch (error) {
+      console.error('Error during email verification:', error);
+    }
+  }
+
+  const handleVerifyEmail = async() => {
+    try {
+      const response = await fetch('http://localhost:5000/email_verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username: usernameRegister, code: emailVerificationCode }),
+      });
+      const result = await response.json();
+      console.log('Verification Response:', result);
+    } catch (error) {
+      console.error('Error during email verification:', error);
+    }
+  };
 
   const handleLogin = async () => {
     try {
@@ -88,7 +122,14 @@ function UserLoginRegister({ setUsername }) {
           width: '96%',
         }}
       />
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {/* Login Button */}
         <button
           onClick={handleLogin}
           style={{
@@ -103,7 +144,26 @@ function UserLoginRegister({ setUsername }) {
         >
           Login
         </button>
+
+        {/* Forgot Button */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => handleForgot()}
+            style={{
+              padding: '10px 15px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              borderRadius: '5px',
+              backgroundColor: '#2196F3',
+              color: 'white',
+              border: 'none',
+            }}
+          >
+            Forgot
+          </button>
+        </div>
       </div>
+
     <div
         style={{
           position: 'absolute',
@@ -195,25 +255,68 @@ function UserLoginRegister({ setUsername }) {
           <option value="false">No</option>
           <option value="true">Yes</option>
         </select>
-        <button
-          onClick={handleRegister}
+        <div
           style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            cursor: 'pointer',
-            marginTop: "10px",
-            borderRadius: '5px',
-            backgroundColor: '#2196F3',
-            color: 'white',
-            border: 'none',
-            width: '20%',
             display: 'flex',
-            justifyContent: 'center', 
-            alignItems: 'center',
+            alignItems: 'center', // Align items horizontally
+            justifyContent: 'space-between', // Distribute space evenly
+            width: '100%',
           }}
         >
-          Register
-        </button>
+          <button
+            onClick={handleRegister}
+            style={{
+              padding: '10px 20px',
+              fontSize: '16px',
+              cursor: 'pointer',
+              borderRadius: '5px',
+              backgroundColor: '#2196F3',
+              color: 'white',
+              border: 'none',
+              width: '20%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            Register
+          </button>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center', // Align input and button horizontally
+              marginLeft: '10px', // Add space between Register and Verify section
+            }}
+          >
+            <input
+              type="text"
+              placeholder="Email Verification Code"
+              value={emailVerificationCode} // Define this state if necessary
+              onChange={(e) => setEmailVerificationCode(e.target.value)}
+              style={{
+                padding: '8px',
+                fontSize: '14px',
+                borderRadius: '5px',
+                border: '1px solid #ccc',
+                marginRight: '10px', // Space between input and button
+              }}
+            />
+            <button
+              onClick={handleVerifyEmail} // Define a function to handle verification
+              style={{
+                padding: '10px 20px',
+                fontSize: '14px',
+                cursor: 'pointer',
+                borderRadius: '5px',
+                backgroundColor: '#4CAF50',
+                color: 'white',
+                border: 'none',
+              }}
+            >
+              Verify
+            </button>
+          </div>
+        </div>
       </div>
       </div>
     </div>

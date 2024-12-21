@@ -8,6 +8,8 @@ from helper import image_analyzer
 from helper import login_register
 from helper import wishlist
 from helper import cart
+from helper import sendEmail
+import random
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -16,6 +18,7 @@ user_container = database.get_container_client(os.getenv("UserContainer"))
 suggestion_container = database.get_container_client(os.getenv("SuggestionContainer"))
 wishlist_container = database.get_container_client(os.getenv("WishListContainer"))
 cart_container = database.get_container_client(os.getenv("CartContainer"))
+sendEmail_api_key = os.getenv("SendGrid_API_KEY")
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -149,9 +152,12 @@ def register(req: func.HttpRequest) -> func.HttpResponse:
     username = data['username']
     password = data['password']
     email = data['email']
+    email_verification_code = ''.join(str(random.randint(0, 9)) for _ in range(6))
+    logging.info(f"api key: {sendEmail_api_key}")
+    sendEmail.send_verification_email(username, email, email_verification_code, sendEmail_api_key) # if error return the error
     phone = data['phone']
     notifications = data['notifications']
-    output = login_register.register_user(username, password, user_container)
+    output = login_register.register_user(username, password, user_container, email, phone, notifications, email_verification_code)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",
@@ -159,6 +165,37 @@ def register(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response) 
 
+@app.function_name(name="email_verification")
+@app.route(route='email_verification', methods=[func.HttpMethod.POST])
+def email_verification(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    code = data['code']
+    output = login_register.email_verification(username, code, user_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="fetch_user_details")
+@app.route(route='fetch_user_details', methods=[func.HttpMethod.POST])
+def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    email = data['email']
+    output = login_register.get_user_details(email, user_container)
+    if output == "fail":
+        output = "Email does not have a registered account. Please register a new account."
+    else:
+        username = output['username']
+        password = output['password']
+        sendEmail.sendUserDetails(email, username, password, sendEmail_api_key)
+        output = f"Username and Password details sent to {email}."
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+    )
+    return add_cors_headers(response) 
     
 @app.function_name(name="login")
 @app.route(route='login', methods=[func.HttpMethod.POST])
