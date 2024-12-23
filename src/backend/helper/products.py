@@ -7,7 +7,7 @@ def get_products(products):
     # format the output to include link, price per unit, name
     # combine the searches and output as dict with each vendor
     # return the value
-    return None
+    return products
 
 def get_products_with_price_limitation(products, price):
     # products -> GPT output
@@ -15,4 +15,4 @@ def get_products_with_price_limitation(products, price):
     # format the output to include link, price per unit, name  
     # combine the searches and output as dict with each vendor
     # return the value
-    return None
+    return products
