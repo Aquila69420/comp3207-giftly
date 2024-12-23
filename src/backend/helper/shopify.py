@@ -11,7 +11,6 @@ import requests
 def search_products(product):
 
     shop_url = "None" # need to find specific stores
-
     url = f"{shop_url}/search/suggest.json"
 
     params = {

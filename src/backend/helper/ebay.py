@@ -1,6 +1,8 @@
 import base64
 import requests
 
+# Returning: {'message': 'Unauthorized'}
+
 def getting_auth():
     oauth_url_sandbox = "https://api.sandbox.ebay.com/identity/v1/oauth2/token"
     oauth_url_production = "https://api.ebay.com/identity/v1/oauth2/token"
@@ -15,9 +17,14 @@ def searching_item(access_token, item):
     search_url_production = "https://api.ebay.com/buy/browse/v1/item_summary/search"
     response = requests.get(search_url_sandbox, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": item,"limit": 5, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
     if response.status_code == 200:
+        print("Response:\n", response.json())
         return response.json()
-    else: raise Exception(f"Error {response.status_code}: {response.text}")
+    else:
+        print(f"Error {response.status_code}: {response.text}")
+        raise Exception(f"Error {response.status_code}: {response.text}")
 
 def fetch_item(item):
-    try: searching_item(getting_auth(), item)
+    try: return searching_item(getting_auth(), item)
     except Exception as e : return e
+
+fetch_item("adidas")

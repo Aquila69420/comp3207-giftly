@@ -9,6 +9,7 @@ from helper import login_register
 from helper import wishlist
 from helper import cart
 from helper import sendEmail
+from helper import products
 import random
 
 app = func.FunctionApp()
@@ -254,10 +255,9 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     prompt = data['prompt']
     username = data['username'].strip()
     output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
-    # run get_products(output)
-    # return the get_products output
+    fetched_products = products.get_products(output)
     response = func.HttpResponse(
-        body=json.dumps({"response": output}),
+        body=json.dumps({"response": fetched_products}),
         mimetype="application/json",
         status_code=200
     )
@@ -299,10 +299,9 @@ def product_img(req: func.HttpRequest) -> func.HttpResponse:
         objects = output[1]
         suggestion = "rec:" + ','.join(objects)
         gpt_req.update_suggestion(suggestion_container, username, suggestion)
-        # run get_products(output)
-        # return the get_products output
+        fetched_products = products.get_products(output)
         response = func.HttpResponse(
-            body=json.dumps({"response": output}),
+            body=json.dumps({"response": fetched_products}),
             mimetype="application/json",
             status_code=200
         )
@@ -325,8 +324,7 @@ def product_types(req: func.HttpRequest) -> func.HttpResponse:
     themes = [item.strip() for item in data['Themes'].split(",")]
     input = f"I want a gift for my {recipient} that matches ocassions {occassions}, that suits the themes of {themes}."
     output = gpt_req.llm_suggestion(input, suggestion_container, username)
-    # run get_products_with_price_limitation(output, price)
-    # return the get_products output
+    fetched_products = products.get_products_with_price_limitation(output, price)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",

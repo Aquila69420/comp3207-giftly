@@ -3,14 +3,16 @@ import shopify
 
 def get_products(products):
     # products -> GPT output
-    # run each vendor individually 
+    # run each vendor individually: ebay.py, oxylabs.py (amazon, google, etc.), shopify.py
+    # format the output to include link, price per unit, name
     # combine the searches and output as dict with each vendor
     # return the value
     return None
 
 def get_products_with_price_limitation(products, price):
     # products -> GPT output
-    # run each vendor individually with price limitation
+    # run each vendor individually ensuring the price falls within the limit otherwise search again: ebay.py, oxylabs.py (amazon, google, etc.), shopify.py
+    # format the output to include link, price per unit, name  
     # combine the searches and output as dict with each vendor
     # return the value
     return None
