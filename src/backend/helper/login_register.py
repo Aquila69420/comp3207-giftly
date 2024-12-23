@@ -93,3 +93,46 @@ def get_user_details(email, container):
     except Exception as e:
         logging.info(f"Failed to get user details: {e}")
         return "Database error"
+
+def fetch_other_details(user_details, user_data, field_to_update):
+    for field in field_to_update:
+        user_data[field] = user_details[0][field]
+    return user_data
+
+def update_user_details(username, field, details, container):
+    try:
+        user_details = list(container.query_items(
+            query="SELECT * FROM c WHERE c.username=@username",
+            parameters=[{'name': '@username', 'value': username}],
+            enable_cross_partition_query=True
+        ))
+        user_id = user_details[0]['id']
+        user_data = {}
+        user_data['id'] = user_id
+        if field == "username":
+            user_data['username'] = details
+            user_data = fetch_other_details(user_details, user_data, ['password', 'email', 'phone', 'notifications'])
+        elif field == "password":
+            user_data['password'] = details
+            user_data = fetch_other_details(user_details, user_data, ['username', 'email', 'phone', 'notifications'])
+        elif field == "email":
+            user_data['email'] = details
+            user_data = fetch_other_details(user_details, user_data, ['username', 'password', 'phone', 'notifications'])
+        elif field == "phone":
+            user_data['phone'] = details
+            user_data = fetch_other_details(user_details, user_data, ['username', 'password', 'email', 'notifications'])
+        else: 
+            user_data['notifications'] = details
+            fetch_other_details(user_details, user_data, ['username', 'password', 'email', 'phone'])
+        container.replace_item(
+            item = user_id,
+            body = user_data,
+            pre_trigger_include = None,
+            post_trigger_include = None
+        )
+        return f"{field} successfully updated to {details}."
+    except Exception as e:
+        logging.info(f"update user details error: {e}")
+        return "database error"
+    
+    

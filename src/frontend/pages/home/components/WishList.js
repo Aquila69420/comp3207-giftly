@@ -89,7 +89,7 @@ function WishList({ username }) {
             backgroundColor: '#f9f9f9', // Light background for contrast
             borderRadius: '10px',
             boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-            width: '250px', // Limit the width
+            width: '150px', // Limit the width
         }}
     >
         <button

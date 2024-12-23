@@ -154,7 +154,7 @@ def register(req: func.HttpRequest) -> func.HttpResponse:
     email = data['email']
     email_verification_code = ''.join(str(random.randint(0, 9)) for _ in range(6))
     logging.info(f"api key: {sendEmail_api_key}")
-    sendEmail.send_verification_email(username, email, email_verification_code, sendEmail_api_key) # if error return the error
+    # sendEmail.send_verification_email(username, email, email_verification_code, sendEmail_api_key) # if error return the error
     phone = data['phone']
     notifications = data['notifications']
     output = login_register.register_user(username, password, user_container, email, phone, notifications, email_verification_code)
@@ -197,6 +197,42 @@ def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response) 
     
+@app.function_name(name="update_user_details")
+@app.route(route='update_user_details', methods=[func.HttpMethod.POST])
+def update_user_details(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    field = data['field']
+    username = data['username']
+    if field == "username":
+        details = data['newUsername']
+    elif field == "password":
+        details = data['newPassword']
+    elif field == "email":
+        details = data['newEmail']
+    elif field == "phone":
+        details = data['newPhone']
+    else:
+        details = data['newNotifications']
+    output = login_register.update_user_details(username, field, details, user_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+    )
+    return add_cors_headers(response) 
+
+@app.function_name(name="send_notifications")
+@app.route(route='send_notifications', methods=[func.HttpMethod.POST])
+def send_notifications(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    notification = data['notification']
+    output = sendEmail.sendUserNotification(username, notification, user_container, sendEmail_api_key)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+    )
+    return add_cors_headers(response) 
+
 @app.function_name(name="login")
 @app.route(route='login', methods=[func.HttpMethod.POST])
 def login(req: func.HttpRequest) -> func.HttpResponse:

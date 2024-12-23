@@ -6,6 +6,8 @@ import UserLoginRegister from './components/UserLoginRegister';
 import WishList from './components/WishList';
 import FindUsers from './components/FindUsers';
 import Cart from './components/Cart';
+import UpdateDetailsBlock from './components/UpdateDetailsBlock';
+import SendNotifications from './components/SendNotifications';
 
 function Home() {
   const [username, setUsername] = useState('');
@@ -24,6 +26,8 @@ function Home() {
         <WishList username={username}/>
         <FindUsers/>
         <Cart username={username}/>
+        <UpdateDetailsBlock username={username}/>
+        <SendNotifications username={username}/>
       </header>
     </div>
   );

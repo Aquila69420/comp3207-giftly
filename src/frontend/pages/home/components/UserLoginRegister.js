@@ -50,13 +50,13 @@ function UserLoginRegister({ setUsername }) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username: usernameLogin, passwordLogin }),
+        body: JSON.stringify({ username: usernameLogin, password: passwordLogin }),
       });
       const result = await response.json();
       console.log('Login Response:', result);
 
       if (result.response === "User successfully logged in.") {
-        setUsernameLogin(usernameLogin);
+        setUsername(usernameLogin);
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -75,7 +75,7 @@ function UserLoginRegister({ setUsername }) {
       const result = await response.json();
       console.log('Register Response:', result);
       if (result.response === "User successfully registered.") {
-        setUsernameRegister(usernameRegister);
+        setUsername(usernameRegister);
       }
     } catch (error) {
       console.error('Error during registration:', error);
