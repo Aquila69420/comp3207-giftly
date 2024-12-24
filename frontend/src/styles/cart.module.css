@@ -1,0 +1,178 @@
+/* Cart.module.css */
+
+:root {
+  --deep-sea-green: #085b5e;
+  --cararra: #e2e3dc;
+  --tulip-tree: #ebac3f;
+  --caribbean-green: #0ecfae;
+  --vesuvius: #b5540d;
+  --acapulco: #86b39b;
+  --straw: #d2c87a;
+  --jet-stream: #b2d2d0;
+  --wheat: #f1dcac;
+  --gray-chateau: #a5acaf;
+}
+
+
+.cartContainer {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 550px;
+  height: 300px;
+  display: flex;
+  flex-direction: row;
+}
+
+.cartContent {
+  width: 60%;
+  margin-right: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: black;
+}
+
+.cartTitle {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: black;
+}
+
+.cartList {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cartItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.cartItem:last-child {
+  border-bottom: none;
+}
+
+.cartLink {
+  text-decoration: none;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.cartSelect {
+  margin-left: 10px;
+  margin-right: 10px;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+.cartPrice {
+  margin-left: 10px;
+  margin-right: 10px;
+  font-size: 14px;
+  color: #333;
+}
+
+.cartButton {
+  padding: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+}
+
+.totalCost {
+  text-align: right;
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.buttonsContainer {
+  width: 40%;
+}
+
+.button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.addButton {
+  background-color: #4caf50;
+  color: white;
+}
+
+.buyButton {
+  background-color: #2196f3;
+  color: white;
+}
+
+.clearButton {
+  background-color: #f44336;
+  color: white;
+}
+
+.inputContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.input {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.saveButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.loadButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+}
+
+.deleteButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  width: 55px;
+}

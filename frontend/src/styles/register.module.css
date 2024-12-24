@@ -1,0 +1,58 @@
+.registerContainer {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input {
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 96%;
+}
+
+.select {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.actionContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.buttonPrimary {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  width: 20%;
+}
+
+.buttonSecondary {
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+}
+
+.verificationContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
