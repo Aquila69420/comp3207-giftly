@@ -1,12 +1,19 @@
 import React from "react";
 import "./styling/App.css";
-import Home from "./pages/Home";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+
+// add pages here
 
 function App() {
   return (
-    <div>
-      <Home />
-    </div>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<Home />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 

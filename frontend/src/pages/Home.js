@@ -8,17 +8,18 @@ import FindUsers from '../components/FindUsers';
 import Cart from '../components/Cart';
 import UpdateDetailsBlock from '../components/UpdateDetailsBlock';
 import SendNotifications from '../components/SendNotifications';
+import styles from "../styling/home.module.css"
 
 function Home() {
   const [username, setUsername] = useState('');
   return (
     <div>
-      <header className="App-header">
-        <p style={{
+      <header className={styles.AppHeader}>
+        <div style={{
             fontSize: '36px', // Larger font size
             fontWeight: 'bold', // Bold text
             marginBottom: '100px', // Space below the title
-          }}>Gifto</p>
+          }}>Gifto</div>
         <TextInput username={username}/>
         <ImageInput username={username}/>
         <DropdownSelection username={username}/>
