@@ -1,5 +1,3 @@
-import ebay
-import shopify
 
 def get_products(products):
     # products -> GPT output
