@@ -1,13 +1,60 @@
-import React, { useState } from "react";
+import React from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import styles from "../styles/register.module.css";
+import logo from "../image/giftly_logo_trans.png";
+import { MdAccountCircle } from "react-icons/md";
 
 function Register() {
-  const [usernameRegister, setUsernameRegister] = useState("");
-  const [passwordRegister, setPasswordRegister] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [notifications, setNotifications] = useState("");
-  const [emailVerificationCode, setEmailVerificationCode] = useState("");
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      password: "",
+      email: "",
+      phone: "",
+      notifications: "",
+      emailVerificationCode: "",
+    },
+    validationSchema: Yup.object({
+      username: Yup.string()
+        .min(3, "Username must be at least 3 characters")
+        .required("Username is required"),
+      password: Yup.string()
+        .min(8, "Password must be at least 8 characters")
+        .required("Password is required"),
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email is required"),
+      phone: Yup.string()
+        .matches(/^\+\d{1,3}\s\d{6,14}$/, "Phone number must be in the format +44 7765xxxxxx")
+        .required("Phone number is required"),
+      notifications: Yup.string()
+        .oneOf(["true", "false"], "Please select a notification preference")
+        .required("Notification preference is required"),
+      emailVerificationCode: Yup.string().optional(),
+    }),
+    onSubmit: async (values) => {
+      try {
+        const response = await fetch("http://localhost:5000/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: values.username,
+            password: values.password,
+            email: values.email,
+            phone: values.phone,
+            notifications: values.notifications === "true",
+          }),
+        });
+        const result = await response.json();
+        console.log("Register Response:", result);
+      } catch (error) {
+        console.error("Error during registration:", error);
+      }
+    },
+  });
 
   const handleVerifyEmail = async () => {
     try {
@@ -17,8 +64,8 @@ function Register() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: usernameRegister,
-          code: emailVerificationCode,
+          username: formik.values.username,
+          code: formik.values.emailVerificationCode,
         }),
       });
       const result = await response.json();
@@ -28,103 +75,107 @@ function Register() {
     }
   };
 
-  const handleRegister = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: usernameRegister,
-          password: passwordRegister,
-          email: email,
-          phone: phone,
-          notifications: notifications,
-        }),
-      });
-      const result = await response.json();
-      console.log("Register Response:", result);
-
-    } catch (error) {
-      console.error("Error during registration:", error);
-    }
-  };
-
   return (
     <div className={styles.registerContainer}>
-      <input
-        type="text"
-        placeholder="Username"
-        value={usernameRegister}
-        onChange={(e) => setUsernameRegister(e.target.value)}
-        className={styles.input}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={passwordRegister}
-        onChange={(e) => setPasswordRegister(e.target.value)}
-        className={styles.input}
-      />
-      <input
-        type="text"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className={styles.input}
-      />
-      <input
-        type="text"
-        placeholder="Phone number (ie: +44 7765xxxxxx)"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        className={styles.input}
-      />
-      <select
-        value={notifications}
-        onChange={(e) => setNotifications(e.target.value === "true")}
-        className={styles.select}
-      >
-        <option value="" disabled>
-          -- Opt for Notifications --
-        </option>
-        <option value="false">No</option>
-        <option value="true">Yes</option>
-      </select>
-      <div className={styles.actionContainer}>
-        <button
-          onClick={() =>
-            handleRegister({
-              usernameRegister,
-              passwordRegister,
-              email,
-              phone,
-              notifications,
-            })
-          }
-          className={styles.buttonPrimary}
-        >
-          Register
-        </button>
-        <div className={styles.verificationContainer}>
-          <input
-            type="text"
-            placeholder="Email Verification Code"
-            value={emailVerificationCode}
-            onChange={(e) => setEmailVerificationCode(e.target.value)}
-            className={styles.input}
-          />
-          <button
-            onClick={() =>
-              handleVerifyEmail({ usernameRegister, emailVerificationCode })
-            }
-            className={styles.buttonSecondary}
-          >
-            Verify
-          </button>
+      <img src={logo} alt="logo" width={300} className={styles.logo} />
+      <form onSubmit={formik.handleSubmit} className={styles.box}>
+        <div className={styles.iconContainer}>
+          <MdAccountCircle size={60} />
         </div>
-      </div>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={formik.values.username}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.username && formik.errors.username ? (
+          <div className={styles.error}>{formik.errors.username}</div>
+        ) : null}
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.password && formik.errors.password ? (
+          <div className={styles.error}>{formik.errors.password}</div>
+        ) : null}
+
+        <input
+          type="text"
+          name="email"
+          placeholder="Email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.email && formik.errors.email ? (
+          <div className={styles.error}>{formik.errors.email}</div>
+        ) : null}
+
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone number (ie: +44 7765xxxxxx)"
+          value={formik.values.phone}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.phone && formik.errors.phone ? (
+          <div className={styles.error}>{formik.errors.phone}</div>
+        ) : null}
+
+        <select
+          name="notifications"
+          value={formik.values.notifications}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.select}
+        >
+          <option value="" disabled>
+            -- Opt for Notifications --
+          </option>
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+        {formik.touched.notifications && formik.errors.notifications ? (
+          <div className={styles.error}>{formik.errors.notifications}</div>
+        ) : null}
+
+        <div className={styles.actionContainer}>
+          <button type="submit" className={styles.buttonPrimary}>
+            Register
+          </button>
+
+          <div className={styles.verificationContainer}>
+            <input
+              type="text"
+              name="emailVerificationCode"
+              placeholder="Email Verification Code"
+              value={formik.values.emailVerificationCode}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={styles.input}
+            />
+            <button
+              type="button"
+              onClick={handleVerifyEmail}
+              className={styles.buttonSecondary}
+            >
+              Verify
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }
