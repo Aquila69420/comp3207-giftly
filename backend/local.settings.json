@@ -15,7 +15,12 @@
       "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
       "SendGrid_API_KEY": "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",
       "Oxylabs_API_username": "janetjarron_4aquM",
-      "Oxylabs_API_password": "Janetjarron_1992"
+      "Oxylabs_API_password": "Janetjarron_1992",
+      "Ebay_Dev_ID": "35b0fa5e-a6e0-49ab-b823-c32a509b40d3",
+      "Ebay_Sandbox_Client_ID": "DhruvKha-Giftly-SBX-999edef9a-bf74745e",
+      "Ebay_Sandbox_Client_Secret": "SBX-99edef9a0d08-a15b-4448-9c5c-13cb",
+      "Ebay_Production_Client_ID": "DhruvKha-Giftly-PRD-0c261000e-9a7667aa",
+      "Ebay_Production_Client_Secret": "PRD-c261000eef87-b143-451e-9ef3-6bc2"
       },
       "Host": {
         "CORS": "*"
