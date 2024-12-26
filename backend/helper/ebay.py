@@ -2,7 +2,7 @@ import base64
 import json
 import requests
 
-with open('backend\\local.settings.json', 'r') as file:
+with open('./local.settings.json', 'r') as file:
     settings = json.load(file)
 
 sandbox_settings = {
@@ -14,6 +14,10 @@ production_settings = {
     'client_id': settings.get('Values').get('Ebay_Production_Client_ID'),
     'client_secret': settings.get('Values').get('Ebay_Production_Client_Secret'),
 }
+
+# Demo response JSON file for testing
+with open('./ebay_search.json') as f:
+    demo_ebay_response = json.load(f)
 
 def get_oauth_token():
     """
@@ -29,34 +33,46 @@ def get_oauth_token():
     else: 
         raise Exception(f"Error {response.status_code}: {response.text}")
 
-def search_item(access_token, item):
+def search_query(access_token, query):
     """
-    Search for an item on eBay
+    Search for a query on eBay
     param access_token: str, the OAuth token
-    param item: str, the item to search for
+    param query: str, the query to search for
     return: list of 5 dictionaries, each containing the details of a product
     """
     search_url_sandbox = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search"
     search_url_production = "https://api.ebay.com/buy/browse/v1/item_summary/search"
-    response = requests.get(search_url_production, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": item,"limit": 5, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
+    response = requests.get(search_url_production, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": query,"limit": 5, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
     if response.status_code == 200:
         return response.json()
     else:
         print(f"Error {response.status_code}: {response.text}")
         raise Exception(f"Error {response.status_code}: {response.text}")
 
-def search(item):
+def search(query):
     """
-    Search for an item on eBay
+    Search for a query on eBay
     param item: str, the item to search for
     return: list of 5 dictionaries, each containing the details of a product
     """
     try: 
-        products = search_item(get_oauth_token(), item)['itemSummaries']
+        # products = search_query(get_oauth_token(), query)['itemSummaries']
+        products = demo_ebay_response['itemSummaries']
         return products
     except Exception as e : 
         return e
+    
+def parse_search_results(products):
+    products_info = []
+    for product in products:
+        product_info = {}
+        product_info['name'] = product['title']
+        product_info['price'] = product['price']['value']
+        product_info['currency'] = product['price']['currency']
+        product_info['product_url'] = product['itemWebUrl']
+        product_info['image_url'] = product['image'] # Should use product['image'] or product['thumbnailImages'][0]?
+        products_info.append(product_info)
+    return products_info
 
-# Demo response JSON file for testing
-# with open('backend\\ebay_search.json') as f:
-#     demo_ebay_response = json.load(f)
+
+# print(parse_search_results(demo_ebay_response['itemSummaries']))
