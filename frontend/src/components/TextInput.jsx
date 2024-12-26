@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import HashLoader from 'react-spinners/HashLoader';
+import '../styles/hashloader.component.css';
 
 function TextInput({username}) {
   const [prompt, setInputValue] = useState('');
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     // TODO: Work from here for receiving the response from the backend about fetched products from vendors
     // Retrieve the input data from the backend, and redirect the user to the search results page
     try {
+      setLoading(true);
       const response = await fetch('http://localhost:7071/product_text', {
         method: 'POST',
         headers: {
@@ -20,6 +24,7 @@ function TextInput({username}) {
       const result = await response.json();
       console.log('Response from backend:', result);
       navigate('/search');
+      setLoading(false);
     } catch (error) {
       console.error('Error sending input data:', error);
     }
@@ -27,6 +32,20 @@ function TextInput({username}) {
 
   return (
     <div>
+      {loading ? (
+        <div className="overlay">
+        <HashLoader color="#08caa5" loading={loading} size={150} />
+      </div>
+      ) : (
+        <div
+          style={{
+            fontSize: '24px',
+            color: '#4CAF50',
+          }}
+        >
+          Searching products from vendors
+        </div>
+      )}
       <input
         type="text"
         placeholder="Enter something..."
