@@ -333,3 +333,107 @@ def product_types(req: func.HttpRequest) -> func.HttpResponse:
 
     return add_cors_headers(response)
 
+#############################GROUP FUNCTIONS#############################
+
+@app.function_name(name="groups_create")
+@app.route(route='groups/create', methods=[func.HttpMethod.POST])
+def groups_create(req: func.HttpRequest) -> func.HttpResponse:
+    '''User Initialises a Group with a Group Name
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupname: groupname}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", groupname: groupname, admin: username, groupmembers: [username]}
+        data: {result: False, msg: "{groupname} already exists"}
+        data: {result: False, msg: "User {username} does not exist"}
+    '''
+    data = req.get_json()
+    #TODO: code
+
+@app.function_name(name="groups_delete")
+@app.route(route='groups/delete', methods=[func.HttpMethod.POST])
+def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
+    '''User Deletes a Group that they are an admin for
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupname: groupname}
+    
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{username} is not Admin"}
+        data: {result: False, msg: {groupname} does not exist}'''
+    data = req.get_json()
+    #TODO: code
+
+@app.function_name(name="groups_add_user")
+@app.route(route='groups/add_user', methods=[func.HttpMethod.POST])
+def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
+    '''User Adds a Different User to Group
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, user_to_add: username1, groupname: groupname}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupname} does not exist"}
+        data: {result: False, msg: "{username} does not exist"}
+        data: {result: False, msg: "{user_to_add} does not exist}'''
+    data = req.get_json()
+    #TODO: code
+
+
+
+@app.function_name(name="groups_secret_santa")
+@app.route(route='groups_secret_santa')
+def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
+    '''Initiate Secret Santa
+
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupname: groupname, occasionname: occasionname}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupname} does not exist"}
+        data: {result: False, msg: "{username} is not the admin for the group"
+        data: {result: False, msg: "{occasionname} for this group already exists"}'''
+    data = req.get_json()
+    #TODO: code
+
+@app.function_name(name="groups_group_gifting")
+@app.route(route='groups_group_gifting')
+def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
+    '''Initiate Group Gifting for a target recipient
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupname: groupname, occasionname: occasiionname, recipientname: recipientname}
+    
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupname} does not exist}
+        data: {result: False, msg: "{username} is not the admin for the group}
+        data: {result: False, msg: "{occasionname} for this group already exists"}
+        data: {result: False, msg: "{recipientname} is not a part of this group}'''
+    data = req.get_json()
+    #TODO: code
+
