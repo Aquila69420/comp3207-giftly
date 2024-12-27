@@ -39,6 +39,27 @@ const GroupsSettings = () => {
     }
   };
 
+  const handleDeleteGroup = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/groups/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: localStorage.getItem('username'),
+          groupID: groupID,
+        }),
+      });
+      const data = await response.json();
+      if (data.result) {
+        navigate('/groups'); // Navigate back to the groups page after deletion
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      setError('Error deleting group: ' + error.message);
+    }
+  };
+
   return (
     <div className={styles.groupsSettingsPage}>
       {/* Top Bar */}
@@ -70,7 +91,18 @@ const GroupsSettings = () => {
           >
             Add Member
           </button>
-          {error && <p className={styles.error}>{error}</p>}
+        </div>
+
+        {error && <p className={styles.error}>{error}</p>}
+
+        {/* Delete Group Button */}
+        <div className={styles.deleteGroupSection}>
+          <button
+            onClick={handleDeleteGroup}
+            className={styles.deleteGroupButton}
+          >
+            Delete Group
+          </button>
         </div>
       </div>
     </div>
