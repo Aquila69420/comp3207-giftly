@@ -53,7 +53,7 @@ def delete_group(username, groupID):
     
     # Delete group in all containers
     # TODO: Delete all occasions
-    groups_container.delete_item(groupID)
+    groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(username, user_to_add, groupID):
     # Check both usernames exist
