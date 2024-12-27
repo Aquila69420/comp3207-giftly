@@ -435,7 +435,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     
 
 @app.function_name(name="groups_get")
-@app.route(route='groups/get', methods=[func.HttpMethod.GET])
+@app.route(route='groups/get', methods=[func.HttpMethod.POST])
 def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     '''Get the groups that a user is a part of
     
@@ -455,7 +455,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
         gs = groups.get_groups(username)
         body = json.dumps({"result": "OK", "msg": "OK", "groups": gs})
     except Exception as e:
-        body = json.dumps({"result": False, "msg": e})
+        body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
