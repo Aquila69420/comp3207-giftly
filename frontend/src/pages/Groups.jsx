@@ -3,6 +3,8 @@ import GroupsSidebar from '../components/GroupsSidebar';
 import GroupsChat from '../components/GroupsChat';
 import GroupsTopBar from '../components/GroupsTopbar';
 import styles from '../styles/groups.module.css';
+import { useNavigate } from 'react-router-dom';
+
 
 const Groups = () => {
   const [groups, setGroups] = useState([]);
@@ -11,6 +13,7 @@ const Groups = () => {
   const [username] = useState('atharva'); // Replace with actual logged-in username
   const [occasion, setOccasion] = useState("X's Birthday"); // Replace with actual occasion
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch groups from backend
   useEffect(() => {
@@ -62,7 +65,7 @@ const Groups = () => {
       {/* Top Bar */}
       <GroupsTopBar
         onBack={() => console.log('Back')}
-        onSettings={() => console.log('Settings')}
+        onSettings={() => navigate('/groups/settings', { state: { groupName: activeGroup?.groupname } })}
         occasion={occasion}
       />
 
