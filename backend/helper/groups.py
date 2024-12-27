@@ -26,14 +26,14 @@ def group_exists(groupID):
     return groups
 
 
-def create_groups(username, groupname):
+def create_group(username, groupname):
     # Check if username exists
     if not username_exists(username):
         raise Exception(f"User {username} does not exist")
 
     # Add Group
     groups_container.create_item(body={
-        'groupID': str(uuid.uuid4()),
+        'id': str(uuid.uuid4()),
         'groupname': groupname,
         'admin': username,
         'usernames': [],
@@ -62,7 +62,7 @@ def get_groups(username):
 
     # Query database for all groups with user
     groups = list(groups_container.query_items(
-                query="SELECT * FROM c WHERE @username IN c.users",
+                query="SELECT * FROM c WHERE ARRAY_CONTAINS(c.users, @username)",
                 parameters=[{'name': '@username', 'value': username}],
                 enable_cross_partition_query=True
             ))
