@@ -10,6 +10,7 @@
       "SuggestionContainer": "suggestion",
       "WishListContainer": "wishlist",
       "CartContainer": "cart",
+      "GroupsContainer": "groups",
       "FunctionAppKey" : "sjAHwpUaI5N3sVkQfzgfSQJPaaV6OGnVPDaoCz9kG0_lAzFuDrD-oA==",
       "OpenAIEndPoint": "https://amcp1u21-openai-quiplash.openai.azure.com/",
       "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
