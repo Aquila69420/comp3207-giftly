@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import logo from "../image/giftly_logo_trans.png";
 import styles from "../styles/searchResults.module.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import config from "../config";
 
-function SearchResults({ onBack }) {
+function SearchResults() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data } = location.state;
   const username = location.state.username;
   const initialSearchQuery = data.query;
@@ -15,6 +16,10 @@ function SearchResults({ onBack }) {
 
   const onSearchChange = (event) => {
     setSearchQuery(event);
+  };
+  
+  const onBack = () => {
+    navigate("/home")
   };
 
   const handleKeyDown = async (event) => {

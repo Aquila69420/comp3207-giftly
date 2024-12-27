@@ -64,20 +64,19 @@ function TextInput() {
       // File Passed Validation - Proceed with Upload
       const formData = new FormData();
       formData.append("image", selectedFile);
-
-      // TODO: Fix functionality bug for file upload and send to backend
+      
+      const username = localStorage.getItem("username");
+      formData.append("username", username);
 
       try {
-        const username = localStorage.getItem("username");
         const response = await fetch(`${config.backendURL}/product_img`, {
           method: "POST",
           body: formData,
         });
-
         const result = await response.json();
-        console.log("Response from backend (image):", result);
+        console.log("Image upload result:", result);
 
-        // Optionally, you can handle additional logic here, like updating the UI
+        navigate("/search", { state: { data: result, username } });
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -101,7 +100,6 @@ function TextInput() {
       });
 
       const result = await response.json();
-      console.log("Response from backend:", result);
       navigate("/search", { state: { data: result, username } });
       setLoading(false);
     } catch (error) {

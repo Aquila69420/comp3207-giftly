@@ -8,6 +8,7 @@ import OldHome from "./pages/OldHome";
 import SearchResults from "./pages/SearchResults";
 import Product from "./pages/Product";
 
+// TODO: Implement load from back button for pages
 function App() {
   return (
     <Router>
