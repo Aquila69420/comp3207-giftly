@@ -54,7 +54,9 @@ def delete_group(username, groupID):
     group_is_admin(group, username)
     
     # Delete group in all containers
-    # TODO: Delete all occasions
+    for occasionID in group['occasions']:
+        # TODO: Delete all divisions
+        occasions_container.delete_item(item=occasionID, partition_key=occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(username, user_to_add, groupID):
