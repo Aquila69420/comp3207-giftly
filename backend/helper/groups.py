@@ -36,7 +36,7 @@ def create_group(username, groupname):
         'id': str(uuid.uuid4()),
         'groupname': groupname,
         'admin': username,
-        'usernames': [],
+        'usernames': [username],
         'occasions': []
     })
 
@@ -76,7 +76,7 @@ def get_groups(username):
 
     # Query database for all groups with user
     groups = list(groups_container.query_items(
-                query="SELECT * FROM c WHERE ARRAY_CONTAINS(c.users, @username)",
+                query="SELECT * FROM c WHERE ARRAY_CONTAINS(c.usernames, @username)",
                 parameters=[{'name': '@username', 'value': username}],
                 enable_cross_partition_query=True
             ))

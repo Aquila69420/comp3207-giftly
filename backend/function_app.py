@@ -453,7 +453,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     username = data['username']
     try:
         gs = groups.get_groups(username)
-        body = json.dumps({"result": "OK", "msg": "OK", "groups": gs})
+        body = json.dumps({"result": True, "msg": "OK", "groups": gs})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
