@@ -19,7 +19,7 @@ def username_exists(username):
 def group_exists(groupID):
     '''Check if groupname exists in the database'''
     groups = list(groups_container.query_items(
-            query="SELECT * FROM c WHERE c.groupID=@groupID",
+            query="SELECT * FROM c WHERE c.id=@groupID",
             parameters=[{'name': '@groupID', 'value': groupID}],
             enable_cross_partition_query=True
         ))
@@ -53,7 +53,7 @@ def delete_group(username, groupID):
     
     # Delete group in all containers
     # TODO: Delete all occasions
-    groups_container.delete_item(groupID)
+    groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(username, user_to_add, groupID):
     # Check both usernames exist
@@ -63,10 +63,24 @@ def add_user(username, user_to_add, groupID):
         raise Exception(f"{user_to_add} does not exist")
 
     # Check Group exists
-    group = group_exists(groupID)
-    if not group:
+    groups = group_exists(groupID)
+    if not groups:
         raise Exception(f"{groupID} does not exist")
-    
+    groupDoc = groups[0]
+
+    # Check user_to_add is not already in group
+    if user_to_add in groupDoc['usernames']:
+        raise Exception(f"{user_to_add} is already in the group")
+
+    # Retrieve Group Document via ID
+    groupID = groupDoc['id']
+
+    # Apply Patch Operation
+    ops = [
+        {"op": "add", "path": "/usernames/-", "value": user_to_add}
+    ]
+    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
 
 
 def get_groups(username):
