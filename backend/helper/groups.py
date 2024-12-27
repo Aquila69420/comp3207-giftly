@@ -103,13 +103,14 @@ def change_groupname(username, groupID, groupname):
     ]
     groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
 
-def create_occasion(username, groupID, occasionname, occasiondate):
+def create_occasion(username, groupID, usernames, occasionname, occasiondate):
     # Check if group exists
     group = group_exists(groupID)
-
-    # Check username is in group
-    if username not in group['usernames']:
-        raise Exception(f"{username} is not in the group")
+    
+    # Check all usernames are in group
+    for user in ([username] + usernames):
+        if user not in group['usernames']:
+            raise Exception(f"{user} is not in the group")
     
     # Add Occasion
     id = str(uuid.uuid4())
@@ -117,7 +118,7 @@ def create_occasion(username, groupID, occasionname, occasiondate):
         'id': id,
         'admin': username,
         'groupID': groupID,
-        'usernames': [username],
+        'usernames': [username] + usernames,
         'occasionname': occasionname,
         'occasiondate': occasiondate
     })

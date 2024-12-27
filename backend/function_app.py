@@ -515,10 +515,11 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
     groupID = data['groupID']
+    usernames = data['usernames']
     occasionname = data['occasionname']
     occasiondate = data['occasiondate']
     try:
-        groups.create_occasion(username, groupID, occasionname, occasiondate)
+        groups.create_occasion(username, groupID, usernames, occasionname, occasiondate)
         body=json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
