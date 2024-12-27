@@ -359,7 +359,7 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
         groups.create_group(username, groupname)
         body = json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
-        body = json.dumps({"result": False, "msg": e})
+        body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
@@ -390,7 +390,7 @@ def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
         groups.delete_group(username, groupID)
         body = json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
-        body = json.dumps({"result": False, "msg": e})
+        body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
@@ -414,9 +414,9 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
         data: {result: True, msg: "OK"}
         data: {result: False, msg: "{groupID} does not exist"}
         data: {result: False, msg: "{username} does not exist"}
-        data: {result: False, msg: "{user_to_add} does not exist}
-        data: {result: False, msg: "{username} is not the admin of the group
-        data: {result: False, msg: "{user_to_add is already in the group'''
+        data: {result: False, msg: "{user_to_add} does not exist"}
+        data: {result: False, msg: "{username} is not the admin of the group"}
+        data: {result: False, msg: "{user_to_add} is already in the group"}'''
     data = req.get_json()
     username = data['username']
     user_to_add = data['user_to_add']
@@ -425,7 +425,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
         groups.add_user(username, user_to_add, groupID)
         body=json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
-        body=json.dumps({"result": False, "msg": e})
+        body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
