@@ -406,17 +406,33 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, user_to_add: username1, groupname: groupname}
+        data: {username: username, user_to_add: username1, groupID: groupID}
         
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
-        data: {result: False, msg: "{groupname} does not exist"}
+        data: {result: False, msg: "{groupID} does not exist"}
         data: {result: False, msg: "{username} does not exist"}
-        data: {result: False, msg: "{user_to_add} does not exist}'''
+        data: {result: False, msg: "{user_to_add} does not exist}
+        data: {result: False, msg: "{username} is not the admin of the group
+        data: {result: False, msg: "{user_to_add is already in the group'''
     data = req.get_json()
-    #TODO: code
+    username = data['username']
+    user_to_add = data['user_to_add']
+    groupID = data['groupID']
+    try:
+        groups.add_user(username, user_to_add, groupID)
+        body=json.dumps({"result": True, "msg": "OK"})
+    except Exception as e:
+        body=json.dumps({"result": False, "msg": e})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+    
 
 @app.function_name(name="groups_get")
 @app.route(route='groups/get', methods=[func.HttpMethod.POST])
@@ -437,7 +453,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     username = data['username']
     try:
         gs = groups.get_groups(username)
-        body = json.dumps({"result": "OK", "msg": "OK", "groups": gs})
+        body = json.dumps({"result": True, "msg": "OK", "groups": gs})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
