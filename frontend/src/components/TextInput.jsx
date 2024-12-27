@@ -96,25 +96,7 @@ function TextInput() {
       const result = await response.json();
       console.log("Response from backend (text):", result);
     } catch (error) {
-      console.error("Error sending input data:", error);
-    }
-  };
-
-  const handleCombinedSubmit = () => {
-    if (prompt.trim()) {
-      handleSubmit();
-    }
-    if (fileInputRef.current?.files[0]) {
-      const event = { target: { files: [fileInputRef.current.files[0]] } };
-      handleFileChange(event);
-    }
-  };
-
-  const handleEnter = (e) => {
-    if (e.key === "Enter" && prompt.trim()) {
-      handleCombinedSubmit();
-      setInputValue("");
-      e.preventDefault();
+      console.error('Error sending input data:', error);
     }
   };
 
