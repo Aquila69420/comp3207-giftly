@@ -12,7 +12,8 @@ function ProductCard({ image, title, price, url }) {
   /* Define the onclick here, which creates and retrevies cosmos db uuid for that product and then
   navigates to it when click on*/
   const registerProductOrGetId = async () => {
-    setLoading(true);
+    try{
+      setLoading(true);
     const response = await fetch(`${config.backendURL}/register_product_or_get_id`, {
       method: "POST",
       headers: {
@@ -22,7 +23,13 @@ function ProductCard({ image, title, price, url }) {
     });
     const data = await response.json();
     navigate(`/product?id=${data.id}`, {state: {id: data.id, url, title, image, price}});
-    setLoading(false);
+    }
+    catch (error) {
+      console.error("Error sending query to backend: ", error);
+    }
+    finally {
+      setLoading(false);
+    }
   };
 
   return (

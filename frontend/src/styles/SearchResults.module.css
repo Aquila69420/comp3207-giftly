@@ -78,3 +78,9 @@
   font-weight: bold;
 }
 
+.searchButton {
+  color: white;
+  border: none;
+  font-size: 2rem;
+  padding: 10px;
+}

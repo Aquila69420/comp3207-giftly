@@ -4,6 +4,7 @@ import styles from "../styles/searchResults.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import config from "../config";
+import { FaSearch } from "react-icons/fa";
 
 function SearchResults() {
   const location = useLocation();
@@ -22,25 +23,30 @@ function SearchResults() {
     navigate("/home")
   };
 
-  const handleKeyDown = async (event) => {
-    // TODO: Could consider UI search icon click event as well
-    if (event.key === "Enter") {
+  const sendQuery = async () => {
+    try{
       // Send updated query to backend
+      console.log("Sending query to backend: ", searchQuery);
       const prompt = searchQuery;
-      try {
-        const response = await fetch(`${config.backendURL}/product_text`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, prompt }),
-        });
-        const result = await response.json();
-        setSearchQuery(searchQuery);
-        productsInfo = result.response;
-      } catch (error) {
-        console.error("Error sending input data:", error);
-      }
+      const response = await fetch(`${config.backendURL}/product_text`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, prompt }),
+      });
+      const result = await response.json();
+      setSearchQuery(searchQuery);
+      productsInfo = result.response;
+    }
+    catch (error){
+      console.error("Error sending query to backend: ", error); 
+    }
+  };
+
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      sendQuery();
     }
   };
 
@@ -61,6 +67,9 @@ function SearchResults() {
             className={styles.searchText}
             placeholder="Search..."
           />
+          <div className={styles.searchButton} onClick={sendQuery}>
+            <FaSearch />
+          </div>
         </div>
       </div>
 
