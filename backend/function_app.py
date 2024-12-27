@@ -11,6 +11,8 @@ from helper import cart
 from helper import sendEmail
 from helper import products
 import random
+import io
+from PIL import Image
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -344,10 +346,13 @@ def get_product_by_id(req: func.HttpRequest) -> func.HttpResponse:
 def allowed_file(file):
         filename = file.filename
         format = '.' in filename and filename.rsplit('.', 1)[-1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico', 'tiff', 'mpo'}
-        return format
-        # TODO: implement file size restrictions
-        # size = False #image must be less than 20 megabytes (MB)
-        # dimensions = False #must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels
+        image = Image.open(file)
+        imgByteIO = io.BytesIO()
+        image.save(imgByteIO, format=image.format)
+        imgByteArr = imgByteIO.getvalue()
+        width, height = image.size #must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels
+        size_in_mb = len(imgByteArr) / (10**6) #image must be less than 20 megabytes (MB)
+        return format and size_in_mb < 20 and width > 50 and height > 50 and width < 16000 and height < 16000
 
 @app.function_name(name="product_img")
 @app.route(route='product_img', methods=[func.HttpMethod.POST])
@@ -375,15 +380,14 @@ def product_img(req: func.HttpRequest) -> func.HttpResponse:
             )
             return add_cors_headers(response)
         if file and allowed_file(file):
-            # TODO: Figure out how to read file as current output is just b''
-            image_binary = file.read()
-            print("File size:", len(image_binary))
-            output = image_analyzer.image_analysis(image_binary)
-            print("Output from image analysis:", output)
+            image = Image.open(file)
+            imgByteIO = io.BytesIO()
+            image.save(imgByteIO, format=image.format)
+            imgByteArr = imgByteIO.getvalue()
+            output = image_analyzer.image_analysis(imgByteArr)
             brands = output[0]
             objects = output[1]
             suggestion = "rec:" + ','.join(objects)
-            print("Suggestion:", suggestion)
             gpt_req.update_suggestion(suggestion_container, username, suggestion)
             fetched_products = products.get_products(output)
             response = func.HttpResponse(
