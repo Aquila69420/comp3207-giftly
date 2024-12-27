@@ -9,7 +9,6 @@ import config from "../config";
 // Icons available at https://react-icons.github.io/react-icons/
 // Infinity loop: https://codepen.io/suez/pen/myvgdg
 // Gift is from logo but cropped
-// http://localhost:3000/product?id=b7a68cb3-5d2b-41b0-8497-ae7d5efd0adb
 export default function Product() {
   const navigate = useNavigate();
   const location = useLocation();

@@ -27,7 +27,7 @@ function Login() {
         localStorage.setItem("username", values.username);
         setLoginError("");
         console.log("Login successful!");
-        nagivate("/")
+        nagivate("/home");
       } else {
         setLoginError(result.response);
       }

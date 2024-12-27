@@ -34,7 +34,9 @@ function ProductCard({ image, title, price, url }) {
       ) : (
         <div className={styles.card}>
           <img src={image} alt={title} className={styles.image} />
-          <div className={styles.title}>{title}</div>
+          <div className={styles.title}>
+            {title.length > 25 ? `${title.substring(0, 25)}...` : title}
+          </div>
           <div className={styles.price}>{price}</div>
         </div>
       )}

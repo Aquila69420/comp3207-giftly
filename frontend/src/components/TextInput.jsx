@@ -92,7 +92,7 @@ function TextInput() {
     const username = localStorage.getItem("username");
     try {
       setLoading(true);
-      const response = await fetch(`${config.backendURL}product_text`, {
+      const response = await fetch(`${config.backendURL}/product_text`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

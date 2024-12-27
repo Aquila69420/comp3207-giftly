@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: #ffffff;
+  background-color: #5F9389;
   border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
@@ -35,6 +35,8 @@
 }
 
 .searchText {
+  color: white;
+  background-color: #08caa6;
   display: block; /* Ensures the input behaves as a block element */
   padding: 8px;
   font-size: 16px;
@@ -47,31 +49,8 @@
   width: 100%; /* Allows dynamic resizing */
 }
 
-.filters {
-  display: flex;
-  gap: 15px;
-  padding: 10px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ddd;
-  position: sticky;
-  top: 50px;
-  z-index: 10;
-}
-
-.filterSelect {
-  padding: 5px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.mainContent {
-  display: flex;
-  flex-grow: 1;
-  overflow: hidden;
-}
-
 .productGrid {
+  background-color: #5F9389;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
