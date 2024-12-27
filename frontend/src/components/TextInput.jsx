@@ -3,11 +3,14 @@ import styles from "../styles/textInput.module.css"; // Import the CSS module
 import { CgAttachment } from "react-icons/cg";
 import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import HashLoader from "react-spinners/HashLoader"
 
 function TextInput() {
   const [prompt, setInputValue] = useState("");
+  const navigate = useNavigate();
   const fileInputRef = useRef(null);
-
+  const [loading, setLoading] = useState(false);
   const handleFileSelect = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -85,6 +88,7 @@ function TextInput() {
   const handleSubmit = async () => {
     const username = localStorage.getItem("username");
     try {
+      setLoading(true);
       const response = await fetch("http://localhost:5000/product_text", {
         method: "POST",
         headers: {
@@ -94,14 +98,41 @@ function TextInput() {
       });
 
       const result = await response.json();
-      console.log("Response from backend (text):", result);
+      console.log("Response from backend:", result);
+      navigate("/search", { state: { data: result, username } });
+      setLoading(false);
     } catch (error) {
-      console.error('Error sending input data:', error);
+      console.error("Error sending input data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCombinedSubmit = () => {
+    if (prompt.trim()) {
+      handleSubmit();
+    }
+    if (fileInputRef.current?.files[0]) {
+      const event = { target: { files: [fileInputRef.current.files[0]] } };
+      handleFileChange(event);
+    }
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === "Enter" && prompt.trim()) {
+      handleCombinedSubmit();
+      setInputValue("");
+      e.preventDefault();
     }
   };
 
   return (
     <div className={styles.TextInputContainer}>
+      {loading && (
+        <div className="overlay">
+          <HashLoader color="#08caa5" loading={loading} size={150} />
+        </div>
+      )}
       <div className={styles.inputContainer}>
         <textarea
           placeholder="I am looking for ..."
@@ -125,7 +156,11 @@ function TextInput() {
             className={`${styles.iconWrapper} ${styles.iconRight}`}
             onClick={handleCombinedSubmit}
           >
-            {prompt.trim() ? <FaArrowUp size={20} /> : <BsSoundwave size={25} />}
+            {prompt.trim() ? (
+              <FaArrowUp size={20} />
+            ) : (
+              <BsSoundwave size={25} />
+            )}
           </div>
         </div>
       </div>
