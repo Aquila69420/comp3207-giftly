@@ -7,7 +7,7 @@ import { useState } from "react";
 
 function ProductCard({ image, title, price, url }) {
   const navigate = useNavigate();
-  const productInfo = {url, title, image, price}
+  // const productInfo = {url, title, image, price}
   const [loading, setLoading] = useState(false);
   /* Define the onclick here, which creates and retrevies cosmos db uuid for that product and then
   navigates to it when click on*/
@@ -18,11 +18,10 @@ function ProductCard({ image, title, price, url }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(productInfo),
+      body: JSON.stringify({url, title, image, price}),
     });
     const data = await response.json();
-    console.log("Sending productInfo:", productInfo);
-    navigate(`/product?id=${data.id}`, {state: productInfo});
+    navigate(`/product?id=${data.id}`, {state: {id: data.id, url, title, image, price}});
     setLoading(false);
   };
 

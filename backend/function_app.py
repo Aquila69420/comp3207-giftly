@@ -280,8 +280,6 @@ def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
         query = "SELECT * from products WHERE products.url = '{}'".format(product_info['url'])
         products = list(product_container.query_items(query=query, enable_cross_partition_query=True)) 
         if not products: # First check if product with current url is already in the database
-            logging.info("Product not found in database")
-            print("Product not found in database")
             
             # Add to cosmosdb products container with id auto gen by cosmos
             product_container.create_item(body=product_info, enable_automatic_id_generation=True)
@@ -296,12 +294,44 @@ def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
                 status_code=200
             )
         else:
-            logging.info("Product already exists in database")
-            print("Product already exists in database")
             response = func.HttpResponse(
                 body=json.dumps({'response': 'Product already exists', 'id': products[0]['id']}),
                 mimetype='application/json',
                 status_code=400
+            )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({'error': str(e)}),
+            mimetype='application/json',
+            status_code=500
+        )
+    return add_cors_headers(response)
+
+@app.function_name(name='get_product_by_id')
+@app.route(route='get_product_by_id', methods=[func.HttpMethod.GET])
+def get_product_by_id(req: func.HttpRequest) -> func.HttpResponse:
+    id = req.params.get('id')
+    try:
+        query = "SELECT * from products WHERE products.id = '{}'".format(id)
+        products = list(product_container.query_items(query=query, enable_cross_partition_query=True))
+        if products:
+            product_info = {
+                'url': products[0]['url'],
+                'title': products[0]['title'],
+                'image': products[0]['image'],
+                'price': products[0]['price']
+            }
+            print("Sending product info:", product_info)
+            response = func.HttpResponse(
+                body=json.dumps({'response': product_info}),
+                mimetype='application/json',
+                status_code=200
+            )
+        else:
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product not found'}),
+                mimetype='application/json',
+                status_code=404
             )
     except Exception as e:
         response = func.HttpResponse(

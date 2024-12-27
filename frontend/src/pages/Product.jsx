@@ -1,8 +1,9 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import styles from "../styles/product.module.css";
 import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
+import config from "../config";
 
 // TODO: Add loading animation with infinity loop over gift
 // Icons available at https://react-icons.github.io/react-icons/
@@ -10,12 +11,52 @@ import { IoCartOutline, IoCart } from "react-icons/io5";
 // Gift is from logo but cropped
 // http://localhost:3000/product?id=b7a68cb3-5d2b-41b0-8497-ae7d5efd0adb
 export default function Product() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const data = location.state;
-  const url = data.url;
-  const title = data.title;
-  const image = data.image;
-  const price = data.price;
+  const [searchParams] = useSearchParams();
+  const data = location.state || {};
+  const [id, setId] = useState(data.id || searchParams.get("id"));
+  const [url, setUrl] = useState(data.url || "");
+  const [title, setTitle] = useState(data.title || "");
+  const [image, setImage] = useState(data.image || "");
+  const [price, setPrice] = useState(data.price || "");
+  const getProductInfoById = async () => {
+    // Fetch product info by id
+    const productId = searchParams.get("id");
+    setId(productId);
+    const response = await fetch(`${config.backendURL}/get_product_by_id?id=${productId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const productInfo = await response.json();
+    if (productInfo.response !== 'Product not found') {
+      // Set product info
+      const productDetails = productInfo.response;
+      setUrl(productDetails.url);
+      setTitle(productDetails.title);
+      setImage(productDetails.image);
+      setPrice(productDetails.price);
+      console.log('Product Info:', productDetails);
+      console.log('ID is', id);
+      console.log('URL is', productDetails.url);
+      console.log('Title is', productDetails.title);
+      console.log('Image is', productDetails.image);
+      console.log('Price is', productDetails.price);
+    }
+    else {
+      // Redirect to 404 page
+      // TODO: Create 404 page
+      navigate("/404");
+    }
+  };
+  useEffect(() => {
+    if (!data.id) {
+      // Get product info by id from backend
+      getProductInfoById();
+    }
+  }, [data.id]);
 
   const [favorite, setFavorite] = useState(false);
   const [cart, setCart] = useState(false);
