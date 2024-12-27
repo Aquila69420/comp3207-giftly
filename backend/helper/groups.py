@@ -55,6 +55,20 @@ def delete_group(username, groupID):
     # TODO: Delete all occasions
     groups_container.delete_item(groupID)
 
+def add_user(username, user_to_add, groupID):
+    # Check both usernames exist
+    if not username_exists(username):
+        raise Exception(f"{username} does not exist")
+    if not username_exists(user_to_add):
+        raise Exception(f"{user_to_add} does not exist")
+
+    # Check Group exists
+    group = group_exists(groupID)
+    if not group:
+        raise Exception(f"{groupID} does not exist")
+    
+
+
 def get_groups(username):
     # Check if username exists
     if not username_exists(username):
