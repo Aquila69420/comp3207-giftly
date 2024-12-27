@@ -53,4 +53,17 @@ def delete_group(username, groupID):
     
     # Delete group in all containers
     # TODO: Delete all occasions
-    
+    groups_container.delete_item(groupID)
+
+def get_groups(username):
+    # Check if username exists
+    if not username_exists(username):
+        raise Exception(f"{username} does not exist")
+
+    # Query database for all groups with user
+    groups = list(groups_container.query_items(
+                query="SELECT * FROM c WHERE @username IN c.users",
+                parameters=[{'name': '@username', 'value': username}],
+                enable_cross_partition_query=True
+            ))
+    return groups

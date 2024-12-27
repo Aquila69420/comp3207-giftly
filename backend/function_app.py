@@ -433,7 +433,19 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     with
         data: {result: True, msg: "OK", groups: []}
         data: {result: False, msg: "{username} does not exist"}'''
-
+    data = req.get_json()
+    username = data['username']
+    try:
+        gs = groups.get_groups(username)
+        body = json.dumps({"result": "OK", "msg": "OK", "groups": gs})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": e})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="groups_secret_santa")
 @app.route(route='groups_secret_santa')
