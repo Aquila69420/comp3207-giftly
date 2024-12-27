@@ -1,11 +1,29 @@
 .registerContainer {
+  height: 100dvh;
+  display: flex;
+  justify-content: center;
+  width: 100dvw;
+  align-items: center;
+  flex-direction: column;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.box {
   padding: 20px;
-  background-color: #f9f9f9;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #f2f5f5;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 20px;
+  border-radius: 10px;
+  height: fit-content;
 }
 
 .input {
@@ -14,6 +32,9 @@
   border-radius: 5px;
   border: 1px solid #ccc;
   width: 96%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
 }
 
 .select {
@@ -28,6 +49,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .buttonPrimary {
@@ -38,7 +60,8 @@
   background-color: #2196f3;
   color: white;
   border: none;
-  width: 20%;
+  width: fit-content;
+  text-align: center;
 }
 
 .buttonSecondary {
@@ -55,4 +78,9 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.error {
+  color: var(--vesuvius);
+  font-size: 12px;
 }

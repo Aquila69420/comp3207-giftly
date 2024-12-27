@@ -1,0 +1,99 @@
+
+
+.inputField:focus {
+    outline: none;
+}
+
+.TextInputContainer{
+    width: 100%;
+    max-width: 900px;
+}
+
+.submitButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+    background-color: #45a049;
+}
+
+
+.inputField {
+    padding: 15px 15px 0 20px;
+    font-size: medium;
+    color: #5d5d5d;
+    font-size: 1.5rem;
+    border-radius: 5px;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    width: 100%; /* Adjust width to match parent container */
+    height: auto; /* Automatically adjust height based on content */
+    resize: none; /* Prevent resizing of the textarea */
+    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica, Apple Color Emoji, Arial, sans-serif, Segoe UI Emoji, Segoe UI Symbol;
+    background-color: #e3e3e3;
+    border-radius: 0.8rem;
+    box-sizing: border-box;
+}
+
+.inputField:focus {
+    outline: none;
+}
+
+.TextInputContainer {
+    width: 100%;
+    max-width: 900px;
+}
+
+.inputContainer {
+    background-color: #e3e3e3;
+    border-radius: 0.8rem;
+    width: 100%;
+}
+
+.iconContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.1rem 0.5rem 0.3rem 0.5rem;
+}
+
+.iconWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 3px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: #e3e3e3;;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.iconWrapper:hover {
+    background-color: #d0d0d0;
+}
+
+.iconRight {
+    color: white;
+    background-color: black;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iconRight:hover {
+    background-color: #333; /* Slightly lighter black for hover effect */
+    color: #fff; /* Ensures icon color stays white */
+}
