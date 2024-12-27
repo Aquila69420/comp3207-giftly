@@ -1,0 +1,98 @@
+.container {
+  display: flex;
+  height: 100vh;
+  background-color: #f9f9f9;
+}
+
+.sidebar {
+  width: 25%;
+  background-color: #f0f0f0;
+  padding: 20px;
+  border-right: 1px solid #ccc;
+}
+
+.sidebarTitle {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.groupList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.groupItem {
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  transition: background-color 0.3s;
+}
+
+.groupItem:hover {
+  background-color: #e0e0e0;
+}
+
+.subgroupItem {
+  cursor: pointer;
+  padding: 8px;
+  margin-left: 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.subgroupItem:hover {
+  background-color: #d0d0d0;
+}
+
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.chatHeader {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.chatArea {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.chatInput {
+  display: flex;
+  margin-top: 10px;
+}
+
+.chatInputField {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+  outline: none;
+}
+
+.chatInputButton {
+  padding: 10px 15px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 0 5px 5px 0;
+  transition: background-color 0.3s;
+}
+
+.chatInputButton:hover {
+  background-color: #0056b3;
+}
