@@ -43,7 +43,7 @@ function Login() {
 
   return (
     <div className={styles.container}>
-      <img src={logo} alt="logo" width={300} />
+      <img src={logo} alt="logo" width={300} className={styles.logo}/>
       <div className={styles.box}>
       <MdAccountCircle size={60}/>
         <Formik
