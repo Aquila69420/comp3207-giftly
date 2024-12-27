@@ -463,6 +463,39 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_change_groupname")
+@app.route(route='groups/change_groupname', methods=[func.HttpMethod.POST])
+def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
+    '''Admin can change the name of a group
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupID: groupID, groupname: new_groupname}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupID} does not exist"}
+        data: {result: False, msg: "User is not admin of the group"}'''
+    data = req.get_json()
+    username = data['username']
+    groupID = data['groupID']
+    groupname = data['groupname']
+    try:
+        groups.change_groupname(username, groupID, groupname)
+        body = json.dumps({"result": True, "msg": "OK"})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+
 @app.function_name(name="groups_secret_santa")
 @app.route(route='groups_secret_santa')
 def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:

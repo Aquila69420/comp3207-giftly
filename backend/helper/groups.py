@@ -14,6 +14,8 @@ def username_exists(username):
             parameters=[{'name': '@username', 'value': username}],
             enable_cross_partition_query=True
         ))
+    if not user:
+        raise Exception(f"{username} does not exist")
     return user
 
 def group_exists(groupID):
@@ -23,13 +25,17 @@ def group_exists(groupID):
             parameters=[{'name': '@groupID', 'value': groupID}],
             enable_cross_partition_query=True
         ))
-    return groups
+    if not groups:
+        raise Exception(f"{groupID} does not exist")
+    return groups[0]
 
+def group_is_admin(groupDoc, username):
+    if groupDoc['admin'] != username:
+        raise Exception(f"{username} is not the admin of the group")
 
 def create_group(username, groupname):
     # Check if username exists
-    if not username_exists(username):
-        raise Exception(f"User {username} does not exist")
+    username_exists(username)
 
     # Add Group
     groups_container.create_item(body={
@@ -43,13 +49,9 @@ def create_group(username, groupname):
 def delete_group(username, groupID):
     # Check if group exists
     group = group_exists(groupID)
-    if not group:
-        raise Exception(f"{groupID} does not exist")
 
     # Check if username is admin of group
-    g = group[0]
-    if g['admin'] != username:
-        raise Exception(f"{username} is not the admin of the group")
+    group_is_admin(group, username)
     
     # Delete group in all containers
     # TODO: Delete all occasions
@@ -57,23 +59,18 @@ def delete_group(username, groupID):
 
 def add_user(username, user_to_add, groupID):
     # Check both usernames exist
-    if not username_exists(username):
-        raise Exception(f"{username} does not exist")
-    if not username_exists(user_to_add):
-        raise Exception(f"{user_to_add} does not exist")
+    username_exists(username)
+    username_exists(user_to_add)
 
     # Check Group exists
-    groups = group_exists(groupID)
-    if not groups:
-        raise Exception(f"{groupID} does not exist")
-    groupDoc = groups[0]
+    group = group_exists(groupID)
 
     # Check user_to_add is not already in group
-    if user_to_add in groupDoc['usernames']:
+    if user_to_add in group['usernames']:
         raise Exception(f"{user_to_add} is already in the group")
 
     # Retrieve Group Document via ID
-    groupID = groupDoc['id']
+    groupID = group['id']
 
     # Apply Patch Operation
     ops = [
@@ -81,12 +78,9 @@ def add_user(username, user_to_add, groupID):
     ]
     groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
 
-
-
 def get_groups(username):
     # Check if username exists
-    if not username_exists(username):
-        raise Exception(f"{username} does not exist")
+    username_exists(username)
 
     # Query database for all groups with user
     groups = list(groups_container.query_items(
@@ -95,3 +89,16 @@ def get_groups(username):
                 enable_cross_partition_query=True
             ))
     return groups
+
+def change_groupname(username, groupID, groupname):
+    # Check if group exists
+    group = group_exists(groupID)
+
+    # Check admin
+    group_is_admin(group, username)
+
+    # Apply Patch Operation
+    ops = [
+        {"op": "set", "path": "/groupname", "value": groupname}
+    ]
+    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
