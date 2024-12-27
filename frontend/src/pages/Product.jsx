@@ -46,7 +46,6 @@ export default function Product() {
     }
     else {
       // Redirect to 404 page
-      // TODO: Create 404 page
       navigate("/404");
     }
   };

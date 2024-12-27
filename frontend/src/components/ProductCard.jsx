@@ -7,7 +7,6 @@ import { useState } from "react";
 
 function ProductCard({ image, title, price, url }) {
   const navigate = useNavigate();
-  // const productInfo = {url, title, image, price}
   const [loading, setLoading] = useState(false);
   /* Define the onclick here, which creates and retrevies cosmos db uuid for that product and then
   navigates to it when click on*/
