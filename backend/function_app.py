@@ -495,6 +495,39 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_occasions_create")
+@app.route(route='groups/occasions/create', methods=[func.HttpMethod.POST])
+def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
+    '''A user of a group can create an occasion
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, groupID: groupID, occasionname: occasionname, 
+               occasiondate: occasiondate}
+               
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupID} does not exist}
+        data: {result: False, msg: "{username} is not in the group"}'''
+    data = req.get_json()
+    username = data['username']
+    groupID = data['groupID']
+    occasionname = data['occasionname']
+    occasiondate = data['occasiondate']
+    try:
+        groups.create_occasion(username, groupID, occasionname, occasiondate)
+        body=json.dumps({"result": True, "msg": "OK"})
+    except Exception as e:
+        body=json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="groups_secret_santa")
 @app.route(route='groups_secret_santa')

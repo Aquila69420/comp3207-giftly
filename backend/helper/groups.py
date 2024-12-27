@@ -4,8 +4,8 @@ client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionS
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
 groups_container = database.get_container_client(os.getenv("GroupsContainer"))
-groups_occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
-groups_divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
+occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
+divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
 
 def username_exists(username):
     '''Check if username exists in the database'''
@@ -100,5 +100,30 @@ def change_groupname(username, groupID, groupname):
     # Apply Patch Operation
     ops = [
         {"op": "set", "path": "/groupname", "value": groupname}
+    ]
+    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+def create_occasion(username, groupID, occasionname, occasiondate):
+    # Check if group exists
+    group = group_exists(groupID)
+
+    # Check username is in group
+    if username not in group['usernames']:
+        raise Exception(f"{username} is not in the group")
+    
+    # Add Occasion
+    id = str(uuid.uuid4())
+    occasions_container.create_item(body={
+        'id': id,
+        'admin': username,
+        'groupID': groupID,
+        'usernames': [username],
+        'occasionname': occasionname,
+        'occasiondate': occasiondate
+    })
+
+    # Add To Group via Patch Operation
+    ops = [
+        {"op": "add", "path": "/occasions/-", "value": id}
     ]
     groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
