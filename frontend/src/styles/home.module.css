@@ -13,11 +13,23 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow-y: hidden;
 }
 
 .main {
   display: flex;
   flex: 1;
+}
+
+.header {
+  font-size: 2rem; /* Adjust size */
+  font-weight: bold;
+  color: #333; /* Darker color for readability */
+  margin-bottom: 20px; /* Add spacing between the header and TextInput */
+  text-align: center; /* Center the text */
+  margin-bottom: 4rem;
+  width: 70%;
+  max-width: 900px;
 }
 
 .content {
