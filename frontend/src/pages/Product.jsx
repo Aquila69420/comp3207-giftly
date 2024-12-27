@@ -54,7 +54,7 @@ export default function Product() {
       // Get product info by id from backend
       getProductInfoById();
     }
-  }, [data.id]);
+  }, [data.id, getProductInfoById]);
 
   const [favorite, setFavorite] = useState(false);
   const [cart, setCart] = useState(false);
