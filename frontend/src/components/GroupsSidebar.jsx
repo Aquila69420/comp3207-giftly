@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { FaPlus } from 'react-icons/fa'; // Icon for the plus button
 import styles from '../styles/groups.module.css';
 
-const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick, onCreateGroup }) => {
+const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick, activeGroup, onCreateGroup }) => {
   const [showModal, setShowModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState('');
 
@@ -31,7 +31,10 @@ const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick, onCreateGroup })
       {/* Group List */}
       <ul className={styles.groupList}>
         {groups.map((group, index) => (
-          <li key={index} className={styles.groupItem}>
+          <li
+            key={index}
+            className={`${styles.groupItem} ${activeGroup?.groupname === group.groupname ? styles.activeGroup : ''}`}
+          >
             <div onClick={() => onGroupClick(group)} className={styles.groupName}>
               {group.groupname}
             </div>

@@ -5,14 +5,37 @@ import styles from '../styles/groups.module.css';
 
 const GroupsSettings = () => {
   const [username, setUsername] = useState('');
+  const [error, setError] = useState(null);
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
-  const { groupName } = location.state || { groupName: 'Unknown Group' };
+  const { groupName, groupID } = location.state || { groupName: 'Unknown Group', groupID: '' };
 
-  const handleInvite = () => {
+  const handleInvite = async () => {
     if (username.trim()) {
-    //   onInvite(email);
-      setUsername(''); // Clear the email field after inviting
+      try {
+
+        console.log('username:', username, 'groupID:', groupID);
+
+        const response = await fetch('http://localhost:5000/groups/add_user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: localStorage.getItem('username'),
+            user_to_add: username,
+            groupID: groupID,
+          }),
+        });
+        console.log(response);
+        const data = await response.json();
+        if (data.result) {
+          setUsername(''); // Clear the username field after inviting
+          setError(null);
+        } else {
+          setError(data.msg);
+        }
+      } catch (error) {
+        setError('Error inviting user: ' + error.message);
+      }
     }
   };
 
@@ -47,6 +70,7 @@ const GroupsSettings = () => {
           >
             Add Member
           </button>
+          {error && <p className={styles.error}>{error}</p>}
         </div>
       </div>
     </div>

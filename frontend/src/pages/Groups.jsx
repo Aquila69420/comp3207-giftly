@@ -28,6 +28,9 @@ const Groups = () => {
         const data = await response.json();
         if (data.result) {
           setGroups(data.groups);
+          if (data.groups.length > 0) {
+            setActiveGroup(data.groups[0]); // Set the first group as the active group
+          }
         } else {
           setError(data.msg);
         }
@@ -65,7 +68,7 @@ const Groups = () => {
       {/* Top Bar */}
       <GroupsTopBar
         onBack={() => console.log('Back')}
-        onSettings={() => navigate('/groups/settings', { state: { groupName: activeGroup?.groupname } })}
+        onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname } })}
         occasion={occasion}
       />
 
@@ -76,6 +79,7 @@ const Groups = () => {
           onGroupClick={setActiveGroup}
           onSubgroupClick={setActiveSubgroup}
           onCreateGroup={handleCreateGroup}
+          activeGroup={activeGroup}
         />
         <GroupsChat group={activeGroup} subgroup={activeSubgroup} />
       </div>

@@ -519,5 +519,10 @@
   .groupsSettingsButton:hover {
     background-color: #0056b3;
   }
+
+  .activeGroup {
+    background-color: #e0e0e0; /* Highlight color */
+    font-weight: bold;
+  }
   
   
