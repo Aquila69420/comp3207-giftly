@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HashLoader from 'react-spinners/HashLoader';
-import '../styles/HashLoader.component.css';
+import styles from '../styles/hashLoader.module.css';
 
 function TextInput({username}) {
   const [prompt, setInputValue] = useState('');
@@ -36,7 +36,7 @@ function TextInput({username}) {
   return (
     <div>
       {loading ? (
-        <div className="overlay">
+      <div className={styles.overlay}>
         <HashLoader color="#08caa5" loading={loading} size={150} />
       </div>
       ) : (

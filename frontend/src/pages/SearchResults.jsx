@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../image/giftly_logo_trans.png";
-import styles from "../styles/SearchResults.module.css";
+import styles from "../styles/searchResults.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 
@@ -55,30 +55,34 @@ function SearchResults({ onBack }) {
         <img src={logo} alt="logo" width={50} />
         <div className={styles.searchBar}>
           <input
-          type="text"
-          value={searchQuery}
-          onChange={(event) => onSearchChange(event.target.value)} // Display the search in real time as the user changes the value
-          onKeyDown={handleKeyDown} // On enter key pressed, send the new value to the backend
-          className={styles.searchText}
-          placeholder="Search..."
+            type="text"
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)} // Display the search in real time as the user changes the value
+            onKeyDown={handleKeyDown} // On enter key pressed, send the new value to the backend
+            className={styles.searchText}
+            placeholder="Search..."
           />
         </div>
       </div>
       
       {/* Product grid */}
       {/* TODO: Fix bug that doesn't register card styling/CSS at the moment */}
+      {/* TODO: Add target back in */}
       <div className={styles.productGrid}>
         {Object.keys(productsInfo).map((source) =>
-        source !== 'target' &&productsInfo[source].map((product) => (
-        <ProductCard
-        key={product.product_url}
-        image={product.image_url}
-        title={product.name}
-        price={`${product.currency} ${product.price}`}
-        onClick={() => handleCardClick(product.product_url)}
-        />
-        ))
-      )}
+          source !== 'target' && productsInfo[source].map((product) => (
+            <ProductCard
+              key={product.product_url}
+              image={product.image_url}
+              title={product.name}
+              price={`${product.currency} ${product.price}`}
+              onClick={(event) => {
+                event.stopPropagation(); // Stop event bubbling
+                handleCardClick(product.product_url);
+              }}
+            />
+          ))
+        )}
       </div>
     </div>
   );
