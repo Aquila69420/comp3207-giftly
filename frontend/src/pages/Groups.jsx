@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import GroupsSidebar from '../components/GroupsSidebar';
-import Chat from '../components/GroupsChat';
+import GroupsChat from '../components/GroupsChat';
+import GroupsTopBar from '../components/GroupsTopbar';
 import styles from '../styles/groups.module.css';
 
 const Groups = () => {
@@ -8,7 +9,7 @@ const Groups = () => {
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeSubgroup, setActiveSubgroup] = useState(null);
   const [username] = useState('atharva'); // Replace with actual logged-in username
-  const [newGroupName, setNewGroupName] = useState('');
+  const [occasion, setOccasion] = useState("X's Birthday"); // Replace with actual occasion
   const [error, setError] = useState(null);
 
   // Fetch groups from backend
@@ -22,14 +23,10 @@ const Groups = () => {
         });
 
         const data = await response.json();
-        console.log('Fetched groups:', data); // Debugging log
-        
-        if (data.result === "OK") {
-            setGroups(data.groups);
-            console.log('Groups state updated:', data.groups); // Debugging log
+        if (data.result) {
+          setGroups(data.groups);
         } else {
-            setError(data.msg);
-            console.error(data.msg);
+          setError(data.msg);
         }
       } catch (error) {
         console.error('Error fetching groups:', error);
@@ -40,7 +37,7 @@ const Groups = () => {
   }, [username]);
 
   // Handle group creation
-  const handleCreateGroup = async () => {
+  const handleCreateGroup = async (newGroupName) => {
     if (!newGroupName) return;
 
     try {
@@ -52,7 +49,6 @@ const Groups = () => {
       const data = await response.json();
       if (data.result) {
         setGroups([...groups, { groupname: newGroupName, subgroups: [] }]);
-        setNewGroupName(''); // Reset input
       } else {
         console.error(data.msg);
       }
@@ -61,32 +57,25 @@ const Groups = () => {
     }
   };
 
-  const handleGroupClick = (group) => {
-    setActiveGroup(group);
-    setActiveSubgroup(null);
-  };
-
-  const handleSubgroupClick = (subgroup) => {
-    setActiveSubgroup(subgroup);
-  };
-
   return (
-    <div className={styles.container}>
-      <GroupsSidebar
-        groups={groups}
-        onGroupClick={handleGroupClick}
-        onSubgroupClick={handleSubgroupClick}
+    <div className={styles.groupsContainer}>
+      {/* Top Bar */}
+      <GroupsTopBar
+        onBack={() => console.log('Back')}
+        onSettings={() => console.log('Settings')}
+        occasion={occasion}
       />
-      <div>
-        <input
-          type="text"
-          placeholder="Enter new group name"
-          value={newGroupName}
-          onChange={(e) => setNewGroupName(e.target.value)}
+
+      {/* Sidebar and Chat Area */}
+      <div className={styles.groupsContent}>
+        <GroupsSidebar
+          groups={groups}
+          onGroupClick={setActiveGroup}
+          onSubgroupClick={setActiveSubgroup}
+          onCreateGroup={handleCreateGroup}
         />
-        <button onClick={handleCreateGroup}>Add Group</button>
+        <GroupsChat group={activeGroup} subgroup={activeSubgroup} />
       </div>
-      <Chat group={activeGroup} subgroup={activeSubgroup} />
     </div>
   );
 };
