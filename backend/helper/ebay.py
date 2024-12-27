@@ -3,6 +3,7 @@ import json
 import requests
 
 with open('./local.settings.json', 'r') as file:
+# with open('backend/local.settings.json') as file:
     settings = json.load(file)
 
 sandbox_settings = {
@@ -17,6 +18,7 @@ production_settings = {
 
 # Demo response JSON file for testing
 with open('./ebay_search.json') as f:
+# with open('backend/ebay_search.json') as f:
     demo_ebay_response = json.load(f)
 
 def get_oauth_token():
@@ -70,9 +72,9 @@ def parse_search_results(products):
         product_info['price'] = product['price']['value']
         product_info['currency'] = product['price']['currency']
         product_info['product_url'] = product['itemWebUrl']
-        product_info['image_url'] = product['image'] # Should use product['image'] or product['thumbnailImages'][0]?
+        product_info['image_url'] = product['image']['imageUrl'] # Should use product['image'] or product['thumbnailImages'][0]?
         products_info.append(product_info)
     return products_info
 
 
-# print(parse_search_results(demo_ebay_response['itemSummaries']))
+# print(parse_search_results(demo_ebay_response['itemSummaries'])[0]['image_url']['imageUrl'])

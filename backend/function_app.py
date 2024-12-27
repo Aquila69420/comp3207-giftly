@@ -254,11 +254,13 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
     username = data['username'].strip()
-    output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
+    # TODO: uncomment this line for production
+    # output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
+    output = "rec:Lebron James Hoodie,Lebron James Poster,Lebron James Jersey"
     fetched_products = products.get_products(output)
     response = func.HttpResponse(
-        body=json.dumps({"response": fetched_products}),
-        mimetype="application/json",
+        body=json.dumps({'query': output, 'response': fetched_products}),
+        mimetype='application/json',
         status_code=200
     )
     return add_cors_headers(response)

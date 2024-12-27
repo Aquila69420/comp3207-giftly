@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import HashLoader from 'react-spinners/HashLoader';
-import '../styles/hashloader.component.css';
+import '../styles/HashLoader.component.css';
 
 function TextInput({username}) {
   const [prompt, setInputValue] = useState('');
@@ -13,7 +13,7 @@ function TextInput({username}) {
     // Retrieve the input data from the backend, and redirect the user to the search results page
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:7071/product_text', {
+      const response = await fetch('http://localhost:5000/product_text', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,10 +23,13 @@ function TextInput({username}) {
 
       const result = await response.json();
       console.log('Response from backend:', result);
-      navigate('/search');
+      navigate('/search', {state: {data: result, username}});
       setLoading(false);
     } catch (error) {
       console.error('Error sending input data:', error);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
