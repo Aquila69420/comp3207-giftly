@@ -12,7 +12,7 @@ const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick }) => {
             className={styles.groupItem}
             onClick={() => onGroupClick(group)}
           >
-            {group.name}
+            {group.groupname}
             <ul>
               {group.subgroups?.map((subgroup, subIndex) => (
                 <li

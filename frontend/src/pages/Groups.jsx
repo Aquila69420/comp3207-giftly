@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Sidebar from '../components/GroupsSidebar';
+import GroupsSidebar from '../components/GroupsSidebar';
 import Chat from '../components/GroupsChat';
 import styles from '../styles/groups.module.css';
 
@@ -21,13 +21,12 @@ const Groups = () => {
           body: JSON.stringify({ username }),
         });
 
-        console.log(response);
-
         const data = await response.json();
+        console.log('Fetched groups:', data); // Debugging log
         
         if (data.result === "OK") {
             setGroups(data.groups);
-            console.log('Groups:', data.groups);
+            console.log('Groups state updated:', data.groups); // Debugging log
         } else {
             setError(data.msg);
             console.error(data.msg);
@@ -52,7 +51,7 @@ const Groups = () => {
       });
       const data = await response.json();
       if (data.result) {
-        setGroups([...groups, { name: newGroupName, subgroups: [] }]);
+        setGroups([...groups, { groupname: newGroupName, subgroups: [] }]);
         setNewGroupName(''); // Reset input
       } else {
         console.error(data.msg);
@@ -73,7 +72,7 @@ const Groups = () => {
 
   return (
     <div className={styles.container}>
-      <Sidebar
+      <GroupsSidebar
         groups={groups}
         onGroupClick={handleGroupClick}
         onSubgroupClick={handleSubgroupClick}
