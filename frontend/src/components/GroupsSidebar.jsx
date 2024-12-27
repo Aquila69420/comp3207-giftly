@@ -14,7 +14,7 @@ const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick }) => {
           >
             {group.name}
             <ul>
-              {group.subgroups.map((subgroup, subIndex) => (
+              {group.subgroups?.map((subgroup, subIndex) => (
                 <li
                   key={subIndex}
                   className={styles.subgroupItem}
