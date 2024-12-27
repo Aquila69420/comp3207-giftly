@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 
-function TextInput({username}) {
+function TextInput() {
   const [prompt, setInputValue] = useState('');
 
   const handleSubmit = async () => {
+    const username = localStorage.getItem("username")
     try {
       const response = await fetch('http://localhost:5000/product_text', {
         method: 'POST',
@@ -24,7 +25,7 @@ function TextInput({username}) {
     <div>
       <input
         type="text"
-        placeholder="Enter something..."
+        placeholder="I am looking for ..."
         value={prompt}
         onChange={(e) => setInputValue(e.target.value)}
         style={{
