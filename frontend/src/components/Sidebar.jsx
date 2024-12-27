@@ -15,9 +15,9 @@ const Sidebar = () => {
         className={styles.toggleButton}
       >
         {isCollapsed ? (
-          <GoSidebarExpand size={30} />
-        ) : (
           <GoSidebarCollapse size={30} />
+        ) : (
+          <GoSidebarExpand size={30} />
         )}
       </button>
       {!isCollapsed && (

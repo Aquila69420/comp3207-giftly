@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import styles from '../styles/ProductCard.component.css';
+import styles from '../styles/productCard.module.css';
 
 function ProductCard({ image, title, price, onClick }) {
   return (
