@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import logo from "../image/giftly_logo_trans.png";
 import styles from "../styles/searchResults.module.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
+import config from "../config";
 
 function SearchResults({ onBack }) {
-  const navigate = useNavigate();
   const location = useLocation();
   const { data } = location.state;
   const username = location.state.username;
@@ -23,7 +23,7 @@ function SearchResults({ onBack }) {
       // Send updated query to backend
       const prompt = searchQuery;
       try {
-        const response = await fetch("http://localhost:5000/product_text", {
+        const response = await fetch(`${config.backendURL}/product_text`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -37,13 +37,6 @@ function SearchResults({ onBack }) {
         console.error("Error sending input data:", error);
       }
     }
-  };
-
-  const handleCardClick = (productURL) => {
-    // TODO: Fix bug that doesn't register card click at the moment
-    // navigate(`/product/${encodeURIComponent(productURL)}`, { state: { productURL } });
-    console.log("Card clicked");
-    // console.log('Product URL:', productURL);
   };
 
   return (
@@ -67,11 +60,10 @@ function SearchResults({ onBack }) {
       </div>
 
       {/* Product grid */}
-      {/* TODO: Fix bug that doesn't register card styling/CSS at the moment */}
       {/* TODO: Add target back in */}
       <div className={styles.productGrid}>
         {Object.keys(productsInfo).map(
-          (source, idx) =>
+          (source) =>
             source !== "target" &&
             productsInfo[source].map((product) => (
               <ProductCard

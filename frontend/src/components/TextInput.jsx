@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
-import styles from "../styles/textInput.module.css"; // Import the CSS module
+import styles from "../styles/textInput.module.css";
 import { CgAttachment } from "react-icons/cg";
 import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import HashLoader from "react-spinners/HashLoader"
+import config from "../config";
 
 function TextInput() {
   const [prompt, setInputValue] = useState("");
@@ -64,9 +65,11 @@ function TextInput() {
       const formData = new FormData();
       formData.append("image", selectedFile);
 
+      // TODO: Fix functionality bug for file upload and send to backend
+
       try {
         const username = localStorage.getItem("username");
-        const response = await fetch("http://localhost:5000/product_img", {
+        const response = await fetch(`${config.backendURL}/product_img`, {
           method: "POST",
           body: formData,
         });
@@ -89,7 +92,7 @@ function TextInput() {
     const username = localStorage.getItem("username");
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/product_text", {
+      const response = await fetch(`${config.backendURL}product_text`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

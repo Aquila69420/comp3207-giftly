@@ -1,19 +1,44 @@
-import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styles from "../styles/productCard.module.css";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import config from "../config";
+import HashLoader from "react-spinners/HashLoader"
+import { useState } from "react";
 
 function ProductCard({ image, title, price, url }) {
+  const navigate = useNavigate();
+  const productInfo = {url, title, image, price}
+  const [loading, setLoading] = useState(false);
   /* Define the onclick here, which creates and retrevies cosmos db uuid for that product and then
   navigates to it when click on*/
+  const registerProductOrGetId = async () => {
+    setLoading(true);
+    const response = await fetch(`${config.backendURL}/register_product_or_get_id`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(productInfo),
+    });
+    const data = await response.json();
+    console.log("Sending productInfo:", productInfo);
+    navigate(`/product?id=${data.id}`, {state: productInfo});
+    setLoading(false);
+  };
 
   return (
-    <div onClick={() => console.log("suck toes")}>
-      <div className={styles.card}>
-        <img src={image} alt={title} className={styles.image} />
-        <div className={styles.title}>{title}</div>
-        <div className={styles.price}>{price}</div>
-      </div>
+    <div onClick={registerProductOrGetId}>
+      {loading ? (
+        <div className="overlay">
+          <HashLoader color="#08caa5" loading={loading} size={150} />
+        </div>
+      ) : (
+        <div className={styles.card}>
+          <img src={image} alt={title} className={styles.image} />
+          <div className={styles.title}>{title}</div>
+          <div className={styles.price}>{price}</div>
+        </div>
+      )}
     </div>
   );
 }

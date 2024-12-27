@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function UserLoginRegister({ setUsername }) {
   const [usernameLogin, setUsernameLogin] = useState('');
@@ -13,7 +14,7 @@ function UserLoginRegister({ setUsername }) {
   const handleForgot = async() => {
     // IMPORTANT: using usernameLogin text box as email input needed to send user their username and password. Create a new input box and const initialization (const [forgotEmail, setForgotEmail] = useState(''))
     try {
-      const response = await fetch('http://localhost:5000/fetch_user_details', {
+      const response = await fetch(`${config.backendURL}/fetch_user_details`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -29,7 +30,7 @@ function UserLoginRegister({ setUsername }) {
 
   const handleVerifyEmail = async() => {
     try {
-      const response = await fetch('http://localhost:5000/email_verification', {
+      const response = await fetch(`${config.backendURL}/email_verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +46,7 @@ function UserLoginRegister({ setUsername }) {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch(`${config.backendURL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,7 +66,7 @@ function UserLoginRegister({ setUsername }) {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('http://localhost:5000/register', {
+      const response = await fetch(`${config.backendURL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

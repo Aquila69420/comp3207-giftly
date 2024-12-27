@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function ImageInput({username}) {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,7 +40,7 @@ function ImageInput({username}) {
       formData.append('image', selectedFile);
   
       try {
-        const response = await fetch('http://localhost:5000/product_img', {
+        const response = await fetch(`${config.backendURL}/product_img`, {
           method: 'POST',
           body: {
             "username": username,

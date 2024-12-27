@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function FindUsers() {
   const [usernameToFind, setUsernameToFind] = useState('');
@@ -9,7 +10,7 @@ function FindUsers() {
 
   const getWishList = async (username) => {
     try {
-      const response = await fetch('http://localhost:5000/wishlist_get', {
+      const response = await fetch(`${config.backendURL}/wishlist_get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -32,7 +33,7 @@ function FindUsers() {
     }
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/find_user_autocomplete', {
+      const response = await fetch(`${config.backendURL}/find_user_autocomplete`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

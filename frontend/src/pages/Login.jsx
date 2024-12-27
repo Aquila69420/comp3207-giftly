@@ -6,6 +6,7 @@ import styles from "../styles/login.module.css";
 import logo from "../image/giftly_logo_trans.png";
 import { useNavigate } from "react-router-dom";
 import { MdAccountCircle } from "react-icons/md";
+import config from "../config";
 
 function Login() {
   const [loginError, setLoginError] = useState("");
@@ -13,7 +14,7 @@ function Login() {
 
   const handleLogin = async (values) => {
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${config.backendURL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,11 +1,12 @@
 import React from 'react';
+import config from '../config';
 
 function SendNotifications({username}) {
   const handleSendNotification = async () => {
     console.log('Sending notification to user', username);
     const notification_message = "This is a test"
     try {
-        const response = await fetch('http://localhost:5000/send_notifications', {
+        const response = await fetch(`${config.backendURL}/send_notifications`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

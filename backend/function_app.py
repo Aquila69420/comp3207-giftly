@@ -19,6 +19,7 @@ user_container = database.get_container_client(os.getenv("UserContainer"))
 suggestion_container = database.get_container_client(os.getenv("SuggestionContainer"))
 wishlist_container = database.get_container_client(os.getenv("WishListContainer"))
 cart_container = database.get_container_client(os.getenv("CartContainer"))
+product_container = database.get_container_client(os.getenv("ProductContainer"))
 sendEmail_api_key = os.getenv("SendGrid_API_KEY")
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
@@ -263,6 +264,51 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
         mimetype='application/json',
         status_code=200
     )
+    return add_cors_headers(response)
+
+@app.function_name(name='register_product_or_get_id')
+@app.route(route='register_product_or_get_id', methods=[func.HttpMethod.POST])
+def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    product_info = {
+        'url': data['url'],
+        'title': data['title'],
+        'image': data['image'],
+        'price': data['price']
+    }
+    try:
+        query = "SELECT * from products WHERE products.url = '{}'".format(product_info['url'])
+        products = list(product_container.query_items(query=query, enable_cross_partition_query=True)) 
+        if not products: # First check if product with current url is already in the database
+            logging.info("Product not found in database")
+            print("Product not found in database")
+            
+            # Add to cosmosdb products container with id auto gen by cosmos
+            product_container.create_item(body=product_info, enable_automatic_id_generation=True)
+            
+            # Get the id of the product
+            products = list(product_container.query_items(query=query, enable_cross_partition_query=True))
+            id = products[0]['id']
+            
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product registered successfully', 'id': id}),
+                mimetype='application/json',
+                status_code=200
+            )
+        else:
+            logging.info("Product already exists in database")
+            print("Product already exists in database")
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product already exists', 'id': products[0]['id']}),
+                mimetype='application/json',
+                status_code=400
+            )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({'error': str(e)}),
+            mimetype='application/json',
+            status_code=500
+        )
     return add_cors_headers(response)
 
 def allowed_file(file):

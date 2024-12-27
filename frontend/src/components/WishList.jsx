@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function WishList({ username }) {
   const [responseMessage, setResponseMessage] = useState('');
@@ -6,7 +7,7 @@ function WishList({ username }) {
   // Function to handle fetching the wishlist
   const fetchWishlist = async () => {
     try {
-      const response = await fetch('http://localhost:5000/wishlist_get', {
+      const response = await fetch(`${config.backendURL}/wishlist_get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,7 +36,7 @@ function WishList({ username }) {
             }
     }
     try {
-      const response = await fetch('http://localhost:5000/wishlist_update', {
+      const response = await fetch(`${config.backendURL}/wishlist_update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -62,7 +63,7 @@ function WishList({ username }) {
         }
     }
     try {
-        const response = await fetch('http://localhost:5000/wishlist_remove', {
+        const response = await fetch(`${config.backendURL}/wishlist_remove`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

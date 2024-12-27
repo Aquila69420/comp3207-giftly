@@ -17,7 +17,7 @@
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  background-color: #f2f5f5;
+  background-color: #f5f3f2;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -83,4 +83,14 @@
 .error {
   color: var(--vesuvius);
   font-size: 12px;
+}
+
+.linkContainer {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.link {
+  color: blue;
+  cursor: pointer;
 }

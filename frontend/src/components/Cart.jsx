@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/cart.module.css";
+import config from "../config";
 
 function Cart({ username }) {
   const [cartItems, setCartItems] = useState([]); // Cart content stored here
@@ -31,7 +32,7 @@ function Cart({ username }) {
   const handleSaveCart = async (cartName) => {
     console.log("Saving cart", cartName);
     try {
-      const response = await fetch("http://localhost:5000/save_cart", {
+      const response = await fetch(`${config.backendURL}/save_cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -53,7 +54,7 @@ function Cart({ username }) {
   const handleLoadCart = async (loadCartName) => {
     console.log("Loading cart", loadCartName);
     try {
-      const response = await fetch("http://localhost:5000/load_cart", {
+      const response = await fetch(`${config.backendURL}/load_cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -83,7 +84,7 @@ function Cart({ username }) {
   const handleDeleteCart = async (DeleteCartName) => {
     console.log("Deleting cart", DeleteCartName);
     try {
-      const response = await fetch("http://localhost:5000/delete_cart", {
+      const response = await fetch(`${config.backendURL}/delete_cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

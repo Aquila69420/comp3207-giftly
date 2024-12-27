@@ -4,6 +4,8 @@ import * as Yup from "yup";
 import styles from "../styles/register.module.css";
 import logo from "../image/giftly_logo_trans.png";
 import { MdAccountCircle } from "react-icons/md";
+import config from "../config";
+import { Link } from "react-router-dom";
 
 function Register() {
   const formik = useFormik({
@@ -35,7 +37,7 @@ function Register() {
     }),
     onSubmit: async (values) => {
       try {
-        const response = await fetch("http://localhost:5000/register", {
+        const response = await fetch(`${config.backendURL}/register`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -58,7 +60,7 @@ function Register() {
 
   const handleVerifyEmail = async () => {
     try {
-      const response = await fetch("http://localhost:5000/email_verification", {
+      const response = await fetch(`${config.backendURL}/email_verification`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +79,7 @@ function Register() {
 
   return (
     <div className={styles.registerContainer}>
-      <img src={logo} alt="logo" width={300} className={styles.logo} />
+      <img src={logo} alt="logo" width={200} className={styles.logo} />
       <form onSubmit={formik.handleSubmit} className={styles.box}>
         <div className={styles.iconContainer}>
           <MdAccountCircle size={60} />
@@ -176,6 +178,12 @@ function Register() {
           </div>
         </div>
       </form>
+      {/* Add hyperlink text to login page */}
+      <div className={styles.linkContainer}>
+        <Link to="/login" className={styles.link}>
+          Already have an account? Login here
+        </Link>
+      </div>
     </div>
   );
 }

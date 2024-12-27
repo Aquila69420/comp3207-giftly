@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function DropdownSelection({username}) {
   const [selectedOccasions, setSelectedOccasions] = useState([]);
@@ -87,7 +88,7 @@ function DropdownSelection({username}) {
       "Themes": selectedThemes.join(', ')
     }
     try {
-      const response = await fetch('http://localhost:5000/product_types', {
+      const response = await fetch(`${config.backendURL}/product_types`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
