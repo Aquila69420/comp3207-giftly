@@ -33,6 +33,10 @@ def group_is_admin(groupDoc, username):
     if groupDoc['admin'] != username:
         raise Exception(f"{username} is not the admin of the group")
 
+def user_in_group(groupDoc, username):
+    if username not in groupDoc['usernames']:
+        raise Exception(f"{username} is not in the group")
+
 def create_group(username, groupname):
     # Check if username exists
     username_exists(username)
@@ -111,8 +115,7 @@ def create_occasion(username, groupID, usernames, occasionname, occasiondate):
     
     # Check all usernames are in group
     for user in ([username] + usernames):
-        if user not in group['usernames']:
-            raise Exception(f"{user} is not in the group")
+        user_in_group(group, user)
     
     # Add Occasion
     id = str(uuid.uuid4())
@@ -120,7 +123,7 @@ def create_occasion(username, groupID, usernames, occasionname, occasiondate):
         'id': id,
         'admin': username,
         'groupID': groupID,
-        'usernames': [username] + usernames,
+        'usernames':  list(dict.fromkeys([username] + usernames)),
         'occasionname': occasionname,
         'occasiondate': occasiondate
     })
@@ -130,3 +133,19 @@ def create_occasion(username, groupID, usernames, occasionname, occasiondate):
         {"op": "add", "path": "/occasions/-", "value": id}
     ]
     groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+def get_occasions(username, groupID):
+    # Check if group exists
+    group = group_exists(groupID)
+
+    # Check username is in group
+    user_in_group(group, username)
+
+    # Filter occasions in group by ones that are relevant to user
+    ocs = list(occasions_container.query_items(
+        query="SELECT * FROM c WHERE c.groupID=@groupID and ARRAY_CONTAINS(c.usernames, @username)",
+        parameters=[{'name': '@groupID', 'value': groupID},
+                    {'name': '@username', 'value': username}],
+        enable_cross_partition_query=True
+    ))
+    return ocs
