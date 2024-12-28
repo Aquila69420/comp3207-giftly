@@ -20,6 +20,9 @@ export default function Product() {
   const [title, setTitle] = useState(data.title || "");
   const [image, setImage] = useState(data.image || "");
   const [price, setPrice] = useState(data.price || "");
+  const [favorite, setFavorite] = useState(false);
+  const [cart, setCart] = useState(false);
+  
   const getProductInfoById = async () => {
     // Fetch product info by id
     const productId = searchParams.get("id");
@@ -57,8 +60,49 @@ export default function Product() {
     }
   }, [data.id, getProductInfoById]);
 
-  const [favorite, setFavorite] = useState(false);
-  const [cart, setCart] = useState(false);
+  const addToWishlist = async () => {
+    const response = await fetch(`${config.backendURL}/wishlist_update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({"username": username, "gift": id}),
+    });
+    const data = await response.json();
+    console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
+  };
+
+  const removeFromWishlist = async () => {
+    const response = await fetch(`${config.backendURL}/wishlist_remove`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({"username": username, "gift": id}),
+    });
+
+    const data = await response.json();
+    console.log(`Gift removed from wishlist: ${JSON.stringify(data)}`);
+  };
+
+  // Function to handle updating the wishlist
+  const updateWishlistStatus = async () => {
+    setFavorite(!favorite);
+    favorite ? await removeFromWishlist() : await addToWishlist();
+  }
+
+  const addToCart = async () => {
+    // TODO: Implement add to cart functionality
+  };
+
+  const removeFromCart = async () => {
+    // TODO: Implement remove from cart functionality
+  };
+
+  const updateCartStatus = async () => {
+    setCart(!cart);
+    cart ? await removeFromCart() : await addToCart();
+  };
 
   return (
     <div className={styles.product}>
@@ -69,13 +113,13 @@ export default function Product() {
         <h1 className={styles.title}>{title}</h1>
         <p className={styles.price}>${price}</p>
         <div className={styles.productActions}>
-          <button className={styles.favoriteButton} onClick={() => setFavorite(!favorite)}>
+          <button className={styles.favoriteButton} onClick={updateWishlistStatus}>
             {favorite ? <FaHeart /> : <FaRegHeart />}
           </button>
           <a href={url} className={styles.link} target="_blank" rel="noopener noreferrer">
             View Product
           </a>
-          <button className={styles.cartButton} onClick={() => setCart(!cart)}>
+          <button className={styles.cartButton} onClick={updateCartStatus}>
             {cart ? <IoCart /> : <IoCartOutline />}
           </button>
         </div>

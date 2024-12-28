@@ -24,62 +24,6 @@ function WishList({ username }) {
     }
   };
 
-  // Function to handle updating the wishlist
-  const updateWishlist = async () => {
-    // NOTE: this is where the selected gift will. It will require the following information in identical structure
-    const gift = {
-        'name':"Basketball",
-        'data': {
-            "supplier": "link2",
-            "cost": 30,
-            "added_on": "21-12-2024"
-            }
-    }
-    try {
-      const response = await fetch(`${config.backendURL}/wishlist_update`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"username": username, "gift": gift}),
-      });
-
-      const data = await response.json();
-      console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
-      setResponseMessage(`Wishlist updated: ${JSON.stringify(data)}`);
-    } catch (error) {
-      console.log(`Error adding gift to Wishlist`);
-      setResponseMessage(`Error adding gift to wishlist: ${error.message}`);
-    }
-  };
-
-  const removeWishList = async () => {
-    // NOTE: this is where the selected gift will. It will require the following information in identical structure
-    const gift = {
-        'name':"Basketball",
-        'data': {
-            "supplier": "link2",
-            "cost": 30,
-        }
-    }
-    try {
-        const response = await fetch(`${config.backendURL}/wishlist_remove`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({"username": username, "gift": gift}),
-        });
-  
-        const data = await response.json();
-        console.log(`Gift removed from wishlist: ${JSON.stringify(data)}`);
-        setResponseMessage(`Wishlist updated: ${JSON.stringify(data)}`);
-      } catch (error) {
-        console.log(`Error removing gift from Wishlist`);
-        setResponseMessage(`Error removing gift from wishlist: ${error.message}`);
-      }
-  };
-
   return (
     <div
         style={{
