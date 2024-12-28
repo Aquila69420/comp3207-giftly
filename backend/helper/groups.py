@@ -41,16 +41,15 @@ def create_group(userID, groupname):
     # Check if userID exists
     user_exists(userID)
 
-    id = str(uuid.uuid4())
     # Add Group
-    groups_container.create_item(body={
-        'id': id,
+    group = groups_container.create_item(body={
+        'id': str(uuid.uuid4()),
         'groupname': groupname,
         'admin': userID,
         'users': [userID],
         'occasions': []
     })
-    return id
+    return group
 
 def delete_group(userID, groupID):
     # Check if group exists
@@ -84,7 +83,8 @@ def add_user(userID, user_to_add, groupID):
     ops = [
         {"op": "add", "path": "/users/-", "value": user_to_add}
     ]
-    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return group
 
 def get_groups(userID):
     # Check if username exists
@@ -109,7 +109,8 @@ def change_groupname(userID, groupID, groupname):
     ops = [
         {"op": "set", "path": "/groupname", "value": groupname}
     ]
-    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return group
 
 def groups_kick(userID, groupID, user_to_remove):
     # Check if group exists
@@ -130,7 +131,8 @@ def groups_kick(userID, groupID, user_to_remove):
     ops = [
         { "op": "remove", "path": f"/users/{index}"}
     ]
-    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return group
 
 
 def create_occasion(userID, groupID, users, occasionname, occasiondate):
@@ -143,7 +145,7 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     
     # Add Occasion
     id = str(uuid.uuid4())
-    occasions_container.create_item(body={
+    oc = occasions_container.create_item(body={
         'id': id,
         'admin': userID,
         'groupID': groupID,
@@ -156,7 +158,8 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     ops = [
         {"op": "add", "path": "/occasions/-", "value": id}
     ]
-    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return oc, group
 
 def get_occasions(userID, groupID):
     # Check if group exists
