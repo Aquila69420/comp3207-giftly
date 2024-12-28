@@ -30,7 +30,6 @@ function Login() {
           body: JSON.stringify({ username: values.username }),
         });
         const data = await response.json();
-        console.log(data);
         if (data.result) {
           localStorage.setItem("userID", data.userID);
           setLoginError("");

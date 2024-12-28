@@ -11,6 +11,7 @@ const Groups = () => {
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeSubgroup, setActiveSubgroup] = useState(null);
   const [username] = useState('atharva'); // Replace with actual logged-in username
+  const [userID] = useState('06bac64c-9de0-4757-ba1a-ccff044a3399'); // Replace with actual logged-in user id
   const [occasion, setOccasion] = useState("X's Birthday"); // Replace with actual occasion
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const Groups = () => {
         const response = await fetch('http://localhost:5000/groups/get', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
+          body: JSON.stringify({ userID }),
         });
 
         const data = await response.json();
@@ -40,7 +41,7 @@ const Groups = () => {
     };
 
     fetchGroups();
-  }, [username]);
+  }, [userID]);
 
   // Handle group creation
   const handleCreateGroup = async (newGroupName) => {
@@ -50,7 +51,7 @@ const Groups = () => {
       const response = await fetch('http://localhost:5000/groups/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, groupname: newGroupName }),
+        body: JSON.stringify({ userID, groupname: newGroupName }),
       });
       const data = await response.json();
       if (data.result) {
@@ -58,7 +59,7 @@ const Groups = () => {
         const response = await fetch('http://localhost:5000/groups/get', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username }),
+          body: JSON.stringify({ userID }),
         });
 
         const data = await response.json();
@@ -85,7 +86,7 @@ const Groups = () => {
       {/* Top Bar */}
       <GroupsTopBar
         onBack={() => console.log('Back')}
-        onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname, members: activeGroup?.usernames } })}
+        onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname, members: activeGroup?.users } })}
         occasion={occasion}
       />
 
