@@ -518,8 +518,8 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     user_to_remove = data['user_to_remove']
     try:
-        group = groups.groups_kick(userID, groupID, user_to_remove)
-        body=json.dumps({"result": True, "msg": "OK", "group": group})
+        ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
+        body=json.dumps({"result": True, "msg": "OK", "occasions": ocs, "group": group})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -529,7 +529,38 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_leave")
+@app.route(route='groups/leave', methods=[func.HttpMethod.POST])
+def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
+    '''A user of a group leaves the group
     
+    Admin cannot leave their own group
+
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, groupID: groupID}
+    
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", group: {...}}
+        data: {result: False, msg: "{groupID} does not exist"}
+        data: {result: False, msg: "{userID} is not in the group}'''
+    data = req.get_json()
+    userID = data['userID']
+    groupID = data['groupID']
+    try:
+        ocs, group = groups.groups_leave(userID, groupID)
+        body = json.dumps({"response": True, "msg": "OK", "occasions": ocs, "group": group})
+    except Exception as e:
+        body = json.dumps({"response": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_create")
 @app.route(route='groups/occasions/create', methods=[func.HttpMethod.POST])
