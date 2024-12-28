@@ -8,7 +8,10 @@ const GroupsSettings = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
-  const { groupName, groupID } = location.state || { groupName: 'Unknown Group', groupID: '' };
+  const { groupName, groupID, members } = location.state || { groupName: 'Unknown Group', groupID: '', members: [] };
+
+  console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
+  
 
   const handleInvite = async () => {
     if (username.trim()) {
@@ -30,6 +33,8 @@ const GroupsSettings = () => {
         if (data.result) {
           setUsername(''); // Clear the username field after inviting
           setError(null);
+		  // Update the members list
+		  members.push(username);
         } else {
           setError(data.msg);
         }
@@ -38,6 +43,7 @@ const GroupsSettings = () => {
       }
     }
   };
+
 
   const handleDeleteGroup = async () => {
     try {
@@ -94,6 +100,16 @@ const GroupsSettings = () => {
         </div>
 
         {error && <p className={styles.error}>{error}</p>}
+
+		{/* Members Section */}
+        <h2 className={styles.membersHeading}>Members</h2>
+        <ul className={styles.membersList}>
+          {members.map((member, index) => (
+			<li key={index} className={styles.memberItem}>
+			  {member}
+			</li>
+		  ))}
+        </ul>
 
         {/* Delete Group Button */}
         <div className={styles.deleteGroupSection}>
