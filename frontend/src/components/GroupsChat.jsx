@@ -8,7 +8,7 @@ const GroupsChat = ({ group, subgroup }) => {
         {subgroup
           ? `Chat for ${subgroup.name}`
           : group
-          ? `Chat for ${group.name}`
+          ? `Chat for ${group.groupname}`
           : "Select a group or subgroup"}
       </h2>
       <div className={styles.chatArea}>

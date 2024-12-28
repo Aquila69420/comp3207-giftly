@@ -96,3 +96,454 @@
 .chatInputButton:hover {
   background-color: #0056b3;
 }
+
+/* New Chat Button */
+.newChatContainer {
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .newChatButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .newChatButton:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Modal Styles */
+  .modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+  }
+  
+  .modalInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .modalCreateButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .modalCreateButton:hover {
+    background-color: #218838;
+  }
+  
+  .modalCancelButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .modalCancelButton:hover {
+    background-color: #c82333;
+  }
+
+  /* Sidebar Container */
+.sidebar {
+    width: 300px;
+    background-color: #f7f7f7;
+    border-right: 1px solid #ddd;
+    padding: 10px;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  
+  /* Sidebar Header */
+  .sidebarHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .sidebarTitle {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .addGroupButton {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #007bff;
+    cursor: pointer;
+  }
+  
+  .addGroupButton:hover {
+    color: #0056b3;
+  }
+  
+  /* Group List */
+  .groupList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .groupItem {
+    margin-bottom: 15px;
+  }
+  
+  .groupName {
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .groupName:hover {
+    color: #007bff;
+  }
+  
+  /* Subgroup List */
+  .subgroupList {
+    list-style: none;
+    padding-left: 15px;
+  }
+  
+  .subgroupItem {
+    font-size: 14px;
+    cursor: pointer;
+    color: #555;
+  }
+  
+  .subgroupItem:hover {
+    color: #007bff;
+  }
+  
+  /* Modal */
+  .modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+  }
+  
+  .modalInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .modalCreateButton {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .modalCreateButton:hover {
+    background-color: #218838;
+  }
+  
+  .modalCancelButton {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .modalCancelButton:hover {
+    background-color: #c82333;
+  }
+  
+  
+/* Container */
+.groupsContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  /* Top Bar */
+  .groupsTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f7f7f7;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .groupsBackButton,
+  .groupsSettingsButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .groupsOccasionLabel {
+    font-weight: bold;
+  }
+  
+  .groupsSecretSantaButton {
+    background-color: #ff6f61;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+
+
+/* Main container for the Groups page */
+.groupsContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  /* Top Bar */
+  .groupsTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f7f7f7;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    height: 60px;
+    flex-shrink: 0;
+  }
+  
+  /* Content container for Sidebar and Chat */
+  .groupsContent {
+    display: flex;
+    flex: 1; /* Ensures this section takes the remaining height */
+    overflow: hidden; /* Prevents overflow issues */
+  }
+  
+  /* Sidebar styling */
+  .groupsSidebar {
+    width: 300px;
+    background: #f7f7f7;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+    flex-shrink: 0; /* Prevents sidebar from resizing */
+  }
+  
+  /* Chat area */
+  .groupsChat {
+    flex: 1; /* Allows the chat area to expand and take up the remaining space */
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    overflow: hidden; /* Prevents overflow in the chat area */
+  }
+  
+  /* Chat header */
+  .groupsChatHeader {
+    padding: 10px 20px;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ddd;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  
+  /* Chat messages area */
+  .groupsChatArea {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto; /* Allows scrolling for chat messages */
+  }
+  
+  /* Chat input */
+  .groupsChatInput {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    flex-shrink: 0;
+  }
+  
+  .groupsChatInputField {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .groupsChatInputButton {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .groupsChatInputButton:hover {
+    background-color: #0056b3;
+  }
+
+  /* Settings Page */
+.groupsSettingsPage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f9f9f9;
+  }
+  
+  /* Top Bar */
+  .groupsTopBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f7f7f7;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    flex-shrink: 0;
+  }
+  
+  .groupsBackButton {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #007bff;
+  }
+  
+  .groupsBackButton:hover {
+    color: #0056b3;
+  }
+  
+  .groupsTopBarTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    flex-grow: 1;
+    text-align: center;
+  }
+  
+  /* Main Content */
+  .groupsSettingsContent {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .groupsSettingsHeading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .groupsSettingsForm {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .groupsSettingsInput {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .groupsSettingsButton {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .groupsSettingsButton:hover {
+    background-color: #0056b3;
+  }
+
+  .activeGroup {
+    background-color: #e0e0e0; /* Highlight color */
+    font-weight: bold;
+  }
+
+  /* Delete Group Section */
+.deleteGroupSection {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .deleteGroupButton {
+    padding: 10px 20px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .deleteGroupButton:hover {
+    background-color: #c82333;
+  }
+  
+  
+  

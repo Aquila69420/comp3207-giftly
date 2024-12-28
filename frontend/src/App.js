@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Groups from "./pages/Groups";
+import GroupsSettings from "./pages/GroupsSettings";
 
 // add pages here
 
@@ -17,6 +18,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/groups" element={<Groups />} />
+          <Route path="/groups/settings" element={<GroupsSettings  />} />
           <Route path="*" element={<Home />} />
         </Routes>
       </div>
