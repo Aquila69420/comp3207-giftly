@@ -4,8 +4,8 @@ client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionS
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
 groups_container = database.get_container_client(os.getenv("GroupsContainer"))
-groups_occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
-groups_divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
+occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
+divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
 
 def username_exists(username):
     '''Check if username exists in the database'''
@@ -14,6 +14,8 @@ def username_exists(username):
             parameters=[{'name': '@username', 'value': username}],
             enable_cross_partition_query=True
         ))
+    if not user:
+        raise Exception(f"{username} does not exist")
     return user
 
 def group_exists(groupID):
@@ -23,13 +25,21 @@ def group_exists(groupID):
             parameters=[{'name': '@groupID', 'value': groupID}],
             enable_cross_partition_query=True
         ))
-    return groups
+    if not groups:
+        raise Exception(f"{groupID} does not exist")
+    return groups[0]
 
+def group_is_admin(groupDoc, username):
+    if groupDoc['admin'] != username:
+        raise Exception(f"{username} is not the admin of the group")
+
+def user_in_group(groupDoc, username):
+    if username not in groupDoc['usernames']:
+        raise Exception(f"{username} is not in the group")
 
 def create_group(username, groupname):
     # Check if username exists
-    if not username_exists(username):
-        raise Exception(f"User {username} does not exist")
+    username_exists(username)
 
     # Add Group
     groups_container.create_item(body={
@@ -43,37 +53,30 @@ def create_group(username, groupname):
 def delete_group(username, groupID):
     # Check if group exists
     group = group_exists(groupID)
-    if not group:
-        raise Exception(f"{groupID} does not exist")
 
     # Check if username is admin of group
-    g = group[0]
-    if g['admin'] != username:
-        raise Exception(f"{username} is not the admin of the group")
+    group_is_admin(group, username)
     
     # Delete group in all containers
-    # TODO: Delete all occasions
+    for occasionID in group['occasions']:
+        # TODO: Delete all divisions
+        occasions_container.delete_item(item=occasionID, partition_key=occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(username, user_to_add, groupID):
     # Check both usernames exist
-    if not username_exists(username):
-        raise Exception(f"{username} does not exist")
-    if not username_exists(user_to_add):
-        raise Exception(f"{user_to_add} does not exist")
+    username_exists(username)
+    username_exists(user_to_add)
 
     # Check Group exists
-    groups = group_exists(groupID)
-    if not groups:
-        raise Exception(f"{groupID} does not exist")
-    groupDoc = groups[0]
+    group = group_exists(groupID)
 
     # Check user_to_add is not already in group
-    if user_to_add in groupDoc['usernames']:
+    if user_to_add in group['usernames']:
         raise Exception(f"{user_to_add} is already in the group")
 
     # Retrieve Group Document via ID
-    groupID = groupDoc['id']
+    groupID = group['id']
 
     # Apply Patch Operation
     ops = [
@@ -81,12 +84,9 @@ def add_user(username, user_to_add, groupID):
     ]
     groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
 
-
-
 def get_groups(username):
     # Check if username exists
-    if not username_exists(username):
-        raise Exception(f"{username} does not exist")
+    username_exists(username)
 
     # Query database for all groups with user
     groups = list(groups_container.query_items(
@@ -95,3 +95,57 @@ def get_groups(username):
                 enable_cross_partition_query=True
             ))
     return groups
+
+def change_groupname(username, groupID, groupname):
+    # Check if group exists
+    group = group_exists(groupID)
+
+    # Check admin
+    group_is_admin(group, username)
+
+    # Apply Patch Operation
+    ops = [
+        {"op": "set", "path": "/groupname", "value": groupname}
+    ]
+    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+def create_occasion(username, groupID, usernames, occasionname, occasiondate):
+    # Check if group exists
+    group = group_exists(groupID)
+    
+    # Check all usernames are in group
+    for user in ([username] + usernames):
+        user_in_group(group, user)
+    
+    # Add Occasion
+    id = str(uuid.uuid4())
+    occasions_container.create_item(body={
+        'id': id,
+        'admin': username,
+        'groupID': groupID,
+        'usernames':  list(dict.fromkeys([username] + usernames)),
+        'occasionname': occasionname,
+        'occasiondate': occasiondate
+    })
+
+    # Add To Group via Patch Operation
+    ops = [
+        {"op": "add", "path": "/occasions/-", "value": id}
+    ]
+    groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+def get_occasions(username, groupID):
+    # Check if group exists
+    group = group_exists(groupID)
+
+    # Check username is in group
+    user_in_group(group, username)
+
+    # Filter occasions in group by ones that are relevant to user
+    ocs = list(occasions_container.query_items(
+        query="SELECT * FROM c WHERE c.groupID=@groupID and ARRAY_CONTAINS(c.usernames, @username)",
+        parameters=[{'name': '@groupID', 'value': groupID},
+                    {'name': '@username', 'value': username}],
+        enable_cross_partition_query=True
+    ))
+    return ocs
