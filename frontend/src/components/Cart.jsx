@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "../styles/cart.module.css";
 import config from "../config";
 
+// TODO: Connect cart page to route and build cart page functionality
 function Cart({ username }) {
   const [cartItems, setCartItems] = useState([]); // Cart content stored here
   const [cartName, setCartName] = useState("");

@@ -54,7 +54,6 @@ function WishList({ username }) {
             Fetch Wishlist
         </button>
         <button
-            onClick={updateWishlist}
             style={{
                 padding: '10px',
                 fontSize: '14px',
@@ -70,7 +69,6 @@ function WishList({ username }) {
             Add Gift
         </button>
         <button
-            onClick={removeWishList}
             style={{
                 padding: '10px',
                 fontSize: '14px',

@@ -5,11 +5,10 @@ import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
 
-// TODO: Implement add to cart and wishlist functionality
+// TODO: Implement add to cart functionality
+// TODO: Implement proceed to cart and continue shopping functionality
 // TODO: Add loading animation with infinity loop over gift
 // Icons available at https://react-icons.github.io/react-icons/
-// Infinity loop: https://codepen.io/suez/pen/myvgdg
-// Gift is from logo but cropped
 export default function Product() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -22,6 +21,7 @@ export default function Product() {
   const [price, setPrice] = useState(data.price || "");
   const [favorite, setFavorite] = useState(false);
   const [cart, setCart] = useState(false);
+  const username = localStorage.getItem("username");
   
   const getProductInfoById = async () => {
     // Fetch product info by id
@@ -60,47 +60,67 @@ export default function Product() {
     }
   }, [data.id, getProductInfoById]);
 
-  const addToWishlist = async () => {
-    const response = await fetch(`${config.backendURL}/wishlist_update`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({"username": username, "gift": id}),
-    });
-    const data = await response.json();
-    console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
-  };
-
-  const removeFromWishlist = async () => {
-    const response = await fetch(`${config.backendURL}/wishlist_remove`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({"username": username, "gift": id}),
-    });
-
-    const data = await response.json();
-    console.log(`Gift removed from wishlist: ${JSON.stringify(data)}`);
-  };
 
   // Function to handle updating the wishlist
   const updateWishlistStatus = async () => {
     setFavorite(!favorite);
+    const addToWishlist = async () => {
+      const response = await fetch(`${config.backendURL}/wishlist_update`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"username": username, "gift": id}),
+      });
+      const data = await response.json();
+      console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
+    };
+  
+    const removeFromWishlist = async () => {
+      const response = await fetch(`${config.backendURL}/wishlist_remove`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"username": username, "gift": id}),
+      });
+  
+      const data = await response.json();
+      console.log(`Gift removed from wishlist: ${JSON.stringify(data)}`);
+    };
+
     favorite ? await removeFromWishlist() : await addToWishlist();
   }
 
-  const addToCart = async () => {
-    // TODO: Implement add to cart functionality
-  };
-
-  const removeFromCart = async () => {
-    // TODO: Implement remove from cart functionality
-  };
-
   const updateCartStatus = async () => {
     setCart(!cart);
+    
+    const addToCart = async () => {
+      // TODO: Implement add to cart functionality in backend
+      const response = await fetch(`${config.backendURL}/add_to_cart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"username": username, "gift": id}),
+      });
+      const data = await response.json();
+      console.log(`Gift added to cart: ${JSON.stringify(data)}`);
+    };
+  
+    const removeFromCart = async () => {
+      // TODO: Implement remove from cart functionality in backend
+      const response = await fetch(`${config.backendURL}/remove_from_cart`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({"username": username, "gift": id}),
+      });
+      const data = await response.json();
+      console.log(`Gift removed from cart: ${JSON.stringify(data)}`);
+    };
+
     cart ? await removeFromCart() : await addToCart();
   };
 
