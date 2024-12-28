@@ -431,7 +431,7 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     groupname = data['groupname']
     try:
         group = groups.create_group(userID, groupname)
-        body = json.dumps({"result": True, "msg": "OK", "group": group})
+        body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -480,7 +480,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {userId: userID, user_to_add: username, groupID: groupID}
+        data: {userID: userID, user_to_add: username, groupID: groupID}
         
     # Returns
     func.HttpResponse
@@ -497,7 +497,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     try:
         group = groups.add_user(userID, user_to_add, groupID)
-        body=json.dumps({"result": True, "msg": "OK", "group": group})
+        body=json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -527,7 +527,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     try:
         gs = groups.get_groups(userID)
-        body = json.dumps({"result": True, "msg": "OK", "groups": gs})
+        body = json.dumps({"result": True, "msg": "OK", "groups": groups.groups_cleaned(gs)})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -559,7 +559,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     groupname = data['groupname']
     try:
         group = groups.change_groupname(userID, groupID, groupname)
-        body = json.dumps({"result": True, "msg": "OK", "group": group})
+        body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -593,7 +593,7 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     user_to_remove = data['user_to_remove']
     try:
         ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
-        body=json.dumps({"result": True, "msg": "OK", "occasions": ocs, "group": group})
+        body=json.dumps({"result": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -626,7 +626,7 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     try:
         ocs, group = groups.groups_leave(userID, groupID)
-        body = json.dumps({"response": True, "msg": "OK", "occasions": ocs, "group": group})
+        body = json.dumps({"response": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except Exception as e:
         body = json.dumps({"response": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -661,7 +661,7 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     occasiondate = data['occasiondate']
     try:
         oc, group = groups.create_occasion(userID, groupID, users, occasionname, occasiondate)
-        body=json.dumps({"result": True, "msg": "OK", "group": group, "occasion": oc})
+        body=json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group), "occasion": groups.occasion_cleaned(oc)})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -691,7 +691,7 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     try:
         ocs = groups.get_occasions(userID, groupID)
-        body=json.dumps({"result": True, "msg": "OK", "occasions": ocs})
+        body=json.dumps({"result": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs)})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(

@@ -19,6 +19,16 @@ def test_add_user():
     r.raise_for_status()
     print(r.json())
 
+def kick_user():
+    url = getURL("kick")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "groupID": "1a16b794-816c-479b-bca2-37578455c89d",
+        "user_to_remove": "06bac64c-9de0-4757-ba1a-ccff044a3399"
+    }))
+    print(r.json())
+
 def test_add_occasion():
     url = getURL("occasions", "create")
     print(url)
@@ -34,6 +44,18 @@ def test_add_occasion():
     r.raise_for_status()
     print(r.json())
 
+def test_get_occasions():
+    url = getURL("occasions", "get")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "groupID": "1a16b794-816c-479b-bca2-37578455c89d"
+    }))
+    r.raise_for_status()
+    print(r.json())
 
 if __name__ == '__main__':
+    # test_get_occasions()
+    test_add_user()
     test_add_occasion()
+    kick_user()

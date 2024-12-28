@@ -1,5 +1,5 @@
 from azure.cosmos import CosmosClient
-import os, uuid, logging
+import os, uuid, logging, json
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
@@ -52,6 +52,37 @@ def group_is_not_admin(groupDoc, userID):
 def user_in_group(groupDoc, userID):
     if userID not in groupDoc['users']:
         raise Exception(f"This user is not in the group")
+
+def paired_users(users):
+    users = map(lambda userID: {
+        "userID": userID,
+        "username": user_exists(userID)['username']
+    }, users)
+    return list(users)
+
+def group_cleaned(groupDoc):
+    return json.dumps({
+        'id': groupDoc['id'],
+        'groupname': groupDoc['groupname'],
+        'admin': groupDoc['admin'],
+        'users': paired_users(groupDoc['users']),
+        'occasions': groupDoc['occasions']
+    })
+
+def groups_cleaned(groups):
+    return list(map(lambda groupDoc: group_cleaned(groupDoc), groups))
+
+def occasion_cleaned(ocDoc):
+    return json.dumps({
+        'id': ocDoc['id'],
+        'groupID': ocDoc['groupID'],
+        'users': paired_users(ocDoc['users']),
+        'occasionname': ocDoc['occasionname'],
+        'occasiondate': ocDoc['occasiondate']
+    })
+
+def occasions_cleaned(ocs):
+    return list(map(lambda ocDoc: occasion_cleaned(ocDoc), ocs))
 
 def create_group(userID, groupname):
     # Check if userID exists
