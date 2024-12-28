@@ -2,7 +2,7 @@ import PropTypes from "prop-types";
 import styles from "../styles/productCard.module.css";
 import { useNavigate } from "react-router-dom";
 import config from "../config";
-import HashLoader from "react-spinners/HashLoader"
+import InfinityLoader from "./InfinityLoader";
 import { useState } from "react";
 
 function ProductCard({ image, title, price, url }) {
@@ -13,15 +13,15 @@ function ProductCard({ image, title, price, url }) {
   const registerProductOrGetId = async () => {
     try{
       setLoading(true);
-    const response = await fetch(`${config.backendURL}/register_product_or_get_id`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({url, title, image, price}),
-    });
-    const data = await response.json();
-    navigate(`/product?id=${data.id}`, {state: {id: data.id, url, title, image, price}});
+      const response = await fetch(`${config.backendURL}/register_product_or_get_id`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({url, title, image, price}),
+      });
+      const data = await response.json();
+      navigate(`/product?id=${data.id}`, {state: {id: data.id, url, title, image, price}});
     }
     catch (error) {
       console.error("Error sending query to backend: ", error);
@@ -35,7 +35,7 @@ function ProductCard({ image, title, price, url }) {
     <div onClick={registerProductOrGetId}>
       {loading ? (
         <div className="overlay">
-          <HashLoader color="#08caa5" loading={loading} size={150} />
+          <InfinityLoader loading={loading} />
         </div>
       ) : (
         <div className={styles.card}>

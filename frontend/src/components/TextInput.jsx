@@ -4,7 +4,7 @@ import { CgAttachment } from "react-icons/cg";
 import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import HashLoader from "react-spinners/HashLoader"
+import InfinityLoader from "./InfinityLoader";
 import config from "../config";
 
 function TextInput() {
@@ -135,7 +135,7 @@ function TextInput() {
     <div className={styles.TextInputContainer}>
       {loading && (
         <div className="overlay">
-          <HashLoader color="#08caa5" loading={loading} size={150} />
+          <InfinityLoader loading={loading}/>
         </div>
       )}
       <div className={styles.inputContainer}>
