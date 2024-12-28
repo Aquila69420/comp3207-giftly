@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaArrowLeft, FaPencilAlt, FaCheck } from 'react-icons/fa';
+import GroupsMembersList from "../components/GroupsMembersList"; 
 import styles from '../styles/groups.module.css';
 
 const GroupsSettings = () => {
@@ -9,14 +10,15 @@ const GroupsSettings = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
-  const [memberUsernames, setMemberUsernames] = useState([]);
+//   const [memberUsernames, setMemberUsernames] = useState([]);
+  const [memberDetails, setMemberDetails] = useState([]); // Array of { username, userID }
   const { groupID, members } = location.state || { groupID: '', members: [] };
   const [groupName, setGroupName] = useState(
     location.state?.groupName || 'Unknown Group'
   );
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [newGroupName, setNewGroupName] = useState(groupName);
-
+  const currentUserID = localStorage.getItem("userID");
   console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
 
   useEffect(() => {
@@ -30,7 +32,11 @@ const GroupsSettings = () => {
 
         const data = await response.json();
         if (data.result) {
-          setMemberUsernames(data.usernames);
+          const combinedDetails = members.map((id, index) => ({
+            userID: id,
+            username: data.usernames[index],
+          }));
+          setMemberDetails(combinedDetails);
         } else {
           setError(data.msg);
         }
@@ -70,6 +76,30 @@ const GroupsSettings = () => {
       setError('Error updating group name: ' + error.message);
     }
   };
+
+  const handleRemoveMember = async (userIDToRemove) => {
+    try {
+      const response = await fetch("http://localhost:5000/groups/kick", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userID: currentUserID,
+          groupID: groupID,
+          user_to_remove: userIDToRemove,
+        }),
+      });
+      const data = await response.json();
+      if (data.result) {
+        setMemberDetails((prev) =>
+          prev.filter((member) => member.userID !== userIDToRemove)
+        );
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      setError("Error removing member: " + error.message);
+    }
+  };
   
 
   const handleInvite = async () => {
@@ -100,7 +130,10 @@ const GroupsSettings = () => {
                 setUsername(''); // Clear the username field after inviting
                 setError(null);
                 // Update the members list
-                setMemberUsernames((prev) => [...prev, username]);
+                setMemberDetails((prev) => [
+                    ...prev,
+                    { userID: data.userID, username },
+                  ]);
             } else {
                 setError(addUserData.msg);
             }
@@ -197,7 +230,7 @@ const GroupsSettings = () => {
         {/* Error Message */}
         {error && <p className={styles.error}>{error}</p>}
 
-        {/* Members Section */}
+        {/* Members Section
         <h2 className={styles.membersHeading}>Members</h2>
         <ul className={styles.membersList}>
           {memberUsernames.map((member, index) => (
@@ -205,6 +238,19 @@ const GroupsSettings = () => {
 			  {member}
 			</li>
 		  ))}
+        </ul> */}
+
+        {/* Members Section */}
+        <h2 className={styles.membersHeading}>Members</h2>
+        <ul className={styles.membersList}>
+          {memberDetails.map((member) => (
+            <GroupsMembersList
+              key={member.userID}
+              member={member}
+              onRemove={() => handleRemoveMember(member.userID)}
+              isCurrentUser={member.userID === currentUserID}
+            />
+          ))}
         </ul>
 
 		{/* Delete Group Section */}
