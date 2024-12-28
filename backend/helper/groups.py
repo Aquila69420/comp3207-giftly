@@ -79,8 +79,8 @@ def add_user(userID, user_to_add, groupID):
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise Exception(f"{user_to_add} is already in the group")
-    
+        raise Exception("The User is already in the group")
+
     # UserID needs to be admin to add user to group
     group_is_admin(group, userID)
 

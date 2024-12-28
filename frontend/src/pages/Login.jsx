@@ -22,8 +22,21 @@ function Login() {
 
       if (result.response === "User successfully logged in.") {
         localStorage.setItem("username", values.username);
-        setLoginError("");
-        console.log("Login successful!");
+        const response = await fetch("http://localhost:5000/get_user_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: values.username }),
+        });
+        const data = await response.json();
+        if (data.result) {
+          localStorage.setItem("userID", data.userID);
+          setLoginError("");
+          console.log("Login successful!");
+        } else {
+          setLoginError(result.msg);
+        }
       } else {
         setLoginError(result.response);
       }

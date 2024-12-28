@@ -1,37 +1,111 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaPencilAlt, FaCheck } from 'react-icons/fa';
 import styles from '../styles/groups.module.css';
 
 const GroupsSettings = () => {
   const [username, setUsername] = useState('');
+  
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
-  const { groupName, groupID } = location.state || { groupName: 'Unknown Group', groupID: '' };
+  const [memberUsernames, setMemberUsernames] = useState([]);
+  const { groupID, members } = location.state || { groupID: '', members: [] };
+  const [groupName, setGroupName] = useState(
+    location.state?.groupName || 'Unknown Group'
+  );
+  const [isEditingGroupName, setIsEditingGroupName] = useState(false);
+  const [newGroupName, setNewGroupName] = useState(groupName);
+
+  console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
+
+  useEffect(() => {
+    const fetchUsernames = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/get_usernames', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userIDs: members }),
+        });
+
+        const data = await response.json();
+        if (data.result) {
+          setMemberUsernames(data.usernames);
+        } else {
+          setError(data.msg);
+        }
+      } catch (error) {
+        setError('Error fetching usernames: ' + error.message);
+      }
+    };
+
+    fetchUsernames();
+  }, [members]);
+  
+  const handleSaveGroupName = async () => {
+	// Only update the group name if it has changed
+	if (newGroupName === groupName) {
+	  setIsEditingGroupName(false);
+	  return;
+	}
+	try {
+      const response = await fetch('http://localhost:5000/groups/change_groupname', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+		  username: localStorage.getItem('userID'),
+          groupID: groupID,
+          groupname: newGroupName,
+        }),
+      });
+      const data = await response.json();
+      if (data.result) {
+        setGroupName(newGroupName); // Update group name in the UI
+        setIsEditingGroupName(false); // Exit editing mode
+        setError(null);
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      setError('Error updating group name: ' + error.message);
+    }
+  };
+  
 
   const handleInvite = async () => {
     if (username.trim()) {
       try {
-
-        console.log('username:', username, 'groupID:', groupID);
-
-        const response = await fetch('http://localhost:5000/groups/add_user', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: localStorage.getItem('username'),
-            user_to_add: username,
-            groupID: groupID,
-          }),
+		const response = await fetch("http://localhost:5000/get_user_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: username }),
         });
-        console.log(response);
         const data = await response.json();
+        console.log(data);
         if (data.result) {
-          setUsername(''); // Clear the username field after inviting
-          setError(null);
+			const response = await fetch('http://localhost:5000/groups/add_user', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+				  userID: localStorage.getItem('userID'),
+				  user_to_add: data.userID,
+				  groupID: groupID,
+				}),
+			});
+			console.log(response);
+			const addUserData = await response.json();
+			if (addUserData.result) {
+                setUsername(''); // Clear the username field after inviting
+                setError(null);
+                // Update the members list
+                setMemberUsernames((prev) => [...prev, username]);
+            } else {
+                setError(addUserData.msg);
+            }
         } else {
-          setError(data.msg);
+            setError("User not found.");
         }
       } catch (error) {
         setError('Error inviting user: ' + error.message);
@@ -39,13 +113,14 @@ const GroupsSettings = () => {
     }
   };
 
+
   const handleDeleteGroup = async () => {
     try {
       const response = await fetch('http://localhost:5000/groups/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          username: localStorage.getItem('username'),
+          userID: localStorage.getItem('userID'),
           groupID: groupID,
         }),
       });
@@ -71,11 +146,37 @@ const GroupsSettings = () => {
         >
           <FaArrowLeft />
         </button>
-        <span className={styles.groupsTopBarTitle}>{groupName}</span>
+        <div className={styles.groupsTopBarTitleContainer}>
+          {isEditingGroupName ? (
+            <div className={styles.editGroupName}>
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                className={styles.editGroupNameInput}
+              />
+              <button
+                onClick={handleSaveGroupName}
+                className={styles.editGroupNameButton}
+              >
+                <FaCheck />
+              </button>
+            </div>
+          ) : (
+            <span className={styles.groupsTopBarTitle}>
+              {groupName}
+              <FaPencilAlt
+                onClick={() => setIsEditingGroupName(true)}
+                className={styles.editIcon}
+              />
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Content */}
       <div className={styles.groupsSettingsContent}>
+        {/* Add Member Section */}
         <h2 className={styles.groupsSettingsHeading}>Add a Member to the Group</h2>
         <div className={styles.groupsSettingsForm}>
           <input
@@ -93,10 +194,21 @@ const GroupsSettings = () => {
           </button>
         </div>
 
+        {/* Error Message */}
         {error && <p className={styles.error}>{error}</p>}
 
-        {/* Delete Group Button */}
-        <div className={styles.deleteGroupSection}>
+        {/* Members Section */}
+        <h2 className={styles.membersHeading}>Members</h2>
+        <ul className={styles.membersList}>
+          {memberUsernames.map((member, index) => (
+			<li key={index} className={styles.memberItem}>
+			  {member}
+			</li>
+		  ))}
+        </ul>
+
+		{/* Delete Group Section */}
+		<div className={styles.deleteGroupSection}>
           <button
             onClick={handleDeleteGroup}
             className={styles.deleteGroupButton}
@@ -104,6 +216,8 @@ const GroupsSettings = () => {
             Delete Group
           </button>
         </div>
+
+		
       </div>
     </div>
   );
