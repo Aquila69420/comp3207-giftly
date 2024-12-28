@@ -54,7 +54,24 @@ const Groups = () => {
       });
       const data = await response.json();
       if (data.result) {
-        setGroups([...groups, { groupname: newGroupName, subgroups: [] }]);
+        //Fetch the updated groups list
+        const response = await fetch('http://localhost:5000/groups/get', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username }),
+        });
+
+        const data = await response.json();
+
+        if (data.result) {
+            setGroups(data.groups);
+            if (data.groups.length > 0) {
+              setActiveGroup(data.groups[0]); // Set the first group as the active group
+            }
+        } else {
+            setError(data.msg);
+        }
+
       } else {
         console.error(data.msg);
       }

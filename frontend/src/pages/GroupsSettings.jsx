@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaPencilAlt, FaCheck } from 'react-icons/fa';
 import styles from '../styles/groups.module.css';
 
 const GroupsSettings = () => {
@@ -8,9 +8,43 @@ const GroupsSettings = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
-  const { groupName, groupID, members } = location.state || { groupName: 'Unknown Group', groupID: '', members: [] };
+  const { groupID, members } = location.state || { groupID: '', members: [] };
+  const [groupName, setGroupName] = useState(
+    location.state?.groupName || 'Unknown Group'
+  );
+  const [isEditingGroupName, setIsEditingGroupName] = useState(false);
+  const [newGroupName, setNewGroupName] = useState(groupName);
 
   console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
+
+  const handleSaveGroupName = async () => {
+	// Only update the group name if it has changed
+	if (newGroupName === groupName) {
+	  setIsEditingGroupName(false);
+	  return;
+	}
+	try {
+      const response = await fetch('http://localhost:5000/groups/change_groupname', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+		  username: localStorage.getItem('username'),
+          groupID: groupID,
+          groupname: newGroupName,
+        }),
+      });
+      const data = await response.json();
+      if (data.result) {
+        setGroupName(newGroupName); // Update group name in the UI
+        setIsEditingGroupName(false); // Exit editing mode
+        setError(null);
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      setError('Error updating group name: ' + error.message);
+    }
+  };
   
 
   const handleInvite = async () => {
@@ -77,11 +111,37 @@ const GroupsSettings = () => {
         >
           <FaArrowLeft />
         </button>
-        <span className={styles.groupsTopBarTitle}>{groupName}</span>
+        <div className={styles.groupsTopBarTitleContainer}>
+          {isEditingGroupName ? (
+            <div className={styles.editGroupName}>
+              <input
+                type="text"
+                value={newGroupName}
+                onChange={(e) => setNewGroupName(e.target.value)}
+                className={styles.editGroupNameInput}
+              />
+              <button
+                onClick={handleSaveGroupName}
+                className={styles.editGroupNameButton}
+              >
+                <FaCheck />
+              </button>
+            </div>
+          ) : (
+            <span className={styles.groupsTopBarTitle}>
+              {groupName}
+              <FaPencilAlt
+                onClick={() => setIsEditingGroupName(true)}
+                className={styles.editIcon}
+              />
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Content */}
       <div className={styles.groupsSettingsContent}>
+        {/* Add Member Section */}
         <h2 className={styles.groupsSettingsHeading}>Add a Member to the Group</h2>
         <div className={styles.groupsSettingsForm}>
           <input
@@ -99,9 +159,10 @@ const GroupsSettings = () => {
           </button>
         </div>
 
+        {/* Error Message */}
         {error && <p className={styles.error}>{error}</p>}
 
-		{/* Members Section */}
+        {/* Members Section */}
         <h2 className={styles.membersHeading}>Members</h2>
         <ul className={styles.membersList}>
           {members.map((member, index) => (
@@ -111,8 +172,8 @@ const GroupsSettings = () => {
 		  ))}
         </ul>
 
-        {/* Delete Group Button */}
-        <div className={styles.deleteGroupSection}>
+		{/* Delete Group Section */}
+		<div className={styles.deleteGroupSection}>
           <button
             onClick={handleDeleteGroup}
             className={styles.deleteGroupButton}
@@ -120,6 +181,8 @@ const GroupsSettings = () => {
             Delete Group
           </button>
         </div>
+
+		
       </div>
     </div>
   );

@@ -573,5 +573,65 @@
   .memberItem:last-child {
     border-bottom: none;
   }
+
+  /* Editable Group Name */
+.groupsTopBarTitleContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    position: relative;
+  }
+  
+  .groupsTopBarTitle {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    flex-grow: 1;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+
+  
+  .editIcon {
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    padding-left: 8px;
+  }
+  
+  .editIcon:hover {
+    color: #007bff;
+  }
+  
+  .editGroupName {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .editGroupNameInput {
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .editGroupNameButton {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 10px;
+    cursor: pointer;
+  }
+  
+  .editGroupNameButton:hover {
+    background-color: #0056b3;
+  }
+
+  
   
   
