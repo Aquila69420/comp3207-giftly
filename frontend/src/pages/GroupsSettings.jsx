@@ -53,7 +53,7 @@ const GroupsSettings = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-		  username: localStorage.getItem('userID'),
+          userID: localStorage.getItem('userID'),
           groupID: groupID,
           groupname: newGroupName,
         }),

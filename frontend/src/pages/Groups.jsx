@@ -10,8 +10,8 @@ const Groups = () => {
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeSubgroup, setActiveSubgroup] = useState(null);
-  const [username] = useState('atharva'); // Replace with actual logged-in username
-  const [userID] = useState('06bac64c-9de0-4757-ba1a-ccff044a3399'); // Replace with actual logged-in user id
+//   const [username] = useState('atharva'); // Replace with actual logged-in username
+  const [userID] = useState(localStorage.getItem('userID'));
   const [occasion, setOccasion] = useState("X's Birthday"); // Replace with actual occasion
   const [error, setError] = useState(null);
   const navigate = useNavigate();
