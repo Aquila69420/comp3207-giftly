@@ -246,6 +246,56 @@ def get_user_id(req: func.HttpRequest) -> func.HttpResponse:
         )
     return add_cors_headers(response)
 
+@app.function_name(name="get_username")
+@app.route(route='get_username', methods=[func.HttpMethod.POST])
+def get_username(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    userID = data['userID']
+    try:
+        user_data = list(user_container.query_items(
+            query="SELECT c.username FROM c WHERE c.id=@userID",
+            parameters=[{'name': '@userID', 'value': userID}],
+            enable_cross_partition_query=True
+        ))
+        username = user_data[0]['username']
+        response = func.HttpResponse(
+            body=json.dumps({"result": True, "msg": "OK", "username": username}),
+            mimetype="application/json",
+        )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({"result": False, "msg": str(e)}),
+            mimetype="application/json",
+        )
+    return add_cors_headers(response)
+
+@app.function_name(name="get_usernames")
+@app.route(route='get_usernames', methods=[func.HttpMethod.POST])
+def get_usernames(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    userIDs = data['userIDs']
+    usernames = []
+    for userID in userIDs:
+        try:
+            user_data = list(user_container.query_items(
+                query="SELECT c.username FROM c WHERE c.id=@userID",
+                parameters=[{'name': '@userID', 'value': userID}],
+                enable_cross_partition_query=True
+            ))
+            usernames.append(user_data[0]['username'])
+        except Exception as e:
+            return func.HttpResponse(
+                body=json.dumps({"result": False, "msg": str(e)}),
+                mimetype="application/json",
+            )
+    response = func.HttpResponse(
+        body=json.dumps({"result": True, "msg": "OK", "usernames": usernames}),
+        mimetype="application/json",
+    )
+    return add_cors_headers(response)
+
+
+
 @app.function_name(name="send_notifications")
 @app.route(route='send_notifications', methods=[func.HttpMethod.POST])
 def send_notifications(req: func.HttpRequest) -> func.HttpResponse:

@@ -75,7 +75,7 @@ def add_user(userID, user_to_add, groupID):
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise Exception(f"{user_to_add} is already in the group")
+        raise Exception(f"User is already in the group")
 
     # Retrieve Group Document via ID
     groupID = group['id']
