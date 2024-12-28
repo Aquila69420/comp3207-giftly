@@ -480,7 +480,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {userId: userID, user_to_add: userID1, groupID: groupID}
+        data: {userId: userID, user_to_add: username, groupID: groupID}
         
     # Returns
     func.HttpResponse

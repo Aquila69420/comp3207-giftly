@@ -16,7 +16,18 @@ def user_exists(userID):
         ))
     if not user:
         raise Exception("The user does not exist")
-    return user
+    return user[0]
+
+def username_exists(username):
+    '''Check if username exists in the database and return userID'''
+    user = list(user_container.query_items(
+                query="SELECT * FROM c WHERE c.username=@username",
+                parameters=[{'name': '@username', 'value': username}],
+                enable_cross_partition_query=True
+            ))
+    if not user:
+        raise Exception("The user does not exist")
+    return user[0]
 
 def group_exists(groupID):
     '''Check if groupname exists in the database'''
@@ -72,14 +83,16 @@ def delete_group(userID, groupID):
 def add_user(userID, user_to_add, groupID):
     # Check both userIDs exist
     user_exists(userID)
-    user_exists(user_to_add)
+    user_to_add_doc = username_exists(user_to_add)
+    # Set user_to_add username to the user's id
+    user_to_add = user_to_add_doc['id']
 
     # Check Group exists
     group = group_exists(groupID)
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise Exception("The User is already in the group")
+        raise Exception("The user is already in the group")
 
     # UserID needs to be admin to add user to group
     group_is_admin(group, userID)
