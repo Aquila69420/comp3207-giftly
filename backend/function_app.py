@@ -344,20 +344,20 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupname: groupname}
+        data: {userID: userID, groupname: groupname}
 
     # Returns
     func.HttpResponse
     with
-        data: {result: True, msg: "OK"}
+        data: {result: True, msg: "OK", groupID: id}
         data: {result: False, msg: "User {username} does not exist"}
     '''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     groupname = data['groupname']
     try:
-        groups.create_group(username, groupname)
-        body = json.dumps({"result": True, "msg": "OK"})
+        id = groups.create_group(userID, groupname)
+        body = json.dumps({"result": True, "msg": "OK", "groupID": id})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -375,19 +375,19 @@ def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupID: groupID}
+        data: {userID: userID, groupID: groupID}
     
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
-        data: {result: False, msg: "{username} is not the admin of the group"}
+        data: {result: False, msg: "{userID} is not the admin of the group"}
         data: {result: False, msg: {groupID} does not exist}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     groupID = data['groupID']
     try:
-        groups.delete_group(username, groupID)
+        groups.delete_group(userID, groupID)
         body = json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -406,23 +406,23 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, user_to_add: username1, groupID: groupID}
+        data: {userId: userID, user_to_add: userID1, groupID: groupID}
         
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
         data: {result: False, msg: "{groupID} does not exist"}
-        data: {result: False, msg: "{username} does not exist"}
+        data: {result: False, msg: "{userID} does not exist"}
         data: {result: False, msg: "{user_to_add} does not exist"}
-        data: {result: False, msg: "{username} is not the admin of the group"}
+        data: {result: False, msg: "{userID} is not the admin of the group"}
         data: {result: False, msg: "{user_to_add} is already in the group"}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     user_to_add = data['user_to_add']
     groupID = data['groupID']
     try:
-        groups.add_user(username, user_to_add, groupID)
+        groups.add_user(userID, user_to_add, groupID)
         body=json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
@@ -442,17 +442,17 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username}
+        data: {userID: userID}
         
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK", groups: []}
-        data: {result: False, msg: "{username} does not exist"}'''
+        data: {result: False, msg: "{userID} does not exist"}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     try:
-        gs = groups.get_groups(username)
+        gs = groups.get_groups(userID)
         body = json.dumps({"result": True, "msg": "OK", "groups": gs})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -471,7 +471,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupID: groupID, groupname: new_groupname}
+        data: {userID: userID, groupID: groupID, groupname: new_groupname}
         
     # Returns
     func.HttpResponse
@@ -480,11 +480,11 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
         data: {result: False, msg: "{groupID} does not exist"}
         data: {result: False, msg: "User is not admin of the group"}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     groupID = data['groupID']
     groupname = data['groupname']
     try:
-        groups.change_groupname(username, groupID, groupname)
+        groups.change_groupname(userID, groupID, groupname)
         body = json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -495,6 +495,42 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_kick")
+@app.route(route='groups/kick', methods=[func.HttpMethod.POST])
+def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
+    '''The admin of a group removes a different user from the group
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, groupID: groupID, user_to_remove: userID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "{groupID} does not exist"}
+        data: {result: False, msg: "{userID} is not admin"}
+        data: {result: False, msg: "{user_to_remove} is not in the group"}
+        data: {result: False, msg: "Cannot kick yourself from the group"}'''
+    data = req.get_json()
+    userID = data['userID']
+    groupID = data['groupID']
+    user_to_remove = data['user_to_remove']
+    try:
+        groups.groups_kick(userID, groupID, user_to_remove)
+        body=json.dumps({"result": True, "msg": "OK"})
+    except Exception as e:
+        body=json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+    
+
 @app.function_name(name="groups_occasions_create")
 @app.route(route='groups/occasions/create', methods=[func.HttpMethod.POST])
 def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
@@ -503,7 +539,7 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupID: groupID, occasionname: occasionname, 
+        data: {userID: userID, groupID: groupID, users: [], occasionname: occasionname, 
                occasiondate: occasiondate}
                
     # Returns
@@ -511,15 +547,15 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     with
         data: {result: True, msg: "OK"}
         data: {result: False, msg: "{groupID} does not exist}
-        data: {result: False, msg: "{username} is not in the group"}'''
+        data: {result: False, msg: "{userID} is not in the group"}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     groupID = data['groupID']
-    usernames = data['usernames']
+    users = data['users']
     occasionname = data['occasionname']
     occasiondate = data['occasiondate']
     try:
-        groups.create_occasion(username, groupID, usernames, occasionname, occasiondate)
+        groups.create_occasion(userID, groupID, users, occasionname, occasiondate)
         body=json.dumps({"result": True, "msg": "OK"})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
@@ -533,23 +569,23 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="groups_occasions_get")
 @app.route(route='groups/occasions/get', methods=[func.HttpMethod.POST])
 def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
-    '''Get all occasions for a particular group and username
+    '''Get all occasions for a particular group and userID
     
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupID: groupID}
+        data: {userID: userID, groupID: groupID}
         
     # Returns
     func.HttpResponse
     with
         data: {response: True, msg: "OK", "occasions": []}
-        data: {response: False, msg: "{username} is not in the group}'''
+        data: {response: False, msg: "{userID} is not in the group}'''
     data = req.get_json()
-    username = data['username']
+    userID = data['userID']
     groupID = data['groupID']
     try:
-        ocs = groups.get_occasions(username, groupID)
+        ocs = groups.get_occasions(userID, groupID)
         body=json.dumps({"result": True, "msg": "OK", "occasions": ocs})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
@@ -568,14 +604,14 @@ def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupname: groupname, occasionname: occasionname}
+        data: {userID: userID, groupname: groupname, occasionname: occasionname}
 
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
         data: {result: False, msg: "{groupname} does not exist"}
-        data: {result: False, msg: "{username} is not the admin for the group"
+        data: {result: False, msg: "{userID} is not the admin for the group"
         data: {result: False, msg: "{occasionname} for this group already exists"}'''
     data = req.get_json()
     #TODO: code
@@ -588,14 +624,14 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     # Parameters
     req: func.HttpRequest
     with
-        data: {username: username, groupname: groupname, occasionname: occasiionname, recipientname: recipientname}
+        data: {userID: userID, groupname: groupname, occasionname: occasiionname, recipientname: recipientname}
     
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
         data: {result: False, msg: "{groupname} does not exist}
-        data: {result: False, msg: "{username} is not the admin for the group}
+        data: {result: False, msg: "{userID} is not the admin for the group}
         data: {result: False, msg: "{occasionname} for this group already exists"}
         data: {result: False, msg: "{recipientname} is not a part of this group}'''
     data = req.get_json()
