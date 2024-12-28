@@ -8,6 +8,7 @@ import OldHome from "./pages/OldHome";
 import SearchResults from "./pages/SearchResults";
 import Product from "./pages/Product";
 import NotFound from "./pages/NotFound";
+import Cart from "./components/Cart";
 
 // TODO: Implement load from back button for pages
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/oldhome" element={<OldHome />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/cart" element={<Cart />} />
         <Route path="*" element={<NotFound />} /> {/* 404 route */}
       </Routes>
     </Router>

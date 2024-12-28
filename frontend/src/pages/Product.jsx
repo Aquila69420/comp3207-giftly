@@ -5,9 +5,7 @@ import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
 
-// TODO: Implement add to cart functionality
 // TODO: Implement proceed to cart and continue shopping functionality
-// TODO: Add loading animation with infinity loop over gift
 // Icons available at https://react-icons.github.io/react-icons/
 export default function Product() {
   const navigate = useNavigate();
@@ -96,29 +94,19 @@ export default function Product() {
     setCart(!cart);
     
     const addToCart = async () => {
-      // TODO: Implement add to cart functionality in backend
-      const response = await fetch(`${config.backendURL}/add_to_cart`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"username": username, "gift": id}),
-      });
-      const data = await response.json();
-      console.log(`Gift added to cart: ${JSON.stringify(data)}`);
+      // Add to session storage cart
+      console.log('Adding to cart:', id);
+      const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+      cart.push({id, url, title, price, image});
+      sessionStorage.setItem("cart", JSON.stringify(cart));
     };
   
     const removeFromCart = async () => {
-      // TODO: Implement remove from cart functionality in backend
-      const response = await fetch(`${config.backendURL}/remove_from_cart`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"username": username, "gift": id}),
-      });
-      const data = await response.json();
-      console.log(`Gift removed from cart: ${JSON.stringify(data)}`);
+      // Remove from session storage cart
+      console.log('Removing from cart:', id);
+      const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+      const updatedCart = cart.filter((item) => item.id !== id);
+      sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
     cart ? await removeFromCart() : await addToCart();
@@ -142,6 +130,10 @@ export default function Product() {
           <button className={styles.cartButton} onClick={updateCartStatus}>
             {cart ? <IoCart /> : <IoCartOutline />}
           </button>
+        </div>
+        <div className={styles.nav}>
+        <button className={styles.navButton} onClick={() => window.history.back}>Continue Shopping</button>
+        <button className={styles.navButton} onClick={() => navigate("/cart")}>Proceed to Cart</button>
         </div>
       </div>
     </div>

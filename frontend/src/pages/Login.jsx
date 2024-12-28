@@ -25,6 +25,9 @@ function Login() {
 
       if (result.response === "User successfully logged in.") {
         localStorage.setItem("username", values.username);
+        if (!sessionStorage.getItem("cart")) {
+          sessionStorage.setItem("cart", JSON.stringify([]));
+        }
         setLoginError("");
         console.log("Login successful!");
         nagivate("/home");
