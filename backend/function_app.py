@@ -380,7 +380,6 @@ def product_img(req: func.HttpRequest) -> func.HttpResponse:
             )
             return add_cors_headers(response)
         if file and allowed_file(file):
-            # TODO: Fix bug where image is not being understood by the image_analysis
             image = Image.open(file)
             imgByteIO = io.BytesIO()
             image.save(imgByteIO, format=image.format)

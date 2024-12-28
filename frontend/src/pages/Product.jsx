@@ -5,6 +5,7 @@ import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
 
+// TODO: Implement add to cart and wishlist functionality
 // TODO: Add loading animation with infinity loop over gift
 // Icons available at https://react-icons.github.io/react-icons/
 // Infinity loop: https://codepen.io/suez/pen/myvgdg

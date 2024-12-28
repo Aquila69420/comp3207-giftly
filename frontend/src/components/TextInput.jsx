@@ -75,6 +75,10 @@ function TextInput() {
         });
         const result = await response.json();
         console.log("Image upload result:", result);
+        if (result.query === "rec:") {
+          alert("Could not identify any objects in the image.");
+          return;
+        }
 
         navigate("/search", { state: { data: result, username } });
       } catch (error) {
