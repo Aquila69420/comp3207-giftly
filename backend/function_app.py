@@ -220,7 +220,31 @@ def update_user_details(req: func.HttpRequest) -> func.HttpResponse:
         body=json.dumps({"response": output}),
         mimetype="application/json",
     )
-    return add_cors_headers(response) 
+    return add_cors_headers(response)
+
+# BODGE for userID
+@app.function_name(name="get_user_id")
+@app.route(route='get_user_id', methods=[func.HttpMethod.POST])
+def get_user_id(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    try:
+        user_data = list(user_container.query_items(
+            query="SELECT c.id FROM c WHERE c.username=@username",
+            parameters=[{'name': '@username', 'value': username}],
+            enable_cross_partition_query=True
+        ))
+        user_id = user_data[0]['id']
+        response = func.HttpResponse(
+            body=json.dumps({"result": True, "msg": "OK", "userID": user_id}),
+            mimetype="application/json",
+        )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({"result": False, "msg": str(e)}),
+            mimetype="application/json",
+        )
+    return add_cors_headers(response)
 
 @app.function_name(name="send_notifications")
 @app.route(route='send_notifications', methods=[func.HttpMethod.POST])
