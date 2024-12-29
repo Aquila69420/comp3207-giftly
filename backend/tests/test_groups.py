@@ -64,5 +64,16 @@ def test_leave_occasion():
     r.raise_for_status()
     print(r.json())
 
+def test_group_gifting():
+    url = getURL("group_gifting")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "occasionID": "c5582269-3439-4345-94f4-db49a8764d9d",
+        "recipients": ["06bac64c-9de0-4757-ba1a-ccff044a3399"]
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 if __name__ == '__main__':
-    test_get_occasions()
+    test_group_gifting()

@@ -101,16 +101,30 @@ def groups_cleaned(groups):
 
 
 def occasion_cleaned(ocDoc):
-    return ({
+    return {
         'id': ocDoc['id'],
         'groupID': ocDoc['groupID'],
         'users': paired_users(ocDoc['users']),
+        'divisions': ocDoc['divisions'],
         'occasionname': ocDoc['occasionname'],
         'occasiondate': ocDoc['occasiondate']
-    })
+    }
 
 def occasions_cleaned(ocs):
     return list(map(lambda ocDoc: occasion_cleaned(ocDoc), ocs))
+
+def division_cleaned(divisionDoc):
+    return {
+        'id': divisionDoc['id'],
+        'occasionID': divisionDoc['occasionID'],
+        'groupID': divisionDoc['groupID'],
+        'users': paired_users(divisionDoc['users']),
+        'cart': divisionDoc['cart'],
+        'recipients': paired_users(divisionDoc['recipients'])
+    }
+
+def divisions_cleaned(divisions):
+    return list(map(lambda divisionDoc: division_cleaned(divisionDoc), divisions))
 
 def create_group(userID, groupname):
     # Check if userID exists
@@ -228,8 +242,11 @@ def remove_user_from_group(userID, group):
     # Remove from all occasions
     ocs = get_occasions(userID, groupID)
     ocs1 = []
+    divisions = []
     for oc in ocs:
-        ocs1.append(remove_user_from_occasion(userID, oc))
+        division, oc = remove_user_from_occasion(userID, oc)
+        ocs1.append(oc)
+        divisions.append(division)
         
     ocs = ocs1
 
@@ -239,20 +256,38 @@ def remove_user_from_group(userID, group):
         { "op": "remove", "path": f"/users/{index}"}
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
-    return ocs, group
+    return divisions, ocs, group
 
 def remove_user_from_occasion(userID, oc):
     ocID = oc['id']
     # Kick from occasion via Patch Operation
     index = oc['users'].index(userID)
     
+    # Remove from all divisions
+    divisions = get_divisions(userID, ocID)
+    divisions1 = []
+    for division in divisions:
+        divisions1.append(remove_user_from_division(userID, division))
+    divisions = divisions1
+
+
     ops = [
         {"op": "remove", "path": f"/users/{index}"}
     ]
     oc = occasions_container.patch_item(item=ocID, partition_key=ocID, patch_operations=ops)
     # TODO: Occasions with no users are removed
-    # TODO: Remove from divisions
-    return oc
+    return divisions, oc
+
+def remove_user_from_division(userID, division):
+    divisionID = division['id']
+    
+    # Kick from occasion via Patch Operation
+    index = division['users'].index(userID)
+    ops = [
+        {"op": "remove", "path": f"/users/{index}"}
+    ]
+    division = divisions_container.patch_item(item=divisionID, partition_key=divisionID, patch_operations=ops)
+    return division
 
 def create_occasion(userID, groupID, users, occasionname, occasiondate):
     # Check if group exists
@@ -268,6 +303,7 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
         'id': id,
         'groupID': groupID,
         'users':  list(dict.fromkeys([userID] + users)),
+        'divisions': [],
         'occasionname': occasionname,
         'occasiondate': occasiondate
     })
@@ -304,3 +340,57 @@ def occasions_leave(userID, occasionID):
 
     # Remove from occasion
     return remove_user_from_occasion(userID, oc)
+
+def occasion_add_division(ocDoc, divisionID):
+    ocID = ocDoc['id']
+    # Patch operation to add divisionID to occasion
+    ops = [
+        {"op": "add", "path": "/divisions/-", "value": divisionID}
+    ]
+    oc = occasions_container.patch_item(item=ocID, partition_key=ocID, patch_operations=ops)
+    return oc
+
+def group_gifting(userID, occasionID, recipients):
+    # TODO: Lock division creation when divisions have already been made for an occasion
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Check user in occasion
+    user_in_occasion(oc, userID)
+
+    # Check Recipients exist
+    try:
+        users_exist(recipients)
+    except Exception as e:
+        raise Exception("A recipient in recipients does not exist")
+
+    # Add all users from the users in occasion to the division.
+    # If recipients are in users of occasion, they are excluded.
+    division = divisions_container.create_item({
+        'id': str(uuid.uuid4()),
+        'occasionID': oc['id'],
+        'groupID': oc['groupID'],
+        'users': [user for user in oc['users'] if user not in recipients],
+        'cart': "", #TODO: generate cart for division
+        'recipients': recipients
+    })
+    # Add divison to occasion
+    oc = occasion_add_division(oc, division['id'])
+
+    return oc, division
+
+def get_divisions(userID, ocID):
+    # Check occasion exists
+    oc = occasion_exists(ocID)
+
+    # Check user is in occasion
+    user_in_occasion(oc, userID)
+
+    # Query
+    divisions = list(occasions_container.query_items(
+        query="SELECT * FROM c WHERE c.occasionID=@occasionID and ARRAY_CONTAINS(c.users, @userID)",
+        parameters=[{'name': '@occasionID', 'value': ocID},
+                    {'name': '@userID', 'value': userID}],
+        enable_cross_partition_query=True
+    ))
+    return divisions

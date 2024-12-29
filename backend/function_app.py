@@ -592,8 +592,8 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     user_to_remove = data['user_to_remove']
     try:
-        ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
-        body=json.dumps({"result": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
+        divisions, ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
+        body=json.dumps({"result": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except Exception as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -625,8 +625,9 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     groupID = data['groupID']
     try:
-        ocs, group = groups.groups_leave(userID, groupID)
-        body = json.dumps({"response": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
+        divisions, ocs, group = groups.groups_leave(userID, groupID)
+        body = json.dumps({"response": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), 
+                           "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except Exception as e:
         body = json.dumps({"response": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -752,21 +753,33 @@ def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     #TODO: code
 
 @app.function_name(name="groups_group_gifting")
-@app.route(route='groups_group_gifting')
+@app.route(route='groups/group_gifting')
 def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Group Gifting for a target recipient(s)
     
     # Parameters
     req: func.HttpRequest
     with
-        data: {userID: userID, occasionID: occasiionname, recipientIDs: [recipientID, ...]}
+        data: {userID: userID, occasionID: occasionID, recipients: [recipientID, ...]}
     
     # Returns
     func.HttpResponse
     with
-        data: {result: True, msg: "OK"}
+        data: {result: True, msg: "OK", occasion: {...}, divisions: []}
         data: {result: False, msg: "{userID} is not the admin for the group"}
-        data: {result: False, msg: "{A recipient in recipientIDs does not exist"}'''
+        data: {result: False, msg: "A recipient in recipients does not exist"}'''
     data = req.get_json()
-    #TODO: code
-
+    userID = data['userID']
+    occasionID = data['occasionID']
+    recipients = data['recipients']
+    try:
+        oc, division = groups.group_gifting(userID, occasionID, recipients)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.division_cleaned(division)})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
