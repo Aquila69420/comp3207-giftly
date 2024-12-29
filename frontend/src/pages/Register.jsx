@@ -35,7 +35,7 @@ function Register() {
         .required("Email is required"),
       phone: Yup.string()
         .matches(
-          /^\+\d{1,3}\s\d{6,14}$/,
+          /^\+{1,3}\s\d{6,14}$/,
           "Phone number must be in the format +44 7765xxxxxx"
         )
         .required("Phone number is required"),
