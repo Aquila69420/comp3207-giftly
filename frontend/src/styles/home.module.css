@@ -9,6 +9,7 @@
   color: white;
 }
 
+
 .container {
   display: flex;
   flex-direction: column;
@@ -37,11 +38,15 @@
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background-color: ##ffffff;
   display: flex;
+  box-sizing: border-box;
   flex-direction: column;
+  height: 100dvh;
   align-items: center;
+
 }
+
+
 
 .account {
   position: absolute;
