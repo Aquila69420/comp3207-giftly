@@ -7,6 +7,7 @@ import { MdManageAccounts } from "react-icons/md";
 import { FaSignOutAlt } from "react-icons/fa";
 import { MdGroups } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
+import DropdownSelection from "../components/DropdownSelection";
 function Home() {
   const [username, setUsername] = useState(localStorage.getItem("username")); // Default username
   const [showDropdown, setShowDropdown] = useState(false);
@@ -58,6 +59,7 @@ function Home() {
           </h1>
           <TextInput username={username} />
         </div>
+        <DropdownSelection username={username} />
       </div>
       {/* Single container for dropdown icon and menu */}
       <div className={styles.account} ref={dropdownContainerRef}>
