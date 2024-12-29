@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "../styles/cart.module.css";
 import config from "../config";
 
-// TODO: build cart page functionality - save from session storage, delete cart, delete items from current cart, load and view other carts for user
+// TODO: build cart page functionality - delete cart, delete items from current cart, load and view other carts for user
 function Cart({ username }) {
   const [cartItems, setCartItems] = useState([]); // Cart content stored here
   const [cartName, setCartName] = useState("");
@@ -30,9 +30,20 @@ function Cart({ username }) {
   };
 
   // IMPROVEMENT: don't allow for save or load cart button before there is text. Dont allow to save cart if cart is empty. Include if gift alreayd bought (select box)
-  const handleSaveCart = async (cartName) => {
-    console.log("Saving cart", cartName);
-    try {
+  const handleSaveCart = async () => {
+    // Get session id
+    const sessionId = localStorage.getItem("sessionId");
+    // First see if cart is already stored
+    const response = await fetch(`${config.backendURL}/load_cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username, session_id: sessionId }),
+    });
+    const result = await response.json();
+    if (result.response !== "failed") {
+      // If cart is already existing, create a new cart
       const response = await fetch(`${config.backendURL}/save_cart`, {
         method: "POST",
         headers: {
@@ -41,14 +52,26 @@ function Cart({ username }) {
         body: JSON.stringify({
           username: username,
           cart_content: cartItems,
-          cart_name: cartName,
+          session_id: sessionId+1,
         }),
       });
-
       const result = await response.json();
       console.log("Response from backend:", result);
-    } catch (error) {
-      console.error("Error sending data:", error);
+    }
+    else {
+      const response = await fetch(`${config.backendURL}/save_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          cart_content: cartItems,
+          session_id: sessionId,
+        }),
+      });
+      const result = await response.json();
+      console.log("Response from backend:", result);
     }
   };
 

@@ -33,6 +33,10 @@ function Login() {
         if (!sessionStorage.getItem("cart")) {
           sessionStorage.setItem("cart", JSON.stringify([]));
         }
+        if (!sessionStorage.getItem("sessionId")) {
+          const sessionId = Math.random().toString(36).substring(2);
+          sessionStorage.setItem("sessionId", JSON.stringify(sessionId));
+        }
         setLoginError("");
         console.log("Login successful!");
         nagivate("/");

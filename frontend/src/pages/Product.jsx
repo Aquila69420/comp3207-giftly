@@ -112,6 +112,57 @@ export default function Product() {
     cart ? await removeFromCart() : await addToCart();
   };
 
+  const saveCart = async () => {
+    const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+    if (cart.length === 0) {
+      alert("Please add items to your cart first.");
+      return;
+    }
+    // Get session id
+    const sessionId = localStorage.getItem("sessionId");
+    // First see if cart is already stored
+    const response = await fetch(`${config.backendURL}/load_cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username, session_id: sessionId }),
+    });
+    const result = await response.json();
+    if (result.response !== "failed") {
+      // If cart is already existing, create a new cart
+      const response = await fetch(`${config.backendURL}/save_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          cart_content: cart,
+          session_id: sessionId+1,
+        }),
+      });
+      const result = await response.json();
+      console.log("Response from backend:", result);
+    }
+    else {
+      const response = await fetch(`${config.backendURL}/save_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          cart_content: cart,
+          session_id: sessionId,
+        }),
+      });
+      const result = await response.json();
+      console.log("Response from backend:", result);
+    }
+    navigate("/cart")
+  };
+
   return (
     <div className={styles.product}>
       <div className={styles.image}>
@@ -133,7 +184,7 @@ export default function Product() {
         </div>
         <div className={styles.nav}>
         <button className={styles.navButton} onClick={() => window.history.back}>Continue Shopping</button>
-        <button className={styles.navButton} onClick={() => navigate("/cart")}>Proceed to Cart</button>
+        <button className={styles.navButton} onClick={saveCart}>Proceed to Cart</button>
         </div>
       </div>
     </div>

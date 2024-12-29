@@ -75,10 +75,10 @@ def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="save_cart", methods=[func.HttpMethod.POST])
 def save_cart(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
-    cart_name = data['cart_name']
+    session_id = data['session_id']
     cart_content = data['cart_content']
     username = data['username']
-    output = cart.save(username, cart_name, cart_content, cart_container)
+    output = cart.save(username, session_id, cart_content, cart_container)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",
@@ -90,10 +90,10 @@ def save_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="load_cart", methods=[func.HttpMethod.POST])
 def load_cart(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
-    cart_name = data['cart_name']
+    session_id = data['session_id']
     username = data['username']
-    output = cart.load(username, cart_name, cart_container)
-    if output==f"{username} does not have stored cart named {cart_name}" or output==f"{username} does not have any carts stored":
+    output = cart.load(username, session_id, cart_container)
+    if output==f"{username} does not have stored cart corresponding to session {session_id}" or output==f"{username} does not have any carts stored":
         response = func.HttpResponse(
             body=json.dumps({"response": "failed", "message": output}),
             mimetype="application/json",
@@ -111,9 +111,9 @@ def load_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.route(route="delete_cart", methods=[func.HttpMethod.POST])
 def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
-    cart_name = data['cart_name']
+    session_id = data['session_id']
     username = data['username']
-    output = cart.delete(username, cart_name, cart_container)
+    output = cart.delete(username, session_id, cart_container)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",
