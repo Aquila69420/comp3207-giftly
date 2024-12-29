@@ -34,6 +34,7 @@ def register_user(username, password, container, email, phone, notifications, em
         logging.info(f"Register error: {e}")
         return "database error"
 
+# TODO: Implement hashing for password
 def login_user(username, password, container):
     logging.info(f"Trying to login: {username}, {password}")
     try:
@@ -54,7 +55,7 @@ def login_user(username, password, container):
 
         # Compare true vs inputted password value
         if password == real_password: 
-            logging.info("Username successfully logged in.")
+            logging.info("{} successfully logged in.".format(username))
             return "User successfully logged in."
         else: 
             logging.info("Username or password incorrect")

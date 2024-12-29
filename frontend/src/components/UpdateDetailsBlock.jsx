@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function UpdateDetailsBlock({username}) {
   const [newPassword, setNewPassword] = useState('');
@@ -10,7 +11,7 @@ function UpdateDetailsBlock({username}) {
   const handleUpdateDetails = async (field) => {
     console.log(`Updating ${field}...`);
     try {
-        const response = await fetch('http://localhost:5000/update_user_details', {
+        const response = await fetch(`${config.backendURL}/update_user_details`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

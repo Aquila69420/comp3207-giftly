@@ -1,0 +1,16 @@
+.features {
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  box-sizing: border-box;
+  justify-content: space-between;
+}
+
+.feature{
+  padding: 1rem 0;
+}
+
+.addSpace{
+    display: flex;
+    gap: 1rem;
+}

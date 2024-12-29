@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import config from '../config';
 
 function WishList({ username }) {
   const [responseMessage, setResponseMessage] = useState('');
@@ -6,7 +7,7 @@ function WishList({ username }) {
   // Function to handle fetching the wishlist
   const fetchWishlist = async () => {
     try {
-      const response = await fetch('http://localhost:5000/wishlist_get', {
+      const response = await fetch(`${config.backendURL}/wishlist_get`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -21,62 +22,6 @@ function WishList({ username }) {
       console.log(`Error fetching Wishlist`);
       setResponseMessage(`Error fetching wishlist: ${error.message}`);
     }
-  };
-
-  // Function to handle updating the wishlist
-  const updateWishlist = async () => {
-    // NOTE: this is where the selected gift will. It will require the following information in identical structure
-    const gift = {
-        'name':"Basketball",
-        'data': {
-            "supplier": "link2",
-            "cost": 30,
-            "added_on": "21-12-2024"
-            }
-    }
-    try {
-      const response = await fetch('http://localhost:5000/wishlist_update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({"username": username, "gift": gift}),
-      });
-
-      const data = await response.json();
-      console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
-      setResponseMessage(`Wishlist updated: ${JSON.stringify(data)}`);
-    } catch (error) {
-      console.log(`Error adding gift to Wishlist`);
-      setResponseMessage(`Error adding gift to wishlist: ${error.message}`);
-    }
-  };
-
-  const removeWishList = async () => {
-    // NOTE: this is where the selected gift will. It will require the following information in identical structure
-    const gift = {
-        'name':"Basketball",
-        'data': {
-            "supplier": "link2",
-            "cost": 30,
-        }
-    }
-    try {
-        const response = await fetch('http://localhost:5000/wishlist_remove', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({"username": username, "gift": gift}),
-        });
-  
-        const data = await response.json();
-        console.log(`Gift removed from wishlist: ${JSON.stringify(data)}`);
-        setResponseMessage(`Wishlist updated: ${JSON.stringify(data)}`);
-      } catch (error) {
-        console.log(`Error removing gift from Wishlist`);
-        setResponseMessage(`Error removing gift from wishlist: ${error.message}`);
-      }
   };
 
   return (
@@ -109,7 +54,6 @@ function WishList({ username }) {
             Fetch Wishlist
         </button>
         <button
-            onClick={updateWishlist}
             style={{
                 padding: '10px',
                 fontSize: '14px',
@@ -125,7 +69,6 @@ function WishList({ username }) {
             Add Gift
         </button>
         <button
-            onClick={removeWishList}
             style={{
                 padding: '10px',
                 fontSize: '14px',
