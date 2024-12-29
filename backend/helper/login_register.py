@@ -1,5 +1,12 @@
 import uuid, json, os, logging
 import azure.functions as func
+import bcrypt
+
+def hash_password(password):
+    return bcrypt.hashpw(password, bcrypt.gensalt(12))
+
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(password, hashed_password)
 
 def register_user(username, password, container, email, phone, notifications, email_verification_code):
     # add username reqs
@@ -20,7 +27,7 @@ def register_user(username, password, container, email, phone, notifications, em
         container.create_item(body={
             'id': str(uuid.uuid4()),
             'username': username,
-            'password': password,
+            'password': hash_password(password),
             'email': email,
             'phone': phone,
             'notifications': notifications, 
@@ -34,7 +41,6 @@ def register_user(username, password, container, email, phone, notifications, em
         logging.info(f"Register error: {e}")
         return "database error"
 
-# TODO: Implement hashing for password
 def login_user(username, password, container):
     logging.info(f"Trying to login: {username}, {password}")
     try:
@@ -54,7 +60,7 @@ def login_user(username, password, container):
         real_password = real_password_data[0]['password']
 
         # Compare true vs inputted password value
-        if password == real_password: 
+        if check_password(password, real_password): 
             logging.info("{} successfully logged in.".format(username))
             return "User successfully logged in."
         else: 
