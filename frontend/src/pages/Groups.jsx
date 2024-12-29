@@ -120,7 +120,7 @@ const Groups = () => {
     <div className={styles.groupsContainer}>
       {/* Top Bar */}
       <GroupsTopBar
-        onBack={() => console.log('Back')}
+        onBack={() => navigate("/")}
         onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname, members: activeGroup?.users, activeGroup } })}
         occasion={occasion}
       />

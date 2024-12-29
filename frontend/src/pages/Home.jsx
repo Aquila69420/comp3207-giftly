@@ -41,6 +41,10 @@ function Home() {
     navigate("/login");
   };
 
+  const handleGroup = () => {
+    navigate("/groups");
+  };
+
   const handleSetting = () => {
     navigate("/account-settings");
   };
@@ -120,7 +124,8 @@ function Home() {
           {model === "Product Selection" ? (
             <>
               <h1 className={styles.header}>
-                Giftly is your best shot—because Santa’s got nothing on you! 🎁🎄
+                Giftly is your best shot—because Santa’s got nothing on you!
+                🎁🎄
               </h1>
               <TextInput username={username} />
             </>
@@ -144,7 +149,7 @@ function Home() {
                 <MdManageAccounts size={30} />
                 <div>Account Settings</div>
               </div>
-              <div className={styles.dropDownButton}>
+              <div className={styles.dropDownButton} onClick={handleGroup}>
                 <MdGroups size={30} />
                 <div>Groups</div>
               </div>
