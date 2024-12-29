@@ -626,9 +626,9 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     try:
         ocs, group = groups.groups_leave(userID, groupID)
-        body = json.dumps({"response": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
+        body = json.dumps({"result": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except Exception as e:
-        body = json.dumps({"response": False, "msg": str(e)})
+        body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
