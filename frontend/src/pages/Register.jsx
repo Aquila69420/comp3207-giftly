@@ -1,11 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import styles from "../styles/register.module.css";
 import logo from "../image/giftly_logo_trans.png";
 import { MdAccountCircle } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
 
 function Register() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("username")) {
+      navigate("/");
+    }
+  }, []);
   const formik = useFormik({
     initialValues: {
       username: "",
@@ -26,7 +33,10 @@ function Register() {
         .email("Invalid email address")
         .required("Email is required"),
       phone: Yup.string()
-        .matches(/^\+\d{1,3}\s\d{6,14}$/, "Phone number must be in the format +44 7765xxxxxx")
+        .matches(
+          /^\+\d{1,3}\s\d{6,14}$/,
+          "Phone number must be in the format +44 7765xxxxxx"
+        )
         .required("Phone number is required"),
       notifications: Yup.string()
         .oneOf(["true", "false"], "Please select a notification preference")
@@ -50,6 +60,7 @@ function Register() {
         });
         const result = await response.json();
         console.log("Register Response:", result);
+        navigate("/login");
       } catch (error) {
         console.error("Error during registration:", error);
       }
@@ -79,9 +90,8 @@ function Register() {
     <div className={styles.registerContainer}>
       <img src={logo} alt="logo" width={300} className={styles.logo} />
       <form onSubmit={formik.handleSubmit} className={styles.box}>
-        <div className={styles.iconContainer}>
-          <MdAccountCircle size={60} />
-        </div>
+        <div className={styles.iconContainer}>Register</div>
+        <div className={styles.inputLabel}>Username</div>
         <input
           type="text"
           name="username"
@@ -94,7 +104,7 @@ function Register() {
         {formik.touched.username && formik.errors.username ? (
           <div className={styles.error}>{formik.errors.username}</div>
         ) : null}
-
+        <div className={styles.username}>Username</div>
         <input
           type="password"
           name="password"
@@ -107,7 +117,7 @@ function Register() {
         {formik.touched.password && formik.errors.password ? (
           <div className={styles.error}>{formik.errors.password}</div>
         ) : null}
-
+        <div className={styles.username}>Username</div>
         <input
           type="text"
           name="email"
@@ -120,7 +130,7 @@ function Register() {
         {formik.touched.email && formik.errors.email ? (
           <div className={styles.error}>{formik.errors.email}</div>
         ) : null}
-
+        <div className={styles.username}>Username</div>
         <input
           type="text"
           name="phone"
@@ -150,12 +160,17 @@ function Register() {
         {formik.touched.notifications && formik.errors.notifications ? (
           <div className={styles.error}>{formik.errors.notifications}</div>
         ) : null}
+        <button type="submit" className={styles.buttonPrimary}>
+          Register
+        </button>
+      </form>
+    </div>
+  );
+}
 
-        <div className={styles.actionContainer}>
-          <button type="submit" className={styles.buttonPrimary}>
-            Register
-          </button>
+export default Register;
 
+/*        <div className={styles.actionContainer}>
           <div className={styles.verificationContainer}>
             <input
               type="text"
@@ -174,10 +189,4 @@ function Register() {
               Verify
             </button>
           </div>
-        </div>
-      </form>
-    </div>
-  );
-}
-
-export default Register;
+        </div> */

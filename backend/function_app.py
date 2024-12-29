@@ -255,8 +255,7 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     prompt = data['prompt']
     username = data['username'].strip()
     # TODO: uncomment this line for production
-    # output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
-    output = "rec:Lebron James Hoodie,Lebron James Poster,Lebron James Jersey"
+    output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
     fetched_products = products.get_products(output)
     response = func.HttpResponse(
         body=json.dumps({'query': output, 'response': fetched_products}),

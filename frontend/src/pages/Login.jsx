@@ -1,15 +1,20 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import styles from "../styles/login.module.css";
-import logo from "../image/giftly_logo_trans.png";
 import { useNavigate } from "react-router-dom";
 import { MdAccountCircle } from "react-icons/md";
+import Features from "../components/Features";
 
 function Login() {
   const [loginError, setLoginError] = useState("");
-  const nagivate = useNavigate()
+  const nagivate = useNavigate();
+  useEffect(() => {
+    if (localStorage.getItem("username")) {
+      nagivate("/");
+    }
+  }, []);
 
   const handleLogin = async (values) => {
     try {
@@ -26,7 +31,7 @@ function Login() {
         localStorage.setItem("username", values.username);
         setLoginError("");
         console.log("Login successful!");
-        nagivate("/")
+        nagivate("/");
       } else {
         setLoginError(result.response);
       }
@@ -43,47 +48,54 @@ function Login() {
 
   return (
     <div className={styles.container}>
-      <img src={logo} alt="logo" width={300} className={styles.logo}/>
-      <div className={styles.box}>
-      <MdAccountCircle size={60}/>
-        <Formik
-          initialValues={{ username: "", password: "" }}
-          onSubmit={handleLogin}
-          validationSchema={validationSchema}
-        >
-          <Form className={styles.form}>
-            <Field
-              name="username"
-              placeholder="Username"
-              className={styles.input}
-            />
-            <ErrorMessage
-              name="username"
-              component="div"
-              className={styles.error}
-            />
-            <Field
-              name="password"
-              type="password"
-              placeholder="Password"
-              className={styles.input}
-            />
-            <ErrorMessage
-              name="password"
-              component="div"
-              className={styles.error}
-            />
-            {loginError && <div className={styles.error}>{loginError}</div>}
-            <button type="submit" className={styles.button}>
-              Login
-            </button>
-          </Form>
-        </Formik>
-      </div>
-
-      <div className={styles.links}>
-        <Link to="/register">Register</Link> |{" "}
-        <Link to="/forgot-password">Forgot Password?</Link>
+      <div className={styles.maxWidth}>
+        <div>
+          <Features />
+        </div>
+        <div className={styles.box}>
+        <div className={styles.signIn}>Sign In</div>
+          <Formik
+            initialValues={{ username: "", password: "" }}
+            onSubmit={handleLogin}
+            validationSchema={validationSchema}
+          >
+            <Form className={styles.form}>
+              <div className={styles.username}>Username</div>
+              <Field
+                name="username"
+                placeholder="Username"
+                className={styles.input}
+              />
+              <ErrorMessage
+                name="username"
+                component="div"
+                className={styles.error}
+              />
+              <div className={styles.passwordBox}>
+                <div>Password</div>
+                <Link to="Forgot-Password">
+                  <div className={styles.forgotPassword}>Forgot Password?</div>
+                </Link>
+              </div>
+              <Field
+                name="password"
+                type="password"
+                placeholder="Password"
+                className={styles.input}
+              />
+              <ErrorMessage
+                name="password"
+                component="div"
+                className={styles.error}
+              />
+              {loginError && <div className={styles.error}>{loginError}</div>}
+              <button type="submit" className={styles.button}>
+                Login
+              </button>
+              <div className={styles.center}><div>Don't have an account?</div> <div><Link to={"/register"}>Register</Link></div></div>
+            </Form>
+          </Formik>
+        </div>
       </div>
     </div>
   );

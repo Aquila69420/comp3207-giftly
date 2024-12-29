@@ -9,7 +9,14 @@ import HashLoader from "react-spinners/HashLoader"
 function TextInput() {
   const [prompt, setInputValue] = useState("");
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef(null); // Ref for the file input element
+
+  const handleFileButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Trigger the file input's click event
+    }
+  };
+  
   const [loading, setLoading] = useState(false);
   const handleFileSelect = () => {
     if (fileInputRef.current) {
