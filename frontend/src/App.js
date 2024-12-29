@@ -17,6 +17,8 @@ import NotFound from "./pages/NotFound";
 import Cart from "./components/Cart";
 import AccountSettingPage from "./pages/AccountSettingPage";
 import ForgotPassword from "./pages/ForgotPassword";
+import Group from "./pages/Groups";
+import GroupsSettings from "./pages/GroupsSettings";
 
 // TODO: Implement load from back button for pages
 function App() {
@@ -79,6 +81,22 @@ function App() {
           element={
             <Protected>
               <Cart />
+            </Protected>
+          }
+        />
+        <Route
+          path="/groups"
+          element={
+            <Protected>
+              <Group />
+            </Protected>
+          }
+        />
+        <Route
+          path="/groups/settings"
+          element={
+            <Protected>
+              <GroupsSettings />
             </Protected>
           }
         />
