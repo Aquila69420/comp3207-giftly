@@ -11,8 +11,10 @@ const GroupsSettings = () => {
   const navigate = useNavigate(); // For navigating back to the groups page
   const location = useLocation();
 //   const [memberUsernames, setMemberUsernames] = useState([]);
-  const [memberDetails, setMemberDetails] = useState([]); // Array of { username, userID }
-  const { groupID, members } = location.state || { groupID: '', members: [] };
+  // const [memberDetails, setMemberDetails] = useState([]); // Array of { username, userID }
+  const { groupID, members: initialMembers } = location.state || { groupID: '', members: [] };
+  const [members, setMembers] = useState(initialMembers);
+
   const [groupName, setGroupName] = useState(
     location.state?.groupName || 'Unknown Group'
   );
@@ -21,32 +23,32 @@ const GroupsSettings = () => {
   const currentUserID = localStorage.getItem("userID");
   console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
 
-  useEffect(() => {
-    const fetchUsernames = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/get_usernames', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userIDs: members }),
-        });
+  // useEffect(() => {
+  //   const fetchUsernames = async () => {
+  //     try {
+  //       const response = await fetch('http://localhost:5000/get_usernames', {
+  //         method: 'POST',
+  //         headers: { 'Content-Type': 'application/json' },
+  //         body: JSON.stringify({ userIDs: members }),
+  //       });
 
-        const data = await response.json();
-        if (data.result) {
-          const combinedDetails = members.map((id, index) => ({
-            userID: id,
-            username: data.usernames[index],
-          }));
-          setMemberDetails(combinedDetails);
-        } else {
-          setError(data.msg);
-        }
-      } catch (error) {
-        setError('Error fetching usernames: ' + error.message);
-      }
-    };
+  //       const data = await response.json();
+  //       if (data.result) {
+  //         const combinedDetails = members.map((id, index) => ({
+  //           userID: id,
+  //           username: data.usernames[index],
+  //         }));
+  //         // setMemberDetails(combinedDetails);
+  //       } else {
+  //         setError(data.msg);
+  //       }
+  //     } catch (error) {
+  //       setError('Error fetching usernames: ' + error.message);
+  //     }
+  //   };
 
-    fetchUsernames();
-  }, [members]);
+  //   fetchUsernames();
+  // }, [members]);
   
   const handleSaveGroupName = async () => {
 	// Only update the group name if it has changed
@@ -90,9 +92,8 @@ const GroupsSettings = () => {
       });
       const data = await response.json();
       if (data.result) {
-        setMemberDetails((prev) =>
-          prev.filter((member) => member.userID !== userIDToRemove)
-        );
+        //update the members list
+        setMembers((prev) => prev.filter((member) => member.userID !== userIDToRemove));
       } else {
         setError(data.msg);
       }
@@ -105,41 +106,25 @@ const GroupsSettings = () => {
   const handleInvite = async () => {
     if (username.trim()) {
       try {
-		const response = await fetch("http://localhost:5000/get_user_id", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username: username }),
-        });
-        const data = await response.json();
-        console.log(data);
-        if (data.result) {
 			const response = await fetch('http://localhost:5000/groups/add_user', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 				  userID: localStorage.getItem('userID'),
-				  user_to_add: data.userID,
+				  user_to_add: username,
 				  groupID: groupID,
 				}),
 			});
 			console.log(response);
 			const addUserData = await response.json();
 			if (addUserData.result) {
-                setUsername(''); // Clear the username field after inviting
-                setError(null);
-                // Update the members list
-                setMemberDetails((prev) => [
-                    ...prev,
-                    { userID: data.userID, username },
-                  ]);
-            } else {
-                setError(addUserData.msg);
-            }
-        } else {
-            setError("User not found.");
-        }
+          setUsername(''); 
+          setError(null);
+          // Update the members list
+          setMembers((prev) => [...prev, { userID: addUserData.userID, username }]);
+      } else {
+          setError(addUserData.msg);
+      }
       } catch (error) {
         setError('Error inviting user: ' + error.message);
       }
@@ -243,7 +228,7 @@ const GroupsSettings = () => {
         {/* Members Section */}
         <h2 className={styles.membersHeading}>Members</h2>
         <ul className={styles.membersList}>
-          {memberDetails.map((member) => (
+          {members.map((member) => (
             <GroupsMembersList
               key={member.userID}
               member={member}
