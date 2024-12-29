@@ -16,6 +16,7 @@ import Protected from "./components/Protected";
 import NotFound from "./pages/NotFound";
 import Cart from "./components/Cart";
 import AccountSettingPage from "./pages/AccountSettingPage";
+import ForgotPassword from "./pages/ForgotPassword";
 
 // TODO: Implement load from back button for pages
 function App() {
@@ -32,6 +33,7 @@ function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
           path="/oldhome"
           element={

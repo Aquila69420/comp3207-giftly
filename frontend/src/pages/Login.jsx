@@ -81,7 +81,7 @@ function Login() {
               />
               <div className={styles.passwordBox}>
                 <div>Password</div>
-                <Link to="Forgot-Password">
+                <Link to="/forgot-password">
                   <div className={styles.forgotPassword}>Forgot Password?</div>
                 </Link>
               </div>
