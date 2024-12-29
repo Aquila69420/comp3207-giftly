@@ -1,5 +1,5 @@
 from azure.cosmos import CosmosClient
-import os, uuid
+import os, uuid, logging, json
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
@@ -15,8 +15,19 @@ def user_exists(userID):
             enable_cross_partition_query=True
         ))
     if not user:
-        raise Exception(f"{userID} does not exist")
-    return user
+        raise Exception("The user does not exist")
+    return user[0]
+
+def username_exists(username):
+    '''Check if username exists in the database and return userID'''
+    user = list(user_container.query_items(
+                query="SELECT * FROM c WHERE c.username=@username",
+                parameters=[{'name': '@username', 'value': username}],
+                enable_cross_partition_query=True
+            ))
+    if not user:
+        raise Exception("The user does not exist")
+    return user[0]
 
 def group_exists(groupID):
     '''Check if groupname exists in the database'''
@@ -26,16 +37,52 @@ def group_exists(groupID):
             enable_cross_partition_query=True
         ))
     if not groups:
-        raise Exception(f"{groupID} does not exist")
+        raise Exception(f"The group does not exist")
     return groups[0]
 
 def group_is_admin(groupDoc, userID):
     if groupDoc['admin'] != userID:
-        raise Exception(f"{userID} is not the admin of the group")
+        raise Exception(f"The user is not the admin of the group")
+
+def group_is_not_admin(groupDoc, userID):
+    if groupDoc['admin'] == userID:
+        raise Exception(f"This user is the admin of the group")
+
 
 def user_in_group(groupDoc, userID):
     if userID not in groupDoc['users']:
-        raise Exception(f"{userID} is not in the group")
+        raise Exception(f"This user is not in the group")
+
+def paired_users(users):
+    users = map(lambda userID: {
+        "userID": userID,
+        "username": user_exists(userID)['username']
+    }, users)
+    return list(users)
+
+def group_cleaned(groupDoc):
+    return json.dumps({
+        'id': groupDoc['id'],
+        'groupname': groupDoc['groupname'],
+        'admin': groupDoc['admin'],
+        'users': paired_users(groupDoc['users']),
+        'occasions': groupDoc['occasions']
+    })
+
+def groups_cleaned(groups):
+    return list(map(lambda groupDoc: group_cleaned(groupDoc), groups))
+
+def occasion_cleaned(ocDoc):
+    return json.dumps({
+        'id': ocDoc['id'],
+        'groupID': ocDoc['groupID'],
+        'users': paired_users(ocDoc['users']),
+        'occasionname': ocDoc['occasionname'],
+        'occasiondate': ocDoc['occasiondate']
+    })
+
+def occasions_cleaned(ocs):
+    return list(map(lambda ocDoc: occasion_cleaned(ocDoc), ocs))
 
 def create_group(userID, groupname):
     # Check if userID exists
@@ -67,14 +114,19 @@ def delete_group(userID, groupID):
 def add_user(userID, user_to_add, groupID):
     # Check both userIDs exist
     user_exists(userID)
-    user_exists(user_to_add)
+    user_to_add_doc = username_exists(user_to_add)
+    # Set user_to_add username to the user's id
+    user_to_add = user_to_add_doc['id']
 
     # Check Group exists
     group = group_exists(groupID)
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise Exception(f"User is already in the group")
+        raise Exception("The user is already in the group")
+
+    # UserID needs to be admin to add user to group
+    group_is_admin(group, userID)
 
     # Retrieve Group Document via ID
     groupID = group['id']
@@ -126,14 +178,52 @@ def groups_kick(userID, groupID, user_to_remove):
     # Check user is in group
     user_in_group(group, user_to_remove)
 
-    # Kick via Patch Operation
-    index = group['users'].index(user_to_remove)
+    return remove_user_from_group(user_to_remove, group)
+
+def groups_leave(userID, groupID):
+    # Check group exists
+    group = group_exists(groupID)
+
+    # Check user is in group
+    user_in_group(group, userID)
+
+    # Check user is not admin
+    group_is_not_admin(group, userID)
+
+    return remove_user_from_group(userID, group)
+
+
+def remove_user_from_group(userID, group):
+    groupID = group['id']
+
+    # TODO: Remove from all divisions
+    # Remove from all occasions
+    ocs = get_occasions(userID, groupID)
+    ocs1 = []
+    for oc in ocs:
+        ocs1.append(remove_user_from_occasion(userID, oc))
+        
+    ocs = ocs1
+
+    # Kick from group via Patch Operation
+    index = group['users'].index(userID)
     ops = [
         { "op": "remove", "path": f"/users/{index}"}
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
-    return group
+    return ocs, group
 
+def remove_user_from_occasion(userID, oc):
+    ocID = oc['id']
+    # Kick from occasion via Patch Operation
+    index = oc['users'].index(userID)
+    
+    ops = [
+        {"op": "remove", "path": f"/users/{index}"}
+    ]
+    oc = occasions_container.patch_item(item=ocID, partition_key=ocID, patch_operations=ops)
+    # TODO: Occasions with no users are removed
+    return oc
 
 def create_occasion(userID, groupID, users, occasionname, occasiondate):
     # Check if group exists
@@ -147,7 +237,6 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     id = str(uuid.uuid4())
     oc = occasions_container.create_item(body={
         'id': id,
-        'admin': userID,
         'groupID': groupID,
         'users':  list(dict.fromkeys([userID] + users)),
         'occasionname': occasionname,
