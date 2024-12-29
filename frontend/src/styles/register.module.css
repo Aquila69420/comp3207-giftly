@@ -112,3 +112,12 @@
   line-height: 1.4375em;
   padding: 0px;
 }
+.linkContainer {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.link {
+  color: blue;
+  cursor: pointer;
+}

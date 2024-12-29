@@ -6,6 +6,7 @@ import styles from "../styles/login.module.css";
 import { useNavigate } from "react-router-dom";
 import { MdAccountCircle } from "react-icons/md";
 import Features from "../components/Features";
+import config from "../config";
 
 function Login() {
   const [loginError, setLoginError] = useState("");
@@ -18,7 +19,7 @@ function Login() {
 
   const handleLogin = async (values) => {
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${config.backendURL}/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -29,6 +30,9 @@ function Login() {
 
       if (result.response === "User successfully logged in.") {
         localStorage.setItem("username", values.username);
+        if (!sessionStorage.getItem("cart")) {
+          sessionStorage.setItem("cart", JSON.stringify([]));
+        }
         setLoginError("");
         console.log("Login successful!");
         nagivate("/");

@@ -1,0 +1,108 @@
+.product {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px; /* Space between image and info */
+  padding: 20px;
+  background-color: #527D74; /* Light background */
+  min-height: 90vh;
+}
+
+.image {
+  flex: 1; /* Take up 1/3 of space */
+  max-width: 300px; /* Limit image width */
+}
+
+.image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #527D74; /* Accent border color */
+}
+
+.productInfo {
+  flex: 2; /* Take up 2/3 of space */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.title {
+  font-size: 1.5rem;
+  color: #08caa5;
+  margin-bottom: 10px;
+}
+
+.price {
+  font-size: 1rem;
+  color: #08caa5;
+  margin-bottom: 20px;
+}
+
+.productActions {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Space between action buttons */
+}
+
+.favoriteButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  color: red;
+  transition: transform 0.2s ease-in-out;
+}
+
+.favoriteButton:hover {
+  transform: scale(1.2); /* Enlarge slightly on hover */
+}
+
+.link {
+  font-weight: bold;
+  font-size: 2rem;
+  background-color: #08caa5;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.link:hover {
+  background-color: #527D74;
+}
+
+.cartButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  color: #5F9389;
+  transition: transform 0.2s ease-in-out;
+}
+
+.cartButton:hover {
+  transform: scale(1.2); /* Enlarge slightly on hover */
+}
+
+.nav {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+
+.navButton {
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: #5F9389;
+  color: white;
+  transition: transform 0.2s ease-in-out;
+  margin: 20px;
+}

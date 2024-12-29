@@ -3,10 +3,12 @@ import logo from "../image/giftly_logo_trans.png";
 import styles from "../styles/searchResults.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
+import config from "../config";
+import { FaSearch } from "react-icons/fa";
 
-function SearchResults({ onBack }) {
-  const navigate = useNavigate();
+function SearchResults() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { data } = location.state;
   const username = location.state.username;
   const initialSearchQuery = data.query;
@@ -16,34 +18,36 @@ function SearchResults({ onBack }) {
   const onSearchChange = (event) => {
     setSearchQuery(event);
   };
+  
+  const onBack = () => {
+    navigate("/home")
+  };
 
-  const handleKeyDown = async (event) => {
-    // TODO: Could consider UI search icon click event as well
-    if (event.key === "Enter") {
+  const sendQuery = async () => {
+    try{
       // Send updated query to backend
+      console.log("Sending query to backend: ", searchQuery);
       const prompt = searchQuery;
-      try {
-        const response = await fetch("http://localhost:5000/product_text", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, prompt }),
-        });
-        const result = await response.json();
-        setSearchQuery(searchQuery);
-        productsInfo = result.response;
-      } catch (error) {
-        console.error("Error sending input data:", error);
-      }
+      const response = await fetch(`${config.backendURL}/product_text`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, prompt }),
+      });
+      const result = await response.json();
+      setSearchQuery(searchQuery);
+      productsInfo = result.response;
+    }
+    catch (error){
+      console.error("Error sending query to backend: ", error); 
     }
   };
 
-  const handleCardClick = (productURL) => {
-    // TODO: Fix bug that doesn't register card click at the moment
-    // navigate(`/product/${encodeURIComponent(productURL)}`, { state: { productURL } });
-    console.log("Card clicked");
-    // console.log('Product URL:', productURL);
+  const handleKeyDown = async (event) => {
+    if (event.key === "Enter") {
+      sendQuery();
+    }
   };
 
   return (
@@ -63,15 +67,17 @@ function SearchResults({ onBack }) {
             className={styles.searchText}
             placeholder="Search..."
           />
+          <div className={styles.searchButton} onClick={sendQuery}>
+            <FaSearch />
+          </div>
         </div>
       </div>
 
       {/* Product grid */}
-      {/* TODO: Fix bug that doesn't register card styling/CSS at the moment */}
       {/* TODO: Add target back in */}
       <div className={styles.productGrid}>
         {Object.keys(productsInfo).map(
-          (source, idx) =>
+          (source) =>
             source !== "target" &&
             productsInfo[source].map((product) => (
               <ProductCard

@@ -1,10 +1,11 @@
 import React, { useState, useRef } from "react";
-import styles from "../styles/textInput.module.css"; // Import the CSS module
+import styles from "../styles/textInput.module.css";
 import { CgAttachment } from "react-icons/cg";
 import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import HashLoader from "react-spinners/HashLoader"
+import InfinityLoader from "./InfinityLoader";
+import config from "../config";
 
 function TextInput() {
   const [prompt, setInputValue] = useState("");
@@ -70,18 +71,23 @@ function TextInput() {
       // File Passed Validation - Proceed with Upload
       const formData = new FormData();
       formData.append("image", selectedFile);
+      
+      const username = localStorage.getItem("username");
+      formData.append("username", username);
 
       try {
-        const username = localStorage.getItem("username");
-        const response = await fetch("http://localhost:5000/product_img", {
+        const response = await fetch(`${config.backendURL}/product_img`, {
           method: "POST",
           body: formData,
         });
-
         const result = await response.json();
-        console.log("Response from backend (image):", result);
+        console.log("Image upload result:", result);
+        if (result.query === "rec:") {
+          alert("Could not identify any objects in the image.");
+          return;
+        }
 
-        // Optionally, you can handle additional logic here, like updating the UI
+        navigate("/search", { state: { data: result, username } });
       } catch (error) {
         console.error("Error uploading image:", error);
       }
@@ -96,7 +102,7 @@ function TextInput() {
     const username = localStorage.getItem("username");
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/product_text", {
+      const response = await fetch(`${config.backendURL}/product_text`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -105,7 +111,6 @@ function TextInput() {
       });
 
       const result = await response.json();
-      console.log("Response from backend:", result);
       navigate("/search", { state: { data: result, username } });
       setLoading(false);
     } catch (error) {
@@ -137,7 +142,7 @@ function TextInput() {
     <div className={styles.TextInputContainer}>
       {loading && (
         <div className="overlay">
-          <HashLoader color="#08caa5" loading={loading} size={150} />
+          <InfinityLoader loading={loading}/>
         </div>
       )}
       <div className={styles.inputContainer}>

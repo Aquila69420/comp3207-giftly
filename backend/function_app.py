@@ -11,6 +11,8 @@ from helper import cart
 from helper import sendEmail
 from helper import products
 import random
+import io
+from PIL import Image
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -19,6 +21,7 @@ user_container = database.get_container_client(os.getenv("UserContainer"))
 suggestion_container = database.get_container_client(os.getenv("SuggestionContainer"))
 wishlist_container = database.get_container_client(os.getenv("WishListContainer"))
 cart_container = database.get_container_client(os.getenv("CartContainer"))
+product_container = database.get_container_client(os.getenv("ProductContainer"))
 sendEmail_api_key = os.getenv("SendGrid_API_KEY")
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
@@ -264,54 +267,145 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name='register_product_or_get_id')
+@app.route(route='register_product_or_get_id', methods=[func.HttpMethod.POST])
+def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    product_info = {
+        'url': data['url'],
+        'title': data['title'],
+        'image': data['image'],
+        'price': data['price']
+    }
+    try:
+        query = "SELECT * from products WHERE products.url = '{}'".format(product_info['url'])
+        products = list(product_container.query_items(query=query, enable_cross_partition_query=True)) 
+        if not products: # First check if product with current url is already in the database
+            
+            # Add to cosmosdb products container with id auto gen by cosmos
+            product_container.create_item(body=product_info, enable_automatic_id_generation=True)
+            
+            # Get the id of the product
+            products = list(product_container.query_items(query=query, enable_cross_partition_query=True))
+            id = products[0]['id']
+            
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product registered successfully', 'id': id}),
+                mimetype='application/json',
+                status_code=200
+            )
+        else:
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product already exists', 'id': products[0]['id']}),
+                mimetype='application/json',
+                status_code=400
+            )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({'error': str(e)}),
+            mimetype='application/json',
+            status_code=500
+        )
+    return add_cors_headers(response)
+
+@app.function_name(name='get_product_by_id')
+@app.route(route='get_product_by_id', methods=[func.HttpMethod.GET])
+def get_product_by_id(req: func.HttpRequest) -> func.HttpResponse:
+    id = req.params.get('id')
+    try:
+        query = "SELECT * from products WHERE products.id = '{}'".format(id)
+        products = list(product_container.query_items(query=query, enable_cross_partition_query=True))
+        if products:
+            product_info = {
+                'url': products[0]['url'],
+                'title': products[0]['title'],
+                'image': products[0]['image'],
+                'price': products[0]['price']
+            }
+            print("Sending product info:", product_info)
+            response = func.HttpResponse(
+                body=json.dumps({'response': product_info}),
+                mimetype='application/json',
+                status_code=200
+            )
+        else:
+            response = func.HttpResponse(
+                body=json.dumps({'response': 'Product not found'}),
+                mimetype='application/json',
+                status_code=404
+            )
+    except Exception as e:
+        response = func.HttpResponse(
+            body=json.dumps({'error': str(e)}),
+            mimetype='application/json',
+            status_code=500
+        )
+    return add_cors_headers(response)
+
 def allowed_file(file):
         filename = file.filename
-        format = '.' in filename and filename.rsplit('.', 1)[1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico', 'tiff', 'mpo'}
-        size = False #image must be less than 20 megabytes (MB)
-        dimensions = False #must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels
+        format = '.' in filename and filename.rsplit('.', 1)[-1].lower() in {'png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'ico', 'tiff', 'mpo'}
+        image = Image.open(file)
+        imgByteIO = io.BytesIO()
+        image.save(imgByteIO, format=image.format)
+        imgByteArr = imgByteIO.getvalue()
+        width, height = image.size #must be greater than 50 x 50 pixels and less than 16,000 x 16,000 pixels
+        size_in_mb = len(imgByteArr) / (10**6) #image must be less than 20 megabytes (MB)
+        return format and size_in_mb < 20 and width > 50 and height > 50 and width < 16000 and height < 16000
 
 @app.function_name(name="product_img")
 @app.route(route='product_img', methods=[func.HttpMethod.POST])
 def product_img(req: func.HttpRequest) -> func.HttpResponse:
-    data = req.get_json()
-    username = data['username']
-    img_data = data['img_data']
-    brands = None
-    objects = None
-    if 'image' not in img_data.files:
+    try:
+        data = req.form
+        files = req.files
+        username = data['username']
+        brands = None
+        objects = None
+        if 'image' not in files:
+            response = func.HttpResponse(
+                body=json.dumps({'error': 'no File type'}),
+                mimetype="application/json",
+                status_code=400
+            )
+            return add_cors_headers(response)
+        
+        file = files['image']
+        if file.filename == '':
+            response = func.HttpResponse(
+                body=json.dumps({'error': 'no file selected'}),
+                mimetype="application/json",
+                status_code=400
+            )
+            return add_cors_headers(response)
+        if file and allowed_file(file):
+            image = Image.open(file)
+            imgByteIO = io.BytesIO()
+            image.save(imgByteIO, format=image.format)
+            imgByteArr = imgByteIO.getvalue()
+            output = image_analyzer.image_analysis(imgByteArr)
+            brands = output[0]
+            objects = output[1]
+            suggestion = "rec:" + ','.join(objects)
+            gpt_req.update_suggestion(suggestion_container, username, suggestion)
+            fetched_products = products.get_products(output)
+            response = func.HttpResponse(
+                body=json.dumps({"query": suggestion, "response": fetched_products}),
+                mimetype="application/json",
+                status_code=200
+            )
+            return add_cors_headers(response)
         response = func.HttpResponse(
-            body=json.dumps({'error': 'no File type'}),
+            body=json.dumps({'error': 'File type not allowed'}),
             mimetype="application/json",
             status_code=400
         )
-        return add_cors_headers(response)
-    file = img_data.files['image']
-    if file.filename == '':
+    except Exception as e:
         response = func.HttpResponse(
-            body=json.dumps({'error': 'no file selected'}),
+            body=json.dumps({'error': str(e)}),
             mimetype="application/json",
-            status_code=400
+            status_code=500
         )
-        return add_cors_headers(response)
-    if file and allowed_file(file):
-        image_binary = file.read()
-        output = image_analyzer.image_analysis(image_binary)
-        brands = output[0]
-        objects = output[1]
-        suggestion = "rec:" + ','.join(objects)
-        gpt_req.update_suggestion(suggestion_container, username, suggestion)
-        fetched_products = products.get_products(output)
-        response = func.HttpResponse(
-            body=json.dumps({"response": fetched_products}),
-            mimetype="application/json",
-            status_code=200
-        )
-        return add_cors_headers(response)
-    response = func.HttpResponse(
-        body=json.dumps({'error': 'File type not allowed'}),
-        mimetype="application/json",
-        status_code=400
-    )
     return add_cors_headers(response)
 
 @app.function_name(name="product_types")
