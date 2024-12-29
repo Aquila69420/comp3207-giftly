@@ -658,4 +658,89 @@
   .leaveGroupButton:hover {
     background-color: #e89420; /* Darker orange for hover */
   }
+
+  .groupNameWrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
   
+  .addOccasionButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-left: 8px;
+  }
+  
+  .redPlusIcon {
+    color: red;
+    font-size: 1rem;
+  }
+  
+  .modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modalInput {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  
+  .modalCreateButton {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .modalCancelButton {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .membersList {
+    max-height: 150px;
+    overflow-y: auto;
+    margin: 10px 0;
+    padding: 0;
+  }
+  
+  .memberItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .memberItem input {
+    margin-right: 10px;
+  }
+    

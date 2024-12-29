@@ -81,6 +81,41 @@ const Groups = () => {
     }
   };
 
+  // Handle occasion addition
+  const handleAddOccasion = async (group, occasionName, occasionDate, users) => {
+    try {
+      const response = await fetch('http://localhost:5000/groups/occasions/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userID,
+          groupID: group.id,
+          users,
+          occasionname: occasionName,
+          occasiondate: occasionDate,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.result) {
+        // Update the active group with the new occasion
+        const updatedGroup = data.group;
+        setGroups((prevGroups) =>
+          prevGroups.map((grp) => (grp.id === group.id ? updatedGroup : grp))
+        );
+        setActiveGroup(updatedGroup); // Update the active group in state
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      console.error('Error adding occasion:', error);
+    }
+  };
+
+
+
+
+
   return (
     <div className={styles.groupsContainer}>
       {/* Top Bar */}
@@ -98,6 +133,7 @@ const Groups = () => {
           onSubgroupClick={setActiveSubgroup}
           onCreateGroup={handleCreateGroup}
           activeGroup={activeGroup}
+          onAddOccasion={handleAddOccasion}
         />
         <GroupsChat group={activeGroup} subgroup={activeSubgroup} />
       </div>
