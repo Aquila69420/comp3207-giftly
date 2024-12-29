@@ -644,4 +644,18 @@
     color: #c82333;
   }
   
+  .leaveGroupButton {
+    background-color: #f5a623; /* Orange or any color of your choice */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+  }
+  
+  .leaveGroupButton:hover {
+    background-color: #e89420; /* Darker orange for hover */
+  }
   

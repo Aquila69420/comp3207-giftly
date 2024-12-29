@@ -12,8 +12,9 @@ const GroupsSettings = () => {
   const location = useLocation();
 //   const [memberUsernames, setMemberUsernames] = useState([]);
   // const [memberDetails, setMemberDetails] = useState([]); // Array of { username, userID }
-  const { groupID, members: initialMembers } = location.state || { groupID: '', members: [] };
+  const { groupID, members: initialMembers, activeGroup: group } = location.state || { groupID: '', members: [], activeGroup: {} };
   const [members, setMembers] = useState(initialMembers);
+  const [activeGroup, setActiveGroup] = useState(group);
 
   const [groupName, setGroupName] = useState(
     location.state?.groupName || 'Unknown Group'
@@ -21,7 +22,9 @@ const GroupsSettings = () => {
   const [isEditingGroupName, setIsEditingGroupName] = useState(false);
   const [newGroupName, setNewGroupName] = useState(groupName);
   const currentUserID = localStorage.getItem("userID");
-  console.log('groupName:', groupName, 'groupID:', groupID, 'members:', members);
+  console.log('activeGroup', activeGroup);
+  const isAdmin = activeGroup.admin === currentUserID;
+
 
   // useEffect(() => {
   //   const fetchUsernames = async () => {
@@ -153,6 +156,27 @@ const GroupsSettings = () => {
     }
   };
 
+  const handleLeaveGroup = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/groups/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userID: localStorage.getItem('userID'),
+          groupID: groupID,
+        }),
+      });
+      const data = await response.json();
+      if (data.result) {
+        navigate('/groups'); // Navigate back to the groups page after leaving
+      } else {
+        setError(data.msg);
+      }
+    } catch (error) {
+      setError('Error leaving group: ' + error.message);
+    }
+  }
+
   return (
     <div className={styles.groupsSettingsPage}>
       {/* Top Bar */}
@@ -195,22 +219,26 @@ const GroupsSettings = () => {
       {/* Main Content */}
       <div className={styles.groupsSettingsContent}>
         {/* Add Member Section */}
-        <h2 className={styles.groupsSettingsHeading}>Add a Member to the Group</h2>
-        <div className={styles.groupsSettingsForm}>
-          <input
-            type="text"
-            placeholder="Enter a username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className={styles.groupsSettingsInput}
-          />
-          <button
-            onClick={handleInvite}
-            className={styles.groupsSettingsButton}
-          >
-            Add Member
-          </button>
-        </div>
+        {isAdmin && (
+          <>
+            <h2 className={styles.groupsSettingsHeading}>Add a Member to the Group</h2>
+            <div className={styles.groupsSettingsForm}>
+              <input
+                type="text"
+                placeholder="Enter a username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className={styles.groupsSettingsInput}
+              />
+              <button
+                onClick={handleInvite}
+                className={styles.groupsSettingsButton}
+              >
+                Add Member
+              </button>
+            </div>
+          </>
+        )}
 
         {/* Error Message */}
         {error && <p className={styles.error}>{error}</p>}
@@ -234,18 +262,30 @@ const GroupsSettings = () => {
               member={member}
               onRemove={() => handleRemoveMember(member.userID)}
               isCurrentUser={member.userID === currentUserID}
+              isAdmin={isAdmin}
             />
           ))}
         </ul>
 
-		{/* Delete Group Section */}
-		<div className={styles.deleteGroupSection}>
-          <button
-            onClick={handleDeleteGroup}
-            className={styles.deleteGroupButton}
-          >
-            Delete Group
-          </button>
+        {/* Group Action Section */}
+        <div className={styles.groupActionSection}>
+          {isAdmin ? (
+            // Delete Group button for admin
+            <button
+              onClick={handleDeleteGroup}
+              className={styles.deleteGroupButton}
+            >
+              Delete Group
+            </button>
+          ) : (
+            // Leave Group button for non-admin users
+            <button
+              onClick={handleLeaveGroup}
+              className={styles.leaveGroupButton}
+            >
+              Leave Group
+            </button>
+          )}
         </div>
 
 		

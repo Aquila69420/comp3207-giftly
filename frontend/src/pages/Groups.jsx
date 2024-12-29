@@ -86,7 +86,7 @@ const Groups = () => {
       {/* Top Bar */}
       <GroupsTopBar
         onBack={() => console.log('Back')}
-        onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname, members: activeGroup?.users } })}
+        onSettings={() => navigate('/groups/settings', { state: { groupID: activeGroup?.id, groupName: activeGroup?.groupname, members: activeGroup?.users, activeGroup } })}
         occasion={occasion}
       />
 
