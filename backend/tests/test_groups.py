@@ -54,8 +54,15 @@ def test_get_occasions():
     r.raise_for_status()
     print(r.json())
 
+def test_leave_occasion():
+    url = getURL("occasions", "leave")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "occasionID": "313ef1a4-96c9-465d-bf76-67b707e58d91"
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 if __name__ == '__main__':
-    # test_get_occasions()
-    test_add_user()
-    test_add_occasion()
-    kick_user()
+    test_leave_occasion()

@@ -40,6 +40,16 @@ def group_exists(groupID):
         raise Exception(f"The group does not exist")
     return groups[0]
 
+def occasion_exists(occasionID):
+    occasions = list(occasions_container.query_items(
+            query="SELECT * FROM c WHERE c.id=@occasionID",
+            parameters=[{'name': '@occasionID', 'value': occasionID}],
+            enable_cross_partition_query=True
+        ))
+    if not occasions:
+        raise Exception(f"The occasion does not exist")
+    return occasions[0]
+
 def group_is_admin(groupDoc, userID):
     if groupDoc['admin'] != userID:
         raise Exception(f"The user is not the admin of the group")
@@ -52,6 +62,10 @@ def group_is_not_admin(groupDoc, userID):
 def user_in_group(groupDoc, userID):
     if userID not in groupDoc['users']:
         raise Exception(f"This user is not in the group")
+
+def user_in_occasion(occasionDoc, userID):
+    if userID not in occasionDoc['users']:
+        raise Exception(f"This user it not in the occasion")
 
 def paired_users(users):
     users = map(lambda userID: {
@@ -224,6 +238,7 @@ def remove_user_from_occasion(userID, oc):
     ]
     oc = occasions_container.patch_item(item=ocID, partition_key=ocID, patch_operations=ops)
     # TODO: Occasions with no users are removed
+    # TODO: Remove from divisions
     return oc
 
 def create_occasion(userID, groupID, users, occasionname, occasiondate):
@@ -266,3 +281,13 @@ def get_occasions(userID, groupID):
         enable_cross_partition_query=True
     ))
     return ocs
+
+def occasions_leave(userID, occasionID):
+    # Check occasionID exists
+    oc = occasion_exists(occasionID)
+
+    # Check user in occasion
+    user_in_occasion(oc, userID)
+
+    # Remove from occasion
+    return remove_user_from_occasion(userID, oc)

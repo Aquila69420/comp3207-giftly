@@ -701,6 +701,36 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_occasions_leave")
+@app.route(route='groups/occasions/leave')
+def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
+    '''Any user in an occasion can leave the occasion
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, occasionID: occasionID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", occasion: {...}}
+        data: {result: False, msg: "User is not in the occasion"}'''
+    data = req.get_json()
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        oc = groups.occasions_leave(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc)})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
 @app.function_name(name="groups_secret_santa")
 @app.route(route='groups_secret_santa')
 def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
