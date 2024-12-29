@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import config from "../config";
+import styles from "../styles/dropdownselection.module.css";
 
 function DropdownSelection() {
   const [selectedOccasions, setSelectedOccasions] = useState([]);
@@ -8,81 +9,72 @@ function DropdownSelection() {
   const [selectedThemes, setSelectedThemes] = useState([]);
 
   const occasionOptions = [
-    { value: "birthday", label: "Birthday" },
-    { value: "anniversary", label: "Anniversary" },
-    { value: "graduation", label: "Graduation" },
-    { value: "promotion", label: "Promotion" },
-    { value: "farewell", label: "Farewell" },
-    { value: "engagement", label: "engagement" },
-    { value: "wedding", label: "wedding" },
-    { value: "christmas", label: "christmas" },
-    { value: "valentines", label: "valentines" },
-    { value: "housewarming", label: "housewarming" },
-    { value: "baby shower", label: "baby shower" },
-    { value: "corporate party", label: "corporate party" },
-    { value: "mother's day", label: "mother's day" },
-    { value: "father's day", label: "father's day" },
-    { value: "spontaneous", label: "spontaneous" },
-    { value: "apology", label: "apology" },
+    "Birthday",
+    "Anniversary",
+    "Graduation",
+    "Promotion",
+    "Farewell",
+    "Engagement",
+    "Wedding",
+    "Christmas",
+    "Valentine's Day",
+    "Housewarming",
+    "Baby Shower",
+    "Corporate Party",
+    "Mother's Day",
+    "Father's Day",
+    "Spontaneous",
+    "Apology",
   ];
 
   const recipientOptions = [
-    { value: "friend", label: "Friend" },
-    { value: "colleague", label: "Colleague" },
-    { value: "girlfriend", label: "girlfriend" },
-    { value: "boyfriend", label: "boyfriend" },
-    { value: "sister", label: "sister" },
-    { value: "brother", label: "brother" },
-    { value: "mother", label: "mother" },
-    { value: "father", label: "father" },
-    { value: "grandmother", label: "grandmother" },
-    { value: "grandfather", label: "grandfather" },
-    { value: "cousin", label: "cousin" },
-    { value: "aunt", label: "aunt" },
-    { value: "uncle", label: "uncle" },
-    { value: "wife", label: "wife" },
-    { value: "husband", label: "husband" },
-    { value: "son", label: "son" },
-    { value: "daughter", label: "daughter" },
-    { value: "acquaintance", label: "acquaintance" },
+    "Friend",
+    "Colleague",
+    "Girlfriend",
+    "Boyfriend",
+    "Sister",
+    "Brother",
+    "Mother",
+    "Father",
+    "Grandmother",
+    "Grandfather",
+    "Cousin",
+    "Aunt",
+    "Uncle",
+    "Wife",
+    "Husband",
+    "Son",
+    "Daughter",
   ];
 
   const themeOptions = [
-    { value: "romantic", label: "Romantic" },
-    { value: "funny", label: "Funny" },
-    { value: "practical", label: "Practical" },
-    { value: "luxury", label: "Luxury" },
-    { value: "memory", label: "memory" },
-    { value: "game", label: "game" },
-    { value: "learning", label: "learning" },
-    { value: "fun", label: "fun" },
-    { value: "health", label: "health" },
-    { value: "artistic", label: "artistic" },
-    { value: "tech", label: "tech" },
-    { value: "outdoors", label: "outdoors" },
-    { value: "sports", label: "sports" },
-    { value: "clothes", label: "clothes" },
-    { value: "toys", label: "toys" },
-    { value: "accessories", label: "accessories" },
-    { value: "sustainable", label: "sustainable" },
-    { value: "decoration", label: "decoration" },
-    { value: "body products", label: "body products" },
+    "Romantic",
+    "Funny",
+    "Practical",
+    "Luxury",
+    "Memory",
+    "Game",
+    "Learning",
+    "Fun",
+    "Health",
+    "Artistic",
+    "Tech",
+    "Outdoors",
+    "Sports",
+    "Clothes",
+    "Toys",
+    "Accessories",
+    "Sustainable",
+    "Decoration",
+    "Body Products",
   ];
 
-  const handleOccasionChange = (event) => {
-    const values = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value
+  const handleCheckboxChange = (setState, selectedValues, value) => {
+    setState((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
     );
-    setSelectedOccasions(values);
-  };
-
-  const handleThemeChange = (event) => {
-    const values = Array.from(
-      event.target.selectedOptions,
-      (option) => option.value
-    );
-    setSelectedThemes(values);
   };
 
   const handleSubmit = async () => {
@@ -110,99 +102,92 @@ function DropdownSelection() {
   };
 
   return (
-    <div style={{ marginBottom: "20px" }}>
-      {/* Occasion Dropdown */}
-      <select
-        multiple
-        value={selectedOccasions}
-        onChange={handleOccasionChange}
-        style={{
-          margin: "10px",
-          padding: "8px",
-          fontSize: "16px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      >
-        {occasionOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
+    <div className={styles.container}>
+      <h2 className={styles.title}>Gift Finder</h2>
 
-      {/* Recipient Dropdown */}
-      <select
-        value={selectedRecipient}
-        onChange={(e) => setSelectedRecipient(e.target.value)}
-        style={{
-          margin: "10px",
-          padding: "8px",
-          fontSize: "16px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      >
-        <option value="" disabled>
-          -- Select Recipient --
-        </option>
-        {recipientOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-
-      {/* Price Range Slider */}
-      <div style={{ margin: "10px" }}>
-        <label>
-          Price Range: €{priceRange.toLocaleString()}
-          <input
-            type="range"
-            min="1"
-            max="10000"
-            value={priceRange}
-            onChange={(e) => setPriceRange(e.target.value)}
-            style={{ width: "100%" }}
-          />
-        </label>
+      {/* Occasions Section */}
+      <div className={styles.section}>
+        <label className={styles.label}>Select Occasion(s):</label>
+        <div className={styles.checkboxContainer}>
+          {occasionOptions.map((occasion) => (
+            <label key={occasion} className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                value={occasion}
+                onChange={() =>
+                  handleCheckboxChange(
+                    setSelectedOccasions,
+                    selectedOccasions,
+                    occasion
+                  )
+                }
+                checked={selectedOccasions.includes(occasion)}
+                className={styles.checkboxInput}
+              />
+              {occasion}
+            </label>
+          ))}
+        </div>
       </div>
 
-      {/* Theme Dropdown */}
-      <select
-        multiple
-        value={selectedThemes}
-        onChange={handleThemeChange}
-        style={{
-          margin: "10px",
-          padding: "8px",
-          fontSize: "16px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-        }}
-      >
-        {themeOptions.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+      {/* Recipient Section */}
+      <div className={styles.section}>
+        <label className={styles.label}>Select Recipient:</label>
+        <select
+          value={selectedRecipient}
+          onChange={(e) => setSelectedRecipient(e.target.value)}
+          className={styles.selectInput}
+        >
+          <option value="" disabled>
+            -- Select Recipient --
           </option>
-        ))}
-      </select>
+          {recipientOptions.map((recipient) => (
+            <option key={recipient} value={recipient}>
+              {recipient}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Price Range Section */}
+      <div className={styles.section}>
+        <label className={styles.label}>
+          Price Range: €{priceRange.toLocaleString()}
+        </label>
+        <input
+          type="range"
+          min="1"
+          max="10000"
+          value={priceRange}
+          onChange={(e) => setPriceRange(e.target.value)}
+          className={styles.rangeInput}
+        />
+      </div>
+
+      {/* Themes Section */}
+      <div className={styles.section}>
+        <label className={styles.label}>Select Theme(s):</label>
+        <div className={styles.checkboxContainer}>
+          {themeOptions.map((theme) => (
+            <label key={theme} className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                value={theme}
+                onChange={() =>
+                  handleCheckboxChange(setSelectedThemes, selectedThemes, theme)
+                }
+                checked={selectedThemes.includes(theme)}
+                className={styles.checkboxInput}
+              />
+              {theme}
+            </label>
+          ))}
+        </div>
+      </div>
 
       {/* Submit Button */}
-      <button
-        onClick={handleSubmit}
-        style={{
-          marginTop: "10px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          borderRadius: "5px",
-          backgroundColor: "#4CAF50",
-          color: "white",
-          border: "none",
-        }}
-      >
-        Submit
+      <button onClick={handleSubmit} className={styles.button}>
+        Find
       </button>
     </div>
   );
