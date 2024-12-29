@@ -754,21 +754,19 @@ def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="groups_group_gifting")
 @app.route(route='groups_group_gifting')
 def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
-    '''Initiate Group Gifting for a target recipient
+    '''Initiate Group Gifting for a target recipient(s)
     
     # Parameters
     req: func.HttpRequest
     with
-        data: {userID: userID, groupname: groupname, occasionname: occasiionname, recipientname: recipientname}
+        data: {userID: userID, occasionID: occasiionname, recipientIDs: [recipientID, ...]}
     
     # Returns
     func.HttpResponse
     with
         data: {result: True, msg: "OK"}
-        data: {result: False, msg: "{groupname} does not exist}
-        data: {result: False, msg: "{userID} is not the admin for the group}
-        data: {result: False, msg: "{occasionname} for this group already exists"}
-        data: {result: False, msg: "{recipientname} is not a part of this group}'''
+        data: {result: False, msg: "{userID} is not the admin for the group"}
+        data: {result: False, msg: "{A recipient in recipientIDs does not exist"}'''
     data = req.get_json()
     #TODO: code
 

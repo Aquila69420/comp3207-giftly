@@ -65,4 +65,4 @@ def test_leave_occasion():
     print(r.json())
 
 if __name__ == '__main__':
-    test_leave_occasion()
+    test_get_occasions()

@@ -18,6 +18,17 @@ def user_exists(userID):
         raise Exception("The user does not exist")
     return user[0]
 
+def users_exist(users):
+    '''Check if all userIDs in users is in database via a single query and return their documents'''
+    users1 = list(user_container.query_items(
+        query="SELECT * FROM c where ARRAY_CONTAINS(@users, c.id)",
+        parameters=[{'name': '@users', 'value': users}],
+        enable_cross_partition_query=True
+    ))
+    if len(users) != len(users1):
+        raise Exception("There is a user in the users array that does not exist")
+    return users1
+
 def username_exists(username):
     '''Check if username exists in the database and return userID'''
     user = list(user_container.query_items(
@@ -37,7 +48,7 @@ def group_exists(groupID):
             enable_cross_partition_query=True
         ))
     if not groups:
-        raise Exception(f"The group does not exist")
+        raise Exception("The group does not exist")
     return groups[0]
 
 def occasion_exists(occasionID):
@@ -47,30 +58,32 @@ def occasion_exists(occasionID):
             enable_cross_partition_query=True
         ))
     if not occasions:
-        raise Exception(f"The occasion does not exist")
+        raise Exception("The occasion does not exist")
     return occasions[0]
 
 def group_is_admin(groupDoc, userID):
     if groupDoc['admin'] != userID:
-        raise Exception(f"The user is not the admin of the group")
+        raise Exception("The user is not the admin of the group")
 
 def group_is_not_admin(groupDoc, userID):
     if groupDoc['admin'] == userID:
-        raise Exception(f"This user is the admin of the group")
+        raise Exception("This user is the admin of the group")
 
 
 def user_in_group(groupDoc, userID):
     if userID not in groupDoc['users']:
-        raise Exception(f"This user is not in the group")
+        raise Exception("This user is not in the group")
 
 def user_in_occasion(occasionDoc, userID):
     if userID not in occasionDoc['users']:
-        raise Exception(f"This user it not in the occasion")
+        raise Exception("This user it not in the occasion")
 
 def paired_users(users):
-    users = map(lambda userID: {
-        "userID": userID,
-        "username": user_exists(userID)['username']
+    # Query Container through a single Query
+    users = users_exist(users)
+    users = map(lambda userDoc: {
+        "userID": userDoc['id'],
+        "username": userDoc['username']
     }, users)
     return list(users)
 
