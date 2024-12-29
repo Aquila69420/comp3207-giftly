@@ -30,6 +30,19 @@ function Login() {
 
       if (result.response === "User successfully logged in.") {
         localStorage.setItem("username", values.username);
+        const response = await fetch("http://localhost:5000/get_user_id", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: values.username }),
+        });
+        const data = await response.json();
+        if (!data.result) {
+          setLoginError(data.msg);
+          return;
+        }
+        localStorage.setItem("userID", data.userID);
         if (!sessionStorage.getItem("cart")) {
           sessionStorage.setItem("cart", JSON.stringify([]));
         }
