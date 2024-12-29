@@ -8,7 +8,7 @@ const Features = () => {
     <div className={styles.features}>
       <img src={logo} alt="logo" width={90} />
       <div className={styles.feature}>
-        <p className={styles.addSpace}>
+        <div className={styles.addSpace}>
           <div>
             <FaMagic size={24} color="purple" />
           </div>
@@ -17,11 +17,11 @@ const Features = () => {
             adjusts to your needs, making it easy to discover gifts and streamline
             your gift-giving tasks.
           </div>
-        </p>
+        </div>
       </div>
 
       <div className={styles.feature}>
-        <p className={styles.addSpace}>
+        <div className={styles.addSpace}>
           <div>
             <FaShieldAlt size={24} color="green" />
           </div>
@@ -30,11 +30,11 @@ const Features = () => {
             features designed to provide long-term value and reliability for all
             your gifting needs.
           </div>
-        </p>
+        </div>
       </div>
 
       <div className={styles.feature}>
-        <p className={styles.addSpace}>
+        <div className={styles.addSpace}>
           <div>
             <FaSmile size={24} color="orange" />
           </div>
@@ -42,11 +42,11 @@ const Features = () => {
             <strong>Great user experience:</strong> Navigate your gift-giving
             journey effortlessly.
           </div>
-        </p>
+        </div>
       </div>
 
       <div className={styles.feature}>
-        <p className={styles.addSpace}>
+        <div className={styles.addSpace}>
           <div>
             <FaLightbulb size={24} color="red" />
           </div>
@@ -54,7 +54,7 @@ const Features = () => {
             <strong>Innovative functionality:</strong> Stay ahead with unique
             features like Secret Santa automation and gift profile customisation
           </div>
-        </p>
+        </div>
       </div>
     </div>
   );

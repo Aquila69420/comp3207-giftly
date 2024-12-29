@@ -15,6 +15,7 @@ import Product from "./pages/Product";
 import Protected from "./components/Protected";
 import NotFound from "./pages/NotFound";
 import Cart from "./components/Cart";
+import AccountSettingPage from "./pages/AccountSettingPage";
 
 // TODO: Implement load from back button for pages
 function App() {
@@ -55,9 +56,30 @@ function App() {
             </Protected>
           }
         />
-        <Route path="*" element={<Home />} />
-        <Route path="/product" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
+        <Route
+          path="account-settings"
+          element={
+            <Protected>
+              <AccountSettingPage />
+            </Protected>
+          }
+        />
+        <Route
+          path="/product"
+          element={
+            <Protected>
+              <Product />
+            </Protected>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <Protected>
+              <Cart />
+            </Protected>
+          }
+        />
         <Route path="*" element={<NotFound />} /> {/* 404 route */}
       </Routes>
     </Router>

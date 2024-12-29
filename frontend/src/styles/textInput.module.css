@@ -53,24 +53,85 @@
 }
 
 .inputContainer {
+    position: relative; /* Required for the pseudo-element positioning */
+    width: 100%;
     background-color: #e3e3e3;
     border-radius: 0.8rem;
-    width: 100%;
 }
+
+.inputContainer::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 0.8rem;
+    background: linear-gradient(
+        45deg,
+        #ff0000,
+        #ff7300,
+        #fffb00,
+        #48ff00,
+        #00ffd5,
+        #002bff,
+        #7a00ff,
+        #ff00c8,
+        #ff0000
+    );
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    animation: glowing-input 20s linear infinite;
+}
+
+@keyframes glowing-input {
+    0% {
+        background-position: 0 0;
+    }
+    50% {
+        background-position: 400% 0;
+    }
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.inputField {
+    padding: 15px 15px 0 20px;
+    font-size: medium;
+    color: #5d5d5d;
+    font-size: 1.5rem;
+    border-radius: 0.8rem;
+    border: none;
+    background-color: transparent;
+    box-shadow: none;
+    width: 100%; /* Adjust width to match parent container */
+    height: auto; /* Automatically adjust height based on content */
+    resize: none; /* Prevent resizing of the textarea */
+    font-family: ui-sans-serif, -apple-system, system-ui, Segoe UI, Helvetica, Apple Color Emoji, Arial, sans-serif, Segoe UI Emoji, Segoe UI Symbol;
+    background-color: #e3e3e3;
+    box-sizing: border-box;
+}
+
+.inputField:focus {
+    outline: none;
+}
+
 
 .iconContainer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.1rem 0.5rem 0.3rem 0.5rem;
+    padding: 0.1rem 0.5rem 0.5rem 0.5rem;
 }
 
 .iconWrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     padding: 3px;
     box-sizing: border-box;
     border-radius: 8px;

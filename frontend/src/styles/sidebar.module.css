@@ -3,8 +3,8 @@
   left: 0;
   top: 0;
   height: 100vh;
-  width: 250px;
-  background-color: #e5e5e6;
+  width: 300px;
+  background-color: #f9f9f9;
   padding: 20px;
   scrollbar-width: thin; /* For Firefox: make the scrollbar thinner */
   scrollbar-color: #b6b6b6 transparent; /* Customize scrollbar color */
@@ -26,7 +26,7 @@ ul {
 li {
   padding: 10px 15px;
   border-radius: 5px;
-  background-color: #e5e5e6;
+  background-color: #f9f9f9;
   color: #333;
   font-size: 14px;
   display: flex;
@@ -36,7 +36,7 @@ li {
 }
 
 li:hover {
-  background-color: #b6b6b6;
+  background-color: #d1d0d0;
 }
 
 svg:not(:root) {
