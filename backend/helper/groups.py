@@ -61,19 +61,20 @@ def paired_users(users):
     return list(users)
 
 def group_cleaned(groupDoc):
-    return json.dumps({
+    return {
         'id': groupDoc['id'],
         'groupname': groupDoc['groupname'],
         'admin': groupDoc['admin'],
         'users': paired_users(groupDoc['users']),
         'occasions': groupDoc['occasions']
-    })
+    }
 
 def groups_cleaned(groups):
     return list(map(lambda groupDoc: group_cleaned(groupDoc), groups))
 
+
 def occasion_cleaned(ocDoc):
-    return json.dumps({
+    return ({
         'id': ocDoc['id'],
         'groupID': ocDoc['groupID'],
         'users': paired_users(ocDoc['users']),
