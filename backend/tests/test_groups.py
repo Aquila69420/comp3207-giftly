@@ -86,4 +86,4 @@ def test_divisions_get():
     print(r.json())
 
 if __name__ == '__main__':
-    test_divisions_get()
+    test_group_gifting()

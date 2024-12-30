@@ -126,6 +126,11 @@ def division_cleaned(divisionDoc):
 def divisions_cleaned(divisions):
     return list(map(lambda divisionDoc: division_cleaned(divisionDoc), divisions))
 
+def occasion_has_divisions(ocDoc):
+    if ocDoc['divisions']:
+        raise Exception("Occasion already has divisions")
+    return ocDoc['divisions']
+
 def create_group(userID, groupname):
     # Check if userID exists
     user_exists(userID)
@@ -351,9 +356,10 @@ def occasion_add_division(ocDoc, divisionID):
     return oc
 
 def group_gifting(userID, occasionID, recipients):
-    # TODO: Lock division creation when divisions have already been made for an occasion
     # Check occasion exists
     oc = occasion_exists(occasionID)
+
+    occasion_has_divisions(oc)
 
     # Check user in occasion
     user_in_occasion(oc, userID)
