@@ -7,6 +7,7 @@ from pprint import pprint
 # TODO: replace with new credentials, account expires on 26/12/2024
 # TODO: Add demo response JSON files to gitignore for production/final submission
 with open('./local.settings.json', 'r') as file:
+# with open('backend/local.settings.json') as file:
     settings = json.load(file)
 username = settings.get('Values').get('Oxylabs_API_username')
 password = settings.get('Values').get('Oxylabs_API_password')
@@ -18,6 +19,7 @@ with open('./amazon_search.json') as f:
 with open('./google_search.json') as f:
     demo_google_response = json.load(f)
 with open('./walmart_search.json') as f:
+# with open('backend/walmart_search.json') as f:
     demo_walmart_response = json.load(f)
 with open('./target_search.json') as f:
     demo_target_response = json.load(f)
@@ -148,7 +150,7 @@ def parse_walmart_products(products):
         product_info['name'] = product['general']['title']
         product_info['price'] = product['price']['price']
         product_info['currency'] = product['price']['currency']
-        product_info['product_url'] = product['general']['url']
+        product_info['product_url'] = 'https://www.walmart.com' + product['general']['url']
         product_info['image_url'] = product['general']['image']
         products_info.append(product_info)
     return products_info
