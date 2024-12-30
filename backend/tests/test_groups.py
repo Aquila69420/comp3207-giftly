@@ -45,12 +45,15 @@ def test_add_occasion():
             "3e6922b6-23c2-48ee-bca7-c2c04a8be7b0"
         ],
         "occasionname": "Christmas",
-        "occasiondate": "01/01/1990"
+        "occasiondate": "2024-02-29"
     }))
     r.raise_for_status()
     data = r.json()
     print(data)
-    return data['occasion']['id']
+    try:
+        return data['occasion']['id']
+    except KeyError as _:
+        return None
 
 def test_get_occasions():
     url = getURL("occasions", "get")
@@ -123,8 +126,18 @@ def test_exclusion_gifting(id):
     r.raise_for_status()
     print(r.json())
 
+def test_occasion_datechange(id):
+    url = getURL("occasions", "datechange")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "occasionID": id,
+        "occasiondate": "2002-12-02"
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 
 if __name__ == '__main__':
     # test_delete_occasion("1d2ad927-5560-4326-89ec-3f49dc2dd5e7")
-    id = test_add_occasion()
-    test_group_gifting(id)
+    # id = test_add_occasion()
+    test_occasion_datechange("b69ad5bd-ec80-4107-b6c3-a434f02f07c8")
