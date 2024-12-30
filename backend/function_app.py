@@ -909,8 +909,8 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     occasionID = data['occasionID']
     recipients = data['recipients']
     try:
-        oc, division = groups.group_gifting(userID, occasionID, recipients)
-        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.division_cleaned(division)})
+        oc, divisions = groups.group_gifting(userID, occasionID, recipients)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except Exception as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -919,6 +919,51 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200
     )
     return add_cors_headers(response)
+
+@app.function_name(name="groups_exclusion_gifting")
+@app.route(route='groups/exclusion_gifting', methods=[func.HttpMethod.POST])
+def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
+    '''Initiate exclusion gifting of n divisions where n is the number of users in the occasion
+    
+    For example, [a,b,c,d,e]:
+        [a,b,c,d] -> e
+        [a,b,c,e] -> d
+        [a,b,d,e] -> c
+        [a,c,d,e] -> b
+        [b,c,d,e] -> a
+        
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, occasionID: occasionID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", occasion: {...}, divisions: []}
+        data: {result: False, msg: "User is not in the occasion"}
+        data: {result: False, msg: "Occasion already has divisions"}'''
+    data = req.get_json()
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        oc, divisions = groups.exclusion_gifting(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+
+@app.function_name(name="groups_white_elephant")
+@app.route(route='groups/white_elephant', methods=[func.HttpMethod.POST])
+def groups_white_elephant(req: func.HttpRequest) -> func.HttpResponse:
+    #TODO: code if required
+    pass
 
 @app.function_name(name="groups_divisions_get")
 @app.route(route='groups/divisions/get', methods=[func.HttpMethod.POST])

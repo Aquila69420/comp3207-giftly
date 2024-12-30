@@ -404,7 +404,7 @@ def group_gifting(userID, occasionID, recipients):
     # Add divison to occasion
     oc = occasion_add_division(oc, division['id'])
 
-    return oc, division
+    return oc, [division]
 
 def get_divisions(userID, ocID):
     # Check occasion exists
@@ -438,7 +438,6 @@ def secret_santa(userID, occasionID):
     users.append(users[0])
 
     divisions = []
-    ops = []
     for user, recipient in zip(users, users[1:]):
         division = divisions_container.create_item({
             'id': str(uuid.uuid4()),
@@ -453,3 +452,28 @@ def secret_santa(userID, occasionID):
     
     return oc, divisions
 
+def exclusion_gifting(userID, occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Lock division creation if divisions already exist
+    occasion_has_divisions(oc)
+
+    # Check user is in occasion
+    user_in_occasion(oc, userID)
+
+    users = oc['users']
+    divisions = []
+    for i in range(len(users)):
+        division = divisions_container.create_item({
+            'id': str(uuid.uuid4()),
+            'occasionID': oc['id'],
+            'groupID': oc['groupID'],
+            'users': users[:i] + users[i+1:],
+            'cart': "", #TODO: generate cart for division
+            'recipients': [users[i]]
+        })
+        divisions.append(division)
+        oc = occasion_add_division(oc, division['id'])
+    
+    return oc, divisions
