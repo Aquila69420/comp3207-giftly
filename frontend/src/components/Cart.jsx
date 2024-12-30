@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styles from "../styles/cart.module.css";
+import CartItem from "./CartItem"; 
 import config from "../config";
 
 // TODO: build cart page functionality - delete cart, delete items from current cart, load and view other carts for user
+// TODO: only one cart per user
 function Cart({ username }) {
-  const [cartItems, setCartItems] = useState([]); // Cart content stored here
+  const [cartItems, setCartItems] = useState(JSON.parse(sessionStorage.getItem("cart")) || []); // Cart content stored here
   const [cartName, setCartName] = useState("");
   const [loadCartName, setLoadCartName] = useState("");
   const [deleteCartName, setDeleteCartName] = useState("");
@@ -12,7 +14,7 @@ function Cart({ username }) {
 
   useEffect(() => {
     const newTotalCost = cartItems.reduce(
-      (acc, item) => acc + item.quantity * item.pricePerUnit,
+      (acc, item) => acc + item.price,
       0
     );
     setTotalCost(newTotalCost);
@@ -20,17 +22,25 @@ function Cart({ username }) {
 
   // IMPROVEMENT: aggregate the items by vendor and take to actual cart. After buying item the boxes should tick by themselves. If item checkbox crossed then do not add the item as it was already purchased. Buy button deactivated if cart empty.
   const handleBuy = () => {
-    console.log("Buying items", cartItems);
+    // console.log("Buying items", cartItems);
 
-    cartItems.forEach((item) => {
-      if (!item.checked && item.supplier) {
-        window.open(item.supplier, "_blank");
-      }
-    });
+    // cartItems.forEach((item) => {
+    //   if (!item.checked && item.supplier) {
+    //     window.open(item.supplier, "_blank");
+    //   }
+    // });
   };
 
-  // IMPROVEMENT: don't allow for save or load cart button before there is text. Dont allow to save cart if cart is empty. Include if gift alreayd bought (select box)
   const handleSaveCart = async () => {
+    setCartItems(JSON.parse(sessionStorage.getItem("cart")))
+    if (cartItems.length === 0) {
+      alert("Please add items to your cart first.");
+      return;
+    }
+    else if (cartName === "") {
+      alert("Please enter a cart name.");
+      return;
+    }
     // Get session id
     const sessionId = localStorage.getItem("sessionId");
     // First see if cart is already stored
@@ -96,7 +106,6 @@ function Cart({ username }) {
         cartContents.forEach((item) => {
           setCartItems((prevItems) => [...prevItems, item]);
         });
-        // IMPROVEMENT: change cart title to the cart name
       } else {
         console.log("Response from backend:", result);
       }
@@ -124,78 +133,43 @@ function Cart({ username }) {
   };
 
   const handleAddToCart = () => {
-    // change this to the item you actually clicked on the add
-    const newItem = {
-      name: `Basketball`,
-      quantity: 1,
-      pricePerUnit: 10,
-      supplier:
-        "https://www.amazon.co.uk/AmazonBasics-PU-Composite-Basketball-Official/dp/B07VL3NHMY/ref=sr_1_1_ffob_sspa?crid=2J2L2AEEMRLQO&dib=eyJ2IjoiMSJ9.vWaA-4h7T7hycBHPmi8jOGp1hDHrXzgk8RCVnbvdRE2WfU6nse6T_ID9LS1gdKzQiQY6kRA2b_uLfEIqgZzJCPoEXgkpgF7R6oifnYh-ikVSszo58ouszZFWPFlOYKFfFdcI0cEKzPZAvJv5tf-APHV0bGRr6SPQh4xSWXtfuOAYpiI-qEr-Han-xYf09TBpJOWhgdFbpued4G7SSICg-i3-KzsCI5DFL0uzE-OXakC36YuylIN69QZApCqBAoZZvwvP_Dp6OA9rJOAF7MX68cjDURFmq1LqI6H4yISlMKs.hAHbug7idRMmzWeJ7HKa8jMm1NEDaUr-P2cpSA_M-Ug&dib_tag=se&keywords=basketball&qid=1734735620&sprefix=basketball%2Caps%2C233&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1",
-    };
-    setCartItems([...cartItems, newItem]);
+    // // change this to the item you actually clicked on the add
+    // const newItem = {
+    //   name: `Basketball`,
+    //   quantity: 1,
+    //   pricePerUnit: 10,
+    //   supplier:
+    //     "https://www.amazon.co.uk/AmazonBasics-PU-Composite-Basketball-Official/dp/B07VL3NHMY/ref=sr_1_1_ffob_sspa?crid=2J2L2AEEMRLQO&dib=eyJ2IjoiMSJ9.vWaA-4h7T7hycBHPmi8jOGp1hDHrXzgk8RCVnbvdRE2WfU6nse6T_ID9LS1gdKzQiQY6kRA2b_uLfEIqgZzJCPoEXgkpgF7R6oifnYh-ikVSszo58ouszZFWPFlOYKFfFdcI0cEKzPZAvJv5tf-APHV0bGRr6SPQh4xSWXtfuOAYpiI-qEr-Han-xYf09TBpJOWhgdFbpued4G7SSICg-i3-KzsCI5DFL0uzE-OXakC36YuylIN69QZApCqBAoZZvwvP_Dp6OA9rJOAF7MX68cjDURFmq1LqI6H4yISlMKs.hAHbug7idRMmzWeJ7HKa8jMm1NEDaUr-P2cpSA_M-Ug&dib_tag=se&keywords=basketball&qid=1734735620&sprefix=basketball%2Caps%2C233&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1",
+    // };
+    // setCartItems([...cartItems, newItem]);
   };
 
   const handleClear = () => {
     setCartItems([]);
+    sessionStorage.setItem("cart", JSON.stringify([]))
   };
 
-  const handleRemoveItem = (index) => {
-    const updatedCart = cartItems.filter((_, i) => i !== index);
-    setCartItems(updatedCart);
-  };
-
-  const handleQuantityChange = (index, quantity) => {
-    const updatedCart = cartItems.map((item, i) =>
-      i === index ? { ...item, quantity } : item
-    );
-    setCartItems(updatedCart);
-  };
   return (
     <div className={styles.cartContainer}>
       <div className={styles.cartContent}>
         <p className={styles.cartTitle}>Cart</p>
         <ul className={styles.cartList}>
-          {cartItems.length > 0 ? (
-            cartItems.map((item, index) => (
-              <li className={styles.cartItem} key={index}>
-                <input type="checkbox" />
-                <a
-                  href={item.supplier}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.cartLink}
-                >
-                  {item.name}
-                </a>
-                <select
-                  value={item.quantity}
-                  onChange={(e) =>
-                    handleQuantityChange(index, parseInt(e.target.value, 10))
-                  }
-                  className={styles.cartSelect}
-                >
-                  {[1, 2, 3, 4, 5].map((qty) => (
-                    <option key={qty} value={qty}>
-                      {qty}
-                    </option>
-                  ))}
-                </select>
-                <p className={styles.cartPrice}>
-                  £{(item.quantity * item.pricePerUnit).toFixed(2)}
-                </p>
-                <button
-                  onClick={() => handleRemoveItem(index)}
-                  className={styles.cartButton}
-                >
-                  X
-                </button>
-              </li>
-            ))
-          ) : (
-            <li>Your cart is empty</li>
-          )}
+          <ul className={styles.cartList}>
+            {cartItems.length > 0 ? (
+              cartItems.map((item, index) => (
+              <CartItem
+              key={index}
+              item={item}
+              index={index}
+              />
+              ))
+            ) : (
+              <li>Your cart is empty</li>
+            )}
+          </ul>
         </ul>
-        <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div>
+        {/* <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div> */}
+        <div className={styles.totalCost}>Total: £{totalCost}</div>
       </div>
 
       <div className={styles.buttonsContainer}>

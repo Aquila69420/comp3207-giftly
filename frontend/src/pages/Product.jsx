@@ -5,7 +5,6 @@ import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
 
-// TODO: Implement proceed to cart and continue shopping functionality
 // Icons available at https://react-icons.github.io/react-icons/
 export default function Product() {
   const navigate = useNavigate();
