@@ -6,23 +6,23 @@ from pprint import pprint
 
 # TODO: replace with new credentials, account expires on 26/12/2024
 # TODO: Add demo response JSON files to gitignore for production/final submission
-# with open('./local.settings.json', 'r') as file:
-with open('backend/local.settings.json') as file:
+with open('./local.settings.json', 'r') as file:
+# with open('backend/local.settings.json') as file:
     settings = json.load(file)
 username = settings.get('Values').get('Oxylabs_API_username')
 password = settings.get('Values').get('Oxylabs_API_password')
 
 
 # Demo response JSON files for testing
-# with open('./amazon_search.json') as f:
-#     demo_amazon_response = json.load(f)
-# with open('./google_search.json') as f:
-#     demo_google_response = json.load(f)
-# with open('./walmart_search.json') as f:
-with open('backend/walmart_search.json') as f:
+with open('./amazon_search.json') as f:
+    demo_amazon_response = json.load(f)
+with open('./google_search.json') as f:
+    demo_google_response = json.load(f)
+with open('./walmart_search.json') as f:
+# with open('backend/walmart_search.json') as f:
     demo_walmart_response = json.load(f)
-# with open('./target_search.json') as f:
-#     demo_target_response = json.load(f)
+with open('./target_search.json') as f:
+    demo_target_response = json.load(f)
 
 def amazon(query):
     """
