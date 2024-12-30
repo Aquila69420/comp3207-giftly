@@ -387,7 +387,7 @@ def get_divisions(userID, ocID):
     user_in_occasion(oc, userID)
 
     # Query
-    divisions = list(occasions_container.query_items(
+    divisions = list(divisions_container.query_items(
         query="SELECT * FROM c WHERE c.occasionID=@occasionID and ARRAY_CONTAINS(c.users, @userID)",
         parameters=[{'name': '@occasionID', 'value': ocID},
                     {'name': '@userID', 'value': userID}],

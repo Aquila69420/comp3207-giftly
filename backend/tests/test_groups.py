@@ -75,5 +75,15 @@ def test_group_gifting():
     r.raise_for_status()
     print(r.json())
 
+def test_divisions_get():
+    url = getURL("divisions", "get")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "occasionID": "c5582269-3439-4345-94f4-db49a8764d9d"
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 if __name__ == '__main__':
-    test_group_gifting()
+    test_divisions_get()
