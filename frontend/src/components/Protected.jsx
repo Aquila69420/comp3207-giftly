@@ -6,6 +6,6 @@ export default function Protected({ children }) {
     return !!localStorage.getItem("username");
   }
   return (
-    <div>{isAuthenticated() ? children : <Navigate to={"/login"} />} </div>
+    <div>{isAuthenticated() ? children : <Navigate to={"/"} />} </div>
   );
 }
