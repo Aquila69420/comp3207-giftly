@@ -767,6 +767,35 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+@app.function_name(name="groups_occasions_delete")
+@app.route(route='groups/occasions/delete', methods=[func.HttpMethod.POST])
+def groups_occasions_delete(req: func.HttpRequest) -> func.HttpResponse:
+    '''Remove an occasion and all its divisions via its occasionID
+    
+    # Paramaters
+    req: func.HttpRequest
+    with
+        data: {occasionID: occasionID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", group: {...}}
+        data: {result: False, msg: "Occasion does not exist"}'''
+    data = req.get_json()
+    occasionID = data['occasionID']
+    try:
+        group = groups.delete_occasion(occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
 @app.function_name(name="groups_occasions_get")
 @app.route(route='groups/occasions/get', methods=[func.HttpMethod.POST])
 def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
@@ -798,7 +827,7 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_leave")
-@app.route(route='groups/occasions/leave')
+@app.route(route='groups/occasions/leave', methods=[func.HttpMethod.POST])
 def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     '''Any user in an occasion can leave the occasion
     
@@ -828,27 +857,38 @@ def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_secret_santa")
-@app.route(route='groups_secret_santa')
+@app.route(route='groups/secret_santa', methods=[func.HttpMethod.POST])
 def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Secret Santa
 
     # Parameters
     req: func.HttpRequest
     with
-        data: {userID: userID, groupname: groupname, occasionname: occasionname}
+        data: {userID: userID, occasionID: occasionID}
 
     # Returns
     func.HttpResponse
     with
-        data: {result: True, msg: "OK"}
-        data: {result: False, msg: "{groupname} does not exist"}
-        data: {result: False, msg: "{userID} is not the admin for the group"
-        data: {result: False, msg: "{occasionname} for this group already exists"}'''
+        data: {result: True, msg: "OK", occasion: {...}, divisions: []}
+        data: {result: False, msg: "User is not in the occasion"}
+        data: {result: False, msg: "Occasion already has divisions"}'''
     data = req.get_json()
-    #TODO: code
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        oc, divisions = groups.secret_santa(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
+    except Exception as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="groups_group_gifting")
-@app.route(route='groups/group_gifting')
+@app.route(route='groups/group_gifting', methods=[func.HttpMethod.POST])
 def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Group Gifting for a target recipient(s)
     
@@ -861,7 +901,8 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     func.HttpResponse
     with
         data: {result: True, msg: "OK", occasion: {...}, divisions: []}
-        data: {result: False, msg: "{userID} is not the admin for the group"}
+        data: {result: False, msg: "Occasion already has divisions"}
+        data: {result: False, msg: "User is not in the occasion"}
         data: {result: False, msg: "A recipient in recipients does not exist"}'''
     data = req.get_json()
     userID = data['userID']
@@ -880,7 +921,7 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_divisions_get")
-@app.route(route='groups/divisions/get')
+@app.route(route='groups/divisions/get', methods=[func.HttpMethod.POST])
 def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
     '''Get all divisions relevant to a user from an occasion
     

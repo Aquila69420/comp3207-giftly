@@ -14,7 +14,7 @@ def test_add_user():
     r = requests.post(url=url, data=json.dumps({
         "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
         "groupID": "1a16b794-816c-479b-bca2-37578455c89d",
-        "user_to_add": "atharva"
+        "user_to_add": "Jesse"
     }))
     r.raise_for_status()
     print(r.json())
@@ -37,12 +37,20 @@ def test_add_occasion():
     r = requests.post(url=url, data=json.dumps({
         "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
         "groupID": "1a16b794-816c-479b-bca2-37578455c89d",
-        "users": ["06bac64c-9de0-4757-ba1a-ccff044a3399"],
+        "users": [
+            "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+            "06bac64c-9de0-4757-ba1a-ccff044a3399",
+            "5dc28b4d-a237-445c-b4ca-dc28446b2a67",
+            "1815e789-2826-4bbc-b8db-389cb5e2d639",
+            "3e6922b6-23c2-48ee-bca7-c2c04a8be7b0"
+        ],
         "occasionname": "Christmas",
         "occasiondate": "01/01/1990"
     }))
     r.raise_for_status()
-    print(r.json())
+    data = r.json()
+    print(data)
+    return data['occasion']['id']
 
 def test_get_occasions():
     url = getURL("occasions", "get")
@@ -85,5 +93,27 @@ def test_divisions_get():
     r.raise_for_status()
     print(r.json())
 
+def test_delete_occasion(id):
+    url = getURL("occasions", "delete")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "occasionID": id
+    }))
+    r.raise_for_status()
+    print(r.json())
+
+def test_secret_santa(id):
+    url = getURL("secret_santa")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "occasionID": id,
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0"
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 if __name__ == '__main__':
-    test_group_gifting()
+    # test_delete_occasion("ee2ab03e-d0b5-4443-a89d-d84c51d2d620")
+    id = test_add_occasion()
+    test_secret_santa(id)
+    test_delete_occasion(id)

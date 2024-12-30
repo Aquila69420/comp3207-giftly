@@ -1,5 +1,5 @@
 from azure.cosmos import CosmosClient
-import os, uuid, logging, json
+import os, uuid, logging, json, random
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
@@ -154,8 +154,7 @@ def delete_group(userID, groupID):
     
     # Delete group in all containers
     for occasionID in group['occasions']:
-        # TODO: Delete all divisions
-        occasions_container.delete_item(item=occasionID, partition_key=occasionID)
+        delete_occasion(occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(userID, user_to_add, groupID):
@@ -320,6 +319,27 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
     return oc, group
 
+def delete_occasion(occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+    groupID = oc['groupID']
+
+    # Delete every division in occasion
+    for divisionID in oc['divisions']:
+        divisions_container.delete_item(item=divisionID, partition_key=divisionID)
+    
+    # Delete occasion
+    occasions_container.delete_item(item=occasionID, partition_key=occasionID)
+    
+    # Update group document via Patch Operation
+    group = group_exists(groupID)
+    index = group['occasions'].index(occasionID)
+    ops = [
+        {"op": "remove", "path": f"/occasions/{index}"}
+    ]
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return group
+
 def get_occasions(userID, groupID):
     # Check if group exists
     group = group_exists(groupID)
@@ -359,6 +379,7 @@ def group_gifting(userID, occasionID, recipients):
     # Check occasion exists
     oc = occasion_exists(occasionID)
 
+    # Lock division creation if divisions already exist
     occasion_has_divisions(oc)
 
     # Check user in occasion
@@ -400,3 +421,35 @@ def get_divisions(userID, ocID):
         enable_cross_partition_query=True
     ))
     return divisions
+
+def secret_santa(userID, occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Lock division creation if divisions already exist
+    occasion_has_divisions(oc)
+
+    # Check user is in occasion
+    user_in_occasion(oc, userID)
+
+    # Shuffle users and pair i with i + 1 circular array
+    users = oc['users']
+    users = random.sample(users, len(users)) # Not in-place shuffle
+    users.append(users[0])
+
+    divisions = []
+    ops = []
+    for user, recipient in zip(users, users[1:]):
+        division = divisions_container.create_item({
+            'id': str(uuid.uuid4()),
+            'occasionID': oc['id'],
+            'groupID': oc['groupID'],
+            'users': [user],
+            'cart': "", #TODO: generate cart for division
+            'recipients': [recipient]
+        })
+        divisions.append(division)
+        oc = occasion_add_division(oc, division['id'])
+    
+    return oc, divisions
+
