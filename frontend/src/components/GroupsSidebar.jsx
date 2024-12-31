@@ -1,114 +1,234 @@
-import React, { useState } from 'react';
-import { FaPlus } from 'react-icons/fa';
-import styles from '../styles/groups.module.css';
+import React, { useState } from "react";
+import { FaEllipsisV, FaPlus } from "react-icons/fa";
+import { FiChevronDown, FiChevronRight } from "react-icons/fi";
+import styles from "../styles/groups.module.css";
 
-const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick, activeGroup, onCreateGroup, onAddOccasion }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [newGroupName, setNewGroupName] = useState('');
-  const [showOccasionModal, setShowOccasionModal] = useState(false);
-  const [newOccasionName, setNewOccasionName] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedMembers, setSelectedMembers] = useState([]);
-  const currentUserID = localStorage.getItem("userID"); // Assuming userID is stored in localStorage
+/**
+ * groups: [
+ *   {
+ *     id: 1,
+ *     groupname: "Group 1",
+ *     occasions: [
+ *       {
+ *         id: 11,
+ *         occasionname: "Subgroup 1",
+ *         divisions: [
+ *           { id: 111, divisionName: "Division 1" },
+ *           { id: 112, divisionName: "Division 2" },
+ *         ],
+ *       },
+ *       ...
+ *     ]
+ *   },
+ *   ...
+ * ]
+ */
 
-  const openOccasionModal = () => {
-    if (activeGroup?.users) {
-      setSelectedMembers(
-        activeGroup.users.map((user) => ({
-          ...user,
-          selected: true, // Select all members by default
-        }))
-      );
-    }
-    setShowOccasionModal(true);
+const GroupsSidebar = ({
+  groups = [],
+  activeGroup,
+  onGroupClick,       // invoked when user clicks a group
+  onCreateGroup,      // invoked when user wants to create a new group
+  onAddOccasion,      // invoked when user wants to add a new occasion
+}) => {
+  // State to track whether the main "Giftly" heading is open
+  const [isMainOpen, setIsMainOpen] = useState(true);
+
+  // Track which groups are expanded
+  const [openGroups, setOpenGroups] = useState({});
+  // Track which occasions are expanded
+  const [openOccasions, setOpenOccasions] = useState({});
+
+  // Simple toggler for groups
+  const handleGroupToggle = (groupId) => {
+    setOpenGroups((prev) => ({
+      ...prev,
+      [groupId]: !prev[groupId],
+    }));
   };
 
-  const handleCreateGroup = () => {
+  // Simple toggler for occasions (subgroups)
+  const handleOccasionToggle = (occasionId) => {
+    setOpenOccasions((prev) => ({
+      ...prev,
+      [occasionId]: !prev[occasionId],
+    }));
+  };
+
+  // If you want to open a modal or show a context menu for each item
+  const handleMenuClick = (itemType, item) => {
+    // itemType: "group" | "occasion" | "division" | "main-heading"
+    // item: the data object for that item
+    alert(`Menu click for ${itemType}\n${JSON.stringify(item, null, 2)}`);
+  };
+
+  // For adding a group
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [newGroupName, setNewGroupName] = useState("");
+
+  const handleCreateGroupSubmit = () => {
     if (newGroupName.trim()) {
-      onCreateGroup(newGroupName);
-      setNewGroupName('');
-      setShowModal(false);
+      onCreateGroup(newGroupName.trim());
     }
-  };
-
-  const handleAddOccasion = () => {
-    if (newOccasionName.trim() && selectedDate.trim()) {
-      const users = selectedMembers
-        .filter((member) => member.selected)
-        .map((member) => member.userID);
-
-      onAddOccasion(activeGroup, newOccasionName, selectedDate, users);
-      setNewOccasionName('');
-      setSelectedDate('');
-      setShowOccasionModal(false);
-    }
-  };
-
-  const toggleMemberSelection = (userID) => {
-    setSelectedMembers((prev) =>
-      prev.map((member) =>
-        member.userID === userID
-          ? { ...member, selected: !member.selected }
-          : member
-      )
-    );
+    setNewGroupName("");
+    setShowGroupModal(false);
   };
 
   return (
-    <div className={styles.sidebar}>
-      {/* Title and Plus Button */}
-      <div className={styles.sidebarHeader}>
-        <h2 className={styles.sidebarTitle}>Groups</h2>
-        <button
-          className={styles.addGroupButton}
-          onClick={() => setShowModal(true)}
-          title="Add a new group"
+    <div className={styles.sidebarContainer}>
+      {/* MAIN HEADING */}
+      <div className={styles.mainHeading}>
+        {/* Left side: collapse/expand icon + text */}
+        <div
+          className={styles.headingLeft}
+          onClick={() => setIsMainOpen(!isMainOpen)}
         >
-          <FaPlus />
-        </button>
+          {isMainOpen ? <FiChevronDown /> : <FiChevronRight />}
+          <h2 className={styles.mainHeadingText}>Giftly</h2>
+        </div>
+
+        {/* Right side: the three-dot menu (and optional "add group" icon) */}
+        <div className={styles.headingRight}>
+          {/* Three-dot menu for the main heading */}
+          <div
+            className={styles.iconWrapper}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleMenuClick("main-heading", {});
+            }}
+          >
+            <FaEllipsisV />
+          </div>
+          {/* Plus icon to open "create group" modal */}
+          <div
+            className={styles.iconWrapper}
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowGroupModal(true);
+            }}
+          >
+            <FaPlus />
+          </div>
+        </div>
       </div>
 
-      {/* Group List */}
-      <ul className={styles.groupList}>
-        {groups.map((group, index) => (
-          <li
-            key={index}
-            className={`${styles.groupItem} ${activeGroup?.groupname === group.groupname ? styles.activeGroup : ''}`}
-          >
-            <div className={styles.groupNameWrapper}>
-              <div onClick={() => onGroupClick(group)} className={styles.groupName}>
-                {group.groupname}
-              </div>
-              {activeGroup?.groupname === group.groupname && (
-                <button
-                  className={styles.addOccasionButton}
-                  onClick={openOccasionModal}
-                  title="Add Occasion"
-                >
-                  <FaPlus className={styles.redPlusIcon} />
-                </button>
-              )}
-            </div>
-            <ul className={styles.subgroupList}>
-              {group.occasions?.map((subgroup, subIndex) => (
-                <li
-                  key={subIndex}
-                  onClick={() => onSubgroupClick(subgroup)}
-                  className={styles.subgroupItem}
-                >
-                  {subgroup.name}
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
-      </ul>
+      {/* Collapsible content: the groups list */}
+      {isMainOpen && (
+        <div className={styles.groupsWrapper}>
+          {groups.map((group) => {
+            const groupOpen = openGroups[group.id] || false;
+            const isActiveGroup = activeGroup?.id === group.id;
 
-      {/* Modal for creating new group */}
-      {showModal && (
+            return (
+              <div key={group.id} className={styles.groupSection}>
+                {/* GROUP HEADER */}
+                <div
+                  className={`${styles.groupHeading} ${
+                    isActiveGroup ? styles.activeGroupBg : ""
+                  }`}
+                  onClick={() => {
+                    handleGroupToggle(group.id);
+                    onGroupClick?.(group);
+                  }}
+                >
+                  <div className={styles.groupLeft}>
+                    {groupOpen ? <FiChevronDown /> : <FiChevronRight />}
+                    <span
+                      className={
+                        isActiveGroup
+                          ? styles.activeGroupText
+                          : styles.groupText
+                      }
+                    >
+                      {group.groupname}
+                    </span>
+                  </div>
+
+                  <div
+                    className={styles.iconWrapper}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMenuClick("group", group);
+                    }}
+                  >
+                    <FaEllipsisV />
+                  </div>
+                </div>
+
+                {/* OCCASIONS (SUBGROUPS) */}
+                {groupOpen &&
+                  Array.isArray(group.occasions) &&
+                  group.occasions.map((occasion) => {
+                    const occasionOpen = openOccasions[occasion.id] || false;
+
+                    return (
+                      <div key={occasion.id} className={styles.occasionSection}>
+                        <div
+                          className={styles.occasionHeading}
+                          onClick={() => {
+                            handleOccasionToggle(occasion.id);
+                            // If you want a callback: onOccasionClick?.(occasion);
+                          }}
+                        >
+                          <div className={styles.occasionLeft}>
+                            {occasionOpen ? <FiChevronDown /> : <FiChevronRight />}
+                            <span className={styles.occasionText}>
+                              {occasion.occasionname}
+                            </span>
+                          </div>
+                          <div
+                            className={styles.iconWrapper}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMenuClick("occasion", occasion);
+                            }}
+                          >
+                            <FaEllipsisV />
+                          </div>
+                        </div>
+
+                        {/* DIVISIONS */}
+                        {occasionOpen &&
+                          Array.isArray(occasion.divisions) &&
+                          occasion.divisions.map((division) => (
+                            <div
+                              key={division.id}
+                              className={styles.divisionItem}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                // If you want a callback: onDivisionClick?.(division);
+                              }}
+                            >
+                              <div className={styles.divisionLeft}>
+                                <span className={styles.divisionText}>
+                                  {division.divisionName}
+                                </span>
+                              </div>
+                              <div
+                                className={styles.iconWrapper}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleMenuClick("division", division);
+                                }}
+                              >
+                                <FaEllipsisV />
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    );
+                  })}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* CREATE GROUP MODAL */}
+      {showGroupModal && (
         <div className={styles.modalBackdrop}>
           <div className={styles.modal}>
-            <h3>Create New Group</h3>
+            <h3 className={styles.modalTitle}>Create New Group</h3>
             <input
               type="text"
               placeholder="Group Name"
@@ -117,53 +237,16 @@ const GroupsSidebar = ({ groups, onGroupClick, onSubgroupClick, activeGroup, onC
               className={styles.modalInput}
             />
             <div className={styles.modalButtons}>
-              <button onClick={handleCreateGroup} className={styles.modalCreateButton}>
+              <button
+                onClick={handleCreateGroupSubmit}
+                className={styles.modalCreateButton}
+              >
                 Create
               </button>
-              <button onClick={() => setShowModal(false)} className={styles.modalCancelButton}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal for adding occasion */}
-      {showOccasionModal && (
-        <div className={styles.modalBackdrop}>
-          <div className={styles.modal}>
-            <h3>Add Occasion</h3>
-            <input
-              type="text"
-              placeholder="Occasion Name"
-              value={newOccasionName}
-              onChange={(e) => setNewOccasionName(e.target.value)}
-              className={styles.modalInput}
-            />
-            <input
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              className={styles.modalInput}
-            />
-            <div className={styles.membersList}>
-              {selectedMembers.map((member) => (
-                <div key={member.userID} className={styles.memberItem}>
-                  <input
-                    type="checkbox"
-                    checked={member.selected}
-                    onChange={() => toggleMemberSelection(member.userID)}
-                    disabled={member.userID === currentUserID} // Disable the checkbox for the current user
-                  />
-                  <span>{member.username}</span>
-                </div>
-              ))}
-            </div>
-            <div className={styles.modalButtons}>
-              <button onClick={handleAddOccasion} className={styles.modalCreateButton}>
-                Add
-              </button>
-              <button onClick={() => setShowOccasionModal(false)} className={styles.modalCancelButton}>
+              <button
+                onClick={() => setShowGroupModal(false)}
+                className={styles.modalCancelButton}
+              >
                 Cancel
               </button>
             </div>
