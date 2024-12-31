@@ -20,7 +20,7 @@ function SearchResults() {
   };
   
   const onBack = () => {
-    navigate("/")
+    navigate("/home")
   };
 
   const sendQuery = async () => {

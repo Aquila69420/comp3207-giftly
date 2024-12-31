@@ -1,11 +1,16 @@
 from azure.cosmos import CosmosClient
-import os, uuid, logging, json
+import os, uuid, logging, json, random, re, datetime
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
 groups_container = database.get_container_client(os.getenv("GroupsContainer"))
 occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
 divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
+
+# Custom Exception type to Catch
+class GroupsError(Exception):
+    def __init__(self, message):
+        super().__init__(message)
 
 def user_exists(userID):
     '''Check if userID exists in the database'''
@@ -15,7 +20,7 @@ def user_exists(userID):
             enable_cross_partition_query=True
         ))
     if not user:
-        raise Exception("The user does not exist")
+        raise GroupsError("The user does not exist")
     return user[0]
 
 def users_exist(users):
@@ -26,7 +31,7 @@ def users_exist(users):
         enable_cross_partition_query=True
     ))
     if len(users) != len(users1):
-        raise Exception("There is a user in the users array that does not exist")
+        raise GroupsError("There is a user in the users array that does not exist")
     return users1
 
 def username_exists(username):
@@ -37,7 +42,7 @@ def username_exists(username):
                 enable_cross_partition_query=True
             ))
     if not user:
-        raise Exception("The user does not exist")
+        raise GroupsError("The user does not exist")
     return user[0]
 
 def group_exists(groupID):
@@ -48,7 +53,7 @@ def group_exists(groupID):
             enable_cross_partition_query=True
         ))
     if not groups:
-        raise Exception("The group does not exist")
+        raise GroupsError("The group does not exist")
     return groups[0]
 
 def occasion_exists(occasionID):
@@ -58,25 +63,25 @@ def occasion_exists(occasionID):
             enable_cross_partition_query=True
         ))
     if not occasions:
-        raise Exception("The occasion does not exist")
+        raise GroupsError("The occasion does not exist")
     return occasions[0]
 
 def group_is_admin(groupDoc, userID):
     if groupDoc['admin'] != userID:
-        raise Exception("The user is not the admin of the group")
+        raise GroupsError("The user is not the admin of the group")
 
 def group_is_not_admin(groupDoc, userID):
     if groupDoc['admin'] == userID:
-        raise Exception("This user is the admin of the group")
+        raise GroupsError("This user is the admin of the group")
 
 
 def user_in_group(groupDoc, userID):
     if userID not in groupDoc['users']:
-        raise Exception("This user is not in the group")
+        raise GroupsError("This user is not in the group")
 
 def user_in_occasion(occasionDoc, userID):
     if userID not in occasionDoc['users']:
-        raise Exception("This user it not in the occasion")
+        raise GroupsError("This user it not in the occasion")
 
 def paired_users(users):
     # Query Container through a single Query
@@ -123,8 +128,25 @@ def division_cleaned(divisionDoc):
         'recipients': paired_users(divisionDoc['recipients'])
     }
 
+date_format_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
+def check_date_format(occasiondate):
+    m = date_format_re.match(occasiondate)
+    if not m: # occasiondate does not match regex
+        raise GroupsError("Occasion date is not the correct format: YYYY-MM-DD")
+    y, m, d = m.group(1, 2, 3)
+    try:
+        datetime.datetime(year = int(y), month = int(m), day = int(d))
+    except ValueError as e:
+        raise GroupsError("Occasion date is not of a valid date")
+    return True
+
 def divisions_cleaned(divisions):
     return list(map(lambda divisionDoc: division_cleaned(divisionDoc), divisions))
+
+def occasion_has_divisions(ocDoc):
+    if ocDoc['divisions']:
+        raise GroupsError("Occasion already has divisions")
+    return ocDoc['divisions']
 
 def create_group(userID, groupname):
     # Check if userID exists
@@ -149,8 +171,7 @@ def delete_group(userID, groupID):
     
     # Delete group in all containers
     for occasionID in group['occasions']:
-        # TODO: Delete all divisions
-        occasions_container.delete_item(item=occasionID, partition_key=occasionID)
+        delete_occasion(occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
 
 def add_user(userID, user_to_add, groupID):
@@ -165,7 +186,7 @@ def add_user(userID, user_to_add, groupID):
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise Exception("The user is already in the group")
+        raise GroupsError("The user is already in the group")
 
     # UserID needs to be admin to add user to group
     group_is_admin(group, userID)
@@ -215,7 +236,7 @@ def groups_kick(userID, groupID, user_to_remove):
 
     # Check admin is not kicking themselves
     if userID == user_to_remove:
-        raise Exception("Cannot kick yourself from the group")
+        raise GroupsError("Cannot kick yourself from the group")
 
     # Check user is in group
     user_in_group(group, user_to_remove)
@@ -296,6 +317,9 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     # Check all usernames are in group
     for user in ([userID] + users):
         user_in_group(group, user)
+
+    # Check format of occasiondate
+    check_date_format(occasiondate)
     
     # Add Occasion
     id = str(uuid.uuid4())
@@ -314,6 +338,27 @@ def create_occasion(userID, groupID, users, occasionname, occasiondate):
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
     return oc, group
+
+def delete_occasion(occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+    groupID = oc['groupID']
+
+    # Delete every division in occasion
+    for divisionID in oc['divisions']:
+        divisions_container.delete_item(item=divisionID, partition_key=divisionID)
+    
+    # Delete occasion
+    occasions_container.delete_item(item=occasionID, partition_key=occasionID)
+    
+    # Update group document via Patch Operation
+    group = group_exists(groupID)
+    index = group['occasions'].index(occasionID)
+    ops = [
+        {"op": "remove", "path": f"/occasions/{index}"}
+    ]
+    group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    return group
 
 def get_occasions(userID, groupID):
     # Check if group exists
@@ -350,10 +395,26 @@ def occasion_add_division(ocDoc, divisionID):
     oc = occasions_container.patch_item(item=ocID, partition_key=ocID, patch_operations=ops)
     return oc
 
-def group_gifting(userID, occasionID, recipients):
-    # TODO: Lock division creation when divisions have already been made for an occasion
+def occasion_datechange(occasionID, occasiondate):
     # Check occasion exists
     oc = occasion_exists(occasionID)
+
+    # Check format of date
+    check_date_format(occasiondate)
+
+    # Edit via Patch Operation
+    ops = [
+        {"op": "set", "path": "/occasiondate", "value": occasiondate}
+    ]
+    oc = occasions_container.patch_item(item=occasionID, partition_key=occasionID, patch_operations=ops)
+    return oc
+
+def group_gifting(userID, occasionID, recipients):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Lock division creation if divisions already exist
+    occasion_has_divisions(oc)
 
     # Check user in occasion
     user_in_occasion(oc, userID)
@@ -361,8 +422,8 @@ def group_gifting(userID, occasionID, recipients):
     # Check Recipients exist
     try:
         users_exist(recipients)
-    except Exception as e:
-        raise Exception("A recipient in recipients does not exist")
+    except GroupsError as e:
+        raise GroupsError("A recipient in recipients does not exist")
 
     # Add all users from the users in occasion to the division.
     # If recipients are in users of occasion, they are excluded.
@@ -377,7 +438,7 @@ def group_gifting(userID, occasionID, recipients):
     # Add divison to occasion
     oc = occasion_add_division(oc, division['id'])
 
-    return oc, division
+    return oc, [division]
 
 def get_divisions(userID, ocID):
     # Check occasion exists
@@ -387,10 +448,66 @@ def get_divisions(userID, ocID):
     user_in_occasion(oc, userID)
 
     # Query
-    divisions = list(occasions_container.query_items(
+    divisions = list(divisions_container.query_items(
         query="SELECT * FROM c WHERE c.occasionID=@occasionID and ARRAY_CONTAINS(c.users, @userID)",
         parameters=[{'name': '@occasionID', 'value': ocID},
                     {'name': '@userID', 'value': userID}],
         enable_cross_partition_query=True
     ))
     return divisions
+
+def secret_santa(userID, occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Lock division creation if divisions already exist
+    occasion_has_divisions(oc)
+
+    # Check user is in occasion
+    user_in_occasion(oc, userID)
+
+    # Shuffle users and pair i with i + 1 circular array
+    users = oc['users']
+    users = random.sample(users, len(users)) # Not in-place shuffle
+    users.append(users[0])
+
+    divisions = []
+    for user, recipient in zip(users, users[1:]):
+        division = divisions_container.create_item({
+            'id': str(uuid.uuid4()),
+            'occasionID': oc['id'],
+            'groupID': oc['groupID'],
+            'users': [user],
+            'cart': "", #TODO: generate cart for division
+            'recipients': [recipient]
+        })
+        divisions.append(division)
+        oc = occasion_add_division(oc, division['id'])
+    
+    return oc, divisions
+
+def exclusion_gifting(userID, occasionID):
+    # Check occasion exists
+    oc = occasion_exists(occasionID)
+
+    # Lock division creation if divisions already exist
+    occasion_has_divisions(oc)
+
+    # Check user is in occasion
+    user_in_occasion(oc, userID)
+
+    users = oc['users']
+    divisions = []
+    for i in range(len(users)):
+        division = divisions_container.create_item({
+            'id': str(uuid.uuid4()),
+            'occasionID': oc['id'],
+            'groupID': oc['groupID'],
+            'users': users[:i] + users[i+1:],
+            'cart': "", #TODO: generate cart for division
+            'recipients': [users[i]]
+        })
+        divisions.append(division)
+        oc = occasion_add_division(oc, division['id'])
+    
+    return oc, divisions

@@ -14,6 +14,7 @@ from helper import groups
 import random
 import io
 from PIL import Image
+from helper.groups import GroupsError
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -527,7 +528,7 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     try:
         group = groups.create_group(userID, groupname)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -558,7 +559,7 @@ def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
     try:
         groups.delete_group(userID, groupID)
         body = json.dumps({"result": True, "msg": "OK"})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -593,7 +594,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     try:
         group = groups.add_user(userID, user_to_add, groupID)
         body=json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
-    except Exception as e:
+    except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -623,7 +624,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     try:
         gs = groups.get_groups(userID)
         body = json.dumps({"result": True, "msg": "OK", "groups": groups.groups_cleaned(gs)})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -655,7 +656,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     try:
         group = groups.change_groupname(userID, groupID, groupname)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -689,7 +690,7 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     try:
         divisions, ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
         body=json.dumps({"result": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
-    except Exception as e:
+    except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -723,7 +724,7 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
         divisions, ocs, group = groups.groups_leave(userID, groupID)
         body = json.dumps({"response": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), 
                            "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -748,7 +749,9 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     with
         data: {result: True, msg: "OK", group: {...}, occasion: {...}}
         data: {result: False, msg: "{groupID} does not exist}
-        data: {result: False, msg: "{userID} is not in the group"}'''
+        data: {result: False, msg: "{userID} is not in the group"}
+        data: {result: False, msg: "Occasion date is not the correct format: YYYY-MM-DD"}
+        data: {result: False, msg: "Occasion date is not of a valid date}'''
     data = req.get_json()
     userID = data['userID']
     groupID = data['groupID']
@@ -758,8 +761,70 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     try:
         oc, group = groups.create_occasion(userID, groupID, users, occasionname, occasiondate)
         body=json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group), "occasion": groups.occasion_cleaned(oc)})
-    except Exception as e:
+    except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="groups_occasions_datechange")
+@app.route(route='groups/occasions/datechange', methods=[func.HttpMethod.POST])
+def groups_occasions_datechange(req: func.HttpRequest) -> func.HttpResponse:
+    '''Change the date of an occasion via occasionDate
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {occasionID: occasionID, occasiondate: occasiondate}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", occasion: {...}}
+        data: {result: False, msg: "Occasion does not exist"}
+        data: {result: False, msg: "Occasion date is not the correct format: YYYY-MM-DD"}
+        data: {result: False, msg: "Occasion date is not of a valid date}'''
+    data = req.get_json()
+    occasionID = data['occasionID']
+    occasiondate = data['occasiondate']
+    try:
+        oc = groups.occasion_datechange(occasionID, occasiondate)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+
+@app.function_name(name="groups_occasions_delete")
+@app.route(route='groups/occasions/delete', methods=[func.HttpMethod.POST])
+def groups_occasions_delete(req: func.HttpRequest) -> func.HttpResponse:
+    '''Remove an occasion and all its divisions via its occasionID
+    
+    # Paramaters
+    req: func.HttpRequest
+    with
+        data: {occasionID: occasionID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", group: {...}}
+        data: {result: False, msg: "Occasion does not exist"}'''
+    data = req.get_json()
+    occasionID = data['occasionID']
+    try:
+        group = groups.delete_occasion(occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
         mimetype="applications/json",
@@ -788,7 +853,7 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     try:
         ocs = groups.get_occasions(userID, groupID)
         body=json.dumps({"result": True, "msg": "OK", "occasions": groups.occasions_cleaned(ocs)})
-    except Exception as e:
+    except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -798,7 +863,7 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_leave")
-@app.route(route='groups/occasions/leave')
+@app.route(route='groups/occasions/leave', methods=[func.HttpMethod.POST])
 def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     '''Any user in an occasion can leave the occasion
     
@@ -818,7 +883,7 @@ def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     try:
         oc = groups.occasions_leave(userID, occasionID)
         body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc)})
-    except Exception as e:
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,
@@ -828,27 +893,38 @@ def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_secret_santa")
-@app.route(route='groups_secret_santa')
+@app.route(route='groups/secret_santa', methods=[func.HttpMethod.POST])
 def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Secret Santa
 
     # Parameters
     req: func.HttpRequest
     with
-        data: {userID: userID, groupname: groupname, occasionname: occasionname}
+        data: {userID: userID, occasionID: occasionID}
 
     # Returns
     func.HttpResponse
     with
-        data: {result: True, msg: "OK"}
-        data: {result: False, msg: "{groupname} does not exist"}
-        data: {result: False, msg: "{userID} is not the admin for the group"
-        data: {result: False, msg: "{occasionname} for this group already exists"}'''
+        data: {result: True, msg: "OK", occasion: {...}, divisions: []}
+        data: {result: False, msg: "User is not in the occasion"}
+        data: {result: False, msg: "Occasion already has divisions"}'''
     data = req.get_json()
-    #TODO: code
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        oc, divisions = groups.secret_santa(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="groups_group_gifting")
-@app.route(route='groups/group_gifting')
+@app.route(route='groups/group_gifting', methods=[func.HttpMethod.POST])
 def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Group Gifting for a target recipient(s)
     
@@ -861,16 +937,93 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     func.HttpResponse
     with
         data: {result: True, msg: "OK", occasion: {...}, divisions: []}
-        data: {result: False, msg: "{userID} is not the admin for the group"}
+        data: {result: False, msg: "Occasion already has divisions"}
+        data: {result: False, msg: "User is not in the occasion"}
         data: {result: False, msg: "A recipient in recipients does not exist"}'''
     data = req.get_json()
     userID = data['userID']
     occasionID = data['occasionID']
     recipients = data['recipients']
     try:
-        oc, division = groups.group_gifting(userID, occasionID, recipients)
-        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.division_cleaned(division)})
-    except Exception as e:
+        oc, divisions = groups.group_gifting(userID, occasionID, recipients)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="groups_exclusion_gifting")
+@app.route(route='groups/exclusion_gifting', methods=[func.HttpMethod.POST])
+def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
+    '''Initiate exclusion gifting of n divisions where n is the number of users in the occasion
+    
+    For example, [a,b,c,d,e]:
+        [a,b,c,d] -> e
+        [a,b,c,e] -> d
+        [a,b,d,e] -> c
+        [a,c,d,e] -> b
+        [b,c,d,e] -> a
+        
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, occasionID: occasionID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", occasion: {...}, divisions: []}
+        data: {result: False, msg: "User is not in the occasion"}
+        data: {result: False, msg: "Occasion already has divisions"}'''
+    data = req.get_json()
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        oc, divisions = groups.exclusion_gifting(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+
+@app.function_name(name="groups_white_elephant")
+@app.route(route='groups/white_elephant', methods=[func.HttpMethod.POST])
+def groups_white_elephant(req: func.HttpRequest) -> func.HttpResponse:
+    #TODO: code if required
+    pass
+
+@app.function_name(name="groups_divisions_get")
+@app.route(route='groups/divisions/get', methods=[func.HttpMethod.POST])
+def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get all divisions relevant to a user from an occasion
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, occasionID: occasionID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", divisions: [...]}
+        data: {result: False, msg: "User is not in the occasion"}
+        data: {result: False, msg: "User does not exist"}'''
+    data = req.get_json()
+    userID = data['userID']
+    occasionID = data['occasionID']
+    try:
+        divisions = groups.get_divisions(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions)})
+    except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
         body=body,

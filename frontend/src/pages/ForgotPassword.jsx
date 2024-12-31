@@ -59,7 +59,7 @@ function ForgotPassword() {
           Submit
         </button>
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/")}
           className={styles.linkButton}
         >
           Back to Login

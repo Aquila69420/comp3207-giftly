@@ -11,7 +11,7 @@ function Register() {
   const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("username")) {
-      navigate("/");
+      navigate("/home");
     }
   }, []);
   const formik = useFormik({
@@ -61,7 +61,7 @@ function Register() {
         });
         const result = await response.json();
         console.log("Register Response:", result);
-        navigate("/login");
+        navigate("/");
       } catch (error) {
         console.error("Error during registration:", error);
       }
@@ -105,7 +105,7 @@ function Register() {
         {formik.touched.username && formik.errors.username ? (
           <div className={styles.error}>{formik.errors.username}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Password</div>
         <input
           type="password"
           name="password"
@@ -118,7 +118,7 @@ function Register() {
         {formik.touched.password && formik.errors.password ? (
           <div className={styles.error}>{formik.errors.password}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Email</div>
         <input
           type="text"
           name="email"
@@ -131,7 +131,7 @@ function Register() {
         {formik.touched.email && formik.errors.email ? (
           <div className={styles.error}>{formik.errors.email}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Phone Number</div>
         <input
           type="text"
           name="phone"

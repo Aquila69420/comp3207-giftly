@@ -52,7 +52,7 @@ function Login() {
         }
         setLoginError("");
         console.log("Login successful!");
-        nagivate("/");
+        nagivate("/home");
       } else {
         setLoginError(result.response);
       }
