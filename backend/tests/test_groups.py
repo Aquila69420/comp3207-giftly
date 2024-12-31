@@ -136,8 +136,16 @@ def test_occasion_datechange(id):
     r.raise_for_status()
     print(r.json())
 
+def test_calendar_get(id):
+    url = getURL("calendar", "get")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": id
+    }))
+    r.raise_for_status()
+    print(r.json())
 
 if __name__ == '__main__':
     # test_delete_occasion("1d2ad927-5560-4326-89ec-3f49dc2dd5e7")
     # id = test_add_occasion()
-    test_occasion_datechange("b69ad5bd-ec80-4107-b6c3-a434f02f07c8")
+    test_calendar_get("fd91053e-3ba2-4b49-92d1-399d5f03a2f0")
