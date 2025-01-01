@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import styles from "../styles/login.module.css";
 import { useNavigate } from "react-router-dom";
-import { MdAccountCircle } from "react-icons/md";
 import Features from "../components/Features";
 import config from "../config";
 
@@ -18,6 +17,7 @@ function Login() {
   }, []);
 
   const handleLogin = async (values) => {
+    console.log("Logging in with:", values);
     try {
       const response = await fetch(`${config.backendURL}/login`, {
         method: "POST",
@@ -81,7 +81,7 @@ function Login() {
               />
               <div className={styles.passwordBox}>
                 <div>Password</div>
-                <Link to="Forgot-Password">
+                <Link to={"/forgot-password"}>
                   <div className={styles.forgotPassword}>Forgot Password?</div>
                 </Link>
               </div>

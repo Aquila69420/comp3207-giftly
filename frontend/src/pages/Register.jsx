@@ -3,9 +3,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import styles from "../styles/register.module.css";
 import logo from "../image/giftly_logo_trans.png";
-import { MdAccountCircle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import config from "../config";
+
 
 function Register() {
   const navigate = useNavigate();
@@ -61,7 +61,6 @@ function Register() {
         });
         const result = await response.json();
         console.log("Register Response:", result);
-        navigate("/login");
       } catch (error) {
         console.error("Error during registration:", error);
       }
@@ -82,6 +81,12 @@ function Register() {
       });
       const result = await response.json();
       console.log("Verification Response:", result);
+      if (result.response === "Verification successful.") {
+        navigate("/login");
+      }
+      else {
+        console.log("Verification failed");
+      }
     } catch (error) {
       console.error("Error during email verification:", error);
     }
@@ -105,7 +110,7 @@ function Register() {
         {formik.touched.username && formik.errors.username ? (
           <div className={styles.error}>{formik.errors.username}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Password</div>
         <input
           type="password"
           name="password"
@@ -118,7 +123,7 @@ function Register() {
         {formik.touched.password && formik.errors.password ? (
           <div className={styles.error}>{formik.errors.password}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Email</div>
         <input
           type="text"
           name="email"
@@ -131,7 +136,7 @@ function Register() {
         {formik.touched.email && formik.errors.email ? (
           <div className={styles.error}>{formik.errors.email}</div>
         ) : null}
-        <div className={styles.username}>Username</div>
+        <div className={styles.username}>Phone Number</div>
         <input
           type="text"
           name="phone"
@@ -144,7 +149,29 @@ function Register() {
         {formik.touched.phone && formik.errors.phone ? (
           <div className={styles.error}>{formik.errors.phone}</div>
         ) : null}
-
+        <div className={styles.actionContainer}>
+          <div className={styles.verificationContainer}>
+            <input
+              type="text"
+              name="emailVerificationCode"
+              placeholder="Email Verification Code"
+              value={formik.values.emailVerificationCode}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={styles.input}
+            />
+            <button
+              type="button"
+              onClick={handleVerifyEmail}
+              className={styles.buttonSecondary}
+            >
+              Verify
+            </button>
+            {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
+              <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
+            ) : null}
+          </div>
+        </div>
         <select
           name="notifications"
           value={formik.values.notifications}
@@ -170,24 +197,3 @@ function Register() {
 }
 
 export default Register;
-
-/*        <div className={styles.actionContainer}>
-          <div className={styles.verificationContainer}>
-            <input
-              type="text"
-              name="emailVerificationCode"
-              placeholder="Email Verification Code"
-              value={formik.values.emailVerificationCode}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={styles.input}
-            />
-            <button
-              type="button"
-              onClick={handleVerifyEmail}
-              className={styles.buttonSecondary}
-            >
-              Verify
-            </button>
-          </div>
-        </div> */
