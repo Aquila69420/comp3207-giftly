@@ -1,10 +1,15 @@
 import uuid, json, os, logging
 import azure.functions as func
+import bcrypt
+
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12))
+
+def check_password(password, hashed_password):
+    return bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 def register_user(username, password, container, email, phone, notifications, email_verification_code):
-    # add username reqs
-    # add pass reqs
-
+    logging.info(f"Trying to register: {username}, {password}, {email}, {phone}, {notifications}, {email_verification_code}")
     try:
         # Check if user already exists
         user = list(container.query_items(
@@ -20,7 +25,7 @@ def register_user(username, password, container, email, phone, notifications, em
         container.create_item(body={
             'id': str(uuid.uuid4()),
             'username': username,
-            'password': password,
+            'password': hash_password(password).decode('utf-8'),
             'email': email,
             'phone': phone,
             'notifications': notifications, 
@@ -34,7 +39,6 @@ def register_user(username, password, container, email, phone, notifications, em
         logging.info(f"Register error: {e}")
         return "database error"
 
-# TODO: Implement hashing for password
 def login_user(username, password, container):
     logging.info(f"Trying to login: {username}, {password}")
     try:
@@ -52,9 +56,10 @@ def login_user(username, password, container):
 
         # Get the password value
         real_password = real_password_data[0]['password']
+        logging.info("Real password of user: {}".format(real_password))
 
         # Compare true vs inputted password value
-        if password == real_password: 
+        if check_password(password, real_password): 
             logging.info("{} successfully logged in.".format(username))
             return "User successfully logged in."
         else: 
@@ -90,7 +95,9 @@ def get_user_details(email, container):
         ))
         if results:
             return {"username": results[0].get("username"), "password": results[0].get("password")}
-        else: return "fail"
+        else: 
+            logging.info("Results for get user details: ", results)
+            return "fail"
     except Exception as e:
         logging.info(f"Failed to get user details: {e}")
         return "Database error"
@@ -114,7 +121,7 @@ def update_user_details(username, field, details, container):
             user_data['username'] = details
             user_data = fetch_other_details(user_details, user_data, ['password', 'email', 'phone', 'notifications'])
         elif field == "password":
-            user_data['password'] = details
+            user_data['password'] = hash_password(details)
             user_data = fetch_other_details(user_details, user_data, ['username', 'email', 'phone', 'notifications'])
         elif field == "email":
             user_data['email'] = details

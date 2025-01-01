@@ -12,7 +12,6 @@ def get_products(products):
     results['ebay'] = ebay.parse_search_results(ebay.search(products))
     results['amazon'] = parse_amazon_products(amazon(products))
     results['google'] = parse_google_products(google(products))
-    results['target'] = parse_target_products(target(products))
     results['walmart'] = parse_walmart_products(walmart(products))
     return results
 
