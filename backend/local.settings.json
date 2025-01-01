@@ -1,32 +1,34 @@
 {
-    "IsEncrypted": false,
-    "Values": {
-      "FUNCTIONS_WORKER_RUNTIME": "python",
-      "AzureWebJobsStorage": "",
-      "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
-      "AzureCosmosDBConnectionString": "AccountEndpoint=https://giftly-cosmos-db.documents.azure.com:443/;AccountKey=5Xqauq6VxMFwGNj8Rh5mU4o6sJUa7xhPthkBHCsN3BkVlsYGajE1cUTvO6XyHF97bHNwZ6rumHvRACDbi1eTTw==;",
-      "DatabaseName" : "giftly",
-      "UserContainer": "user",
-      "SuggestionContainer": "suggestion",
-      "WishListContainer": "wishlist",
-      "CartContainer": "cart",
-      "ProductContainer": "products",
-      "GroupsContainer": "groups",
-      "GroupsOccasionsContainer": "groups_occasions",
-      "GroupsDivisionsContainer": "groups_divisions",
-      "FunctionAppKey" : "sjAHwpUaI5N3sVkQfzgfSQJPaaV6OGnVPDaoCz9kG0_lAzFuDrD-oA==",
-      "OpenAIEndPoint": "https://amcp1u21-openai-quiplash.openai.azure.com/",
-      "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
-      "SendGrid_API_KEY": "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",
-      "Oxylabs_API_username": "janetjarron_4aquM",
-      "Oxylabs_API_password": "Janetjarron_1992",
-      "Ebay_Dev_ID": "35b0fa5e-a6e0-49ab-b823-c32a509b40d3",
-      "Ebay_Sandbox_Client_ID": "DhruvKha-Giftly-SBX-999edef9a-bf74745e",
-      "Ebay_Sandbox_Client_Secret": "SBX-99edef9a0d08-a15b-4448-9c5c-13cb",
-      "Ebay_Production_Client_ID": "DhruvKha-Giftly-PRD-0c261000e-9a7667aa",
-      "Ebay_Production_Client_Secret": "PRD-c261000eef87-b143-451e-9ef3-6bc2"
-      },
-      "Host": {
-        "CORS": "*"
-      }
-    }
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "python",
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "AzureCosmosDBConnectionString": "AccountEndpoint=https://giftly-cosmos-db.documents.azure.com:443/;AccountKey=5Xqauq6VxMFwGNj8Rh5mU4o6sJUa7xhPthkBHCsN3BkVlsYGajE1cUTvO6XyHF97bHNwZ6rumHvRACDbi1eTTw==;",
+    "DatabaseName": "giftly",
+    "UserContainer": "user",
+    "SuggestionContainer": "suggestion",
+    "WishListContainer": "wishlist",
+    "CartContainer": "cart",
+    "ProductContainer": "products",
+    "GroupsContainer": "groups",
+    "GroupsOccasionsContainer": "groups_occasions",
+    "GroupsDivisionsContainer": "groups_divisions",
+    "FunctionAppKey": "sjAHwpUaI5N3sVkQfzgfSQJPaaV6OGnVPDaoCz9kG0_lAzFuDrD-oA==",
+    "OpenAIEndPoint": "https://amcp1u21-openai-quiplash.openai.azure.com/",
+    "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
+    "SendGrid_API_KEY": "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",
+    "Oxylabs_API_username": "janetjarron_4aquM",
+    "Oxylabs_API_password": "Janetjarron_1992",
+    "Ebay_Dev_ID": "35b0fa5e-a6e0-49ab-b823-c32a509b40d3",
+    "Ebay_Sandbox_Client_ID": "DhruvKha-Giftly-SBX-999edef9a-bf74745e",
+    "Ebay_Sandbox_Client_Secret": "SBX-99edef9a0d08-a15b-4448-9c5c-13cb",
+    "Ebay_Production_Client_ID": "DhruvKha-Giftly-PRD-0c261000e-9a7667aa",
+    "Ebay_Production_Client_Secret": "PRD-c261000eef87-b143-451e-9ef3-6bc2",
+    "AZURE_SPEECH_KEY": "8fK4ZX2S2EXa6METEW0DlcRVz1SNW72Wg027cu3mzJ9YYvobuW70JQQJ99ALAC5RqLJXJ3w3AAAYACOGpXKw",
+    "AZURE_SPEECH_REGION": "westeurope"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}

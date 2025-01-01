@@ -25,6 +25,7 @@ cart_container = database.get_container_client(os.getenv("CartContainer"))
 product_container = database.get_container_client(os.getenv("ProductContainer"))
 sendEmail_api_key = os.getenv("SendGrid_API_KEY")
 
+
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
@@ -878,3 +879,82 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200
     )
     return add_cors_headers(response)
+
+
+@app.function_name(name="process_audio")
+@app.route(route="process_audio", methods=[func.HttpMethod.POST])
+def process_audio(req: func.HttpRequest) -> func.HttpResponse:
+    from azure.cognitiveservices.speech import SpeechConfig, SpeechRecognizer, AudioConfig, audio
+    import azure.cognitiveservices.speech as speechsdk
+    import json
+    import logging
+
+    try:
+        # Check if the request has a file
+        audio_file = req.files.get("audio")
+        if not audio_file:
+            return func.HttpResponse(
+                body=json.dumps({"error": "No audio file found in request"}),
+                mimetype="application/json",
+                status_code=400,
+            )
+
+        # Read the uploaded file into memory
+        audio_data = audio_file.read()
+
+        # Set up Azure Speech Service
+        speech_key = "8fK4ZX2S2EXa6METEW0DlcRVz1SNW72Wg027cu3mzJ9YYvobuW70JQQJ99ALAC5RqLJXJ3w3AAAYACOGpXKw"
+        service_region = "westeurope"
+
+        if not speech_key or not service_region:
+            return func.HttpResponse(
+                body=json.dumps({"error": "Azure Speech key or region is not set"}),
+                mimetype="application/json",
+                status_code=500,
+            )
+
+        speech_config = SpeechConfig(subscription=speech_key, region=service_region)
+
+        # Create a PushAudioInputStream and feed audio data
+        push_stream = audio.PushAudioInputStream()
+        audio_input = audio.AudioConfig(stream=push_stream)
+        recognizer = SpeechRecognizer(speech_config=speech_config, audio_config=audio_input)
+
+        # Push the audio data into the stream in chunks
+        chunk_size = 1024
+        for i in range(0, len(audio_data), chunk_size):
+            push_stream.write(audio_data[i:i + chunk_size])
+
+        # Signal that all data has been pushed
+        push_stream.close()
+
+        # Perform speech recognition
+        result = recognizer.recognize_once()
+
+        # Handle recognition result
+        if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+            return func.HttpResponse(
+                body=json.dumps({"transcription": result.text}),
+                mimetype="application/json",
+                status_code=200,
+            )
+        elif result.reason == speechsdk.ResultReason.NoMatch:
+            return func.HttpResponse(
+                body=json.dumps({"error": "No speech could be recognized."}),
+                mimetype="application/json",
+                status_code=200,
+            )
+        else:
+            return func.HttpResponse(
+                body=json.dumps({"error": f"Recognition failed: {result.reason}"}),
+                mimetype="application/json",
+                status_code=500,
+            )
+
+    except Exception as e:
+        logging.error(f"Error processing audio: {e}")
+        return func.HttpResponse(
+            body=json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500,
+        )
