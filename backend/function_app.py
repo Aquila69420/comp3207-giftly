@@ -1031,3 +1031,29 @@ def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200
     )
     return add_cors_headers(response)
+
+@app.function_name(name='groups_calendar_get')
+@app.route(route='groups/calendar/get', methods=[func.HttpMethod.POST])
+def groups_calendar_get(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get all occasion dates for a user
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {deadlines: [{occasionID: occasionID, occasionname: occasionname, occasiondate: occasiondate, 
+                groupID: groupID, groupname: groupname}]}'''
+    data = req.get_json()
+    userID = data['userID']
+    deadlines = groups.get_calendar(userID)
+    body = json.dumps({"deadlines": deadlines})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)

@@ -511,3 +511,21 @@ def exclusion_gifting(userID, occasionID):
         oc = occasion_add_division(oc, division['id'])
     
     return oc, divisions
+
+def get_calendar(userID):
+    # Query occasions container for user relevant occasions
+    ocs = list(occasions_container.query_items(
+        query="SELECT * FROM c WHERE ARRAY_CONTAINS(c.users, @userID)",
+        parameters=[{'name': '@userID', 'value': userID}],
+        enable_cross_partition_query=True
+    ))
+    groupIDs = {oc['groupID'] for oc in ocs}
+    groupnames = {groupID: group_exists(groupID)['groupname'] for groupID in groupIDs}
+    deadlines = [{
+        "occasionID": oc['id'],
+        "occasionname": oc['occasionname'],
+        "occasiondate": oc['occasiondate'],
+        "groupID": oc['groupID'],
+        "groupname": groupnames[oc['groupID']]
+    } for oc in ocs]
+    return deadlines
