@@ -158,7 +158,7 @@ def register(req: func.HttpRequest) -> func.HttpResponse:
     email = data['email']
     email_verification_code = ''.join(str(random.randint(0, 9)) for _ in range(6))
     logging.info(f"api key: {sendEmail_api_key}")
-    # sendEmail.send_verification_email(username, email, email_verification_code, sendEmail_api_key) # if error return the error
+    sendEmail.send_verification_email(username, email, email_verification_code, sendEmail_api_key) # if error return the error
     phone = data['phone']
     notifications = data['notifications']
     output = login_register.register_user(username, password, user_container, email, phone, notifications, email_verification_code)
@@ -182,6 +182,7 @@ def email_verification(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response) 
 
+# Forgot passsword route
 @app.function_name(name="fetch_user_details")
 @app.route(route='fetch_user_details', methods=[func.HttpMethod.POST])
 def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
@@ -190,13 +191,14 @@ def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
     output = login_register.get_user_details(email, user_container)
     if output == "fail":
         output = "Email does not have a registered account. Please register a new account."
+        username = "Not found"
+        token = 0
     else:
         username = output['username']
-        password = output['password']
-        sendEmail.sendUserDetails(email, username, password, sendEmail_api_key)
-        output = f"Username and Password details sent to {email}."
+        token = sendEmail.send_OTP_email(email, username, sendEmail_api_key)
+        output = f"One time password sent to {email}."
     response = func.HttpResponse(
-        body=json.dumps({"response": output}),
+        body=json.dumps({"username": username, "token": token}),
         mimetype="application/json",
     )
     return add_cors_headers(response) 
@@ -257,7 +259,6 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
     username = data['username'].strip()
-    # TODO: uncomment this line for production
     output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
     fetched_products = products.get_products(output)
     response = func.HttpResponse(
