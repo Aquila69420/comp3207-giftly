@@ -11,7 +11,7 @@ function Register() {
   const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("username")) {
-      navigate("/");
+      navigate("/home");
     }
   }, []);
   const formik = useFormik({

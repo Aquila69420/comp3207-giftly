@@ -12,7 +12,7 @@ function Login() {
   const nagivate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("username")) {
-      nagivate("/");
+      nagivate("/home");
     }
   }, []);
 
@@ -52,7 +52,7 @@ function Login() {
         }
         setLoginError("");
         console.log("Login successful!");
-        nagivate("/");
+        nagivate("/home");
       } else {
         setLoginError(result.response);
       }

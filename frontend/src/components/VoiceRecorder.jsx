@@ -10,12 +10,6 @@ const VoiceRecorder = ({ updatePrompt }) => {
 
       console.log("Converted WAV URL:", wavURL);
 
-      // Optionally, create an audio player for preview
-      const audioPlayer = document.createElement("audio");
-      audioPlayer.src = wavURL;
-      audioPlayer.controls = true;
-      document.body.appendChild(audioPlayer);
-
       // Send WAV blob to the backend
       const formData = new FormData();
       formData.append("audio", wavBlob, "recording.wav");
@@ -60,12 +54,6 @@ const VoiceRecorder = ({ updatePrompt }) => {
 
     const audioURL = URL.createObjectURL(recordingBlob);
     console.log("Generated audio URL:", audioURL);
-
-    // Optionally, create an audio player for preview
-    const audioPlayer = document.createElement("audio");
-    audioPlayer.src = audioURL;
-    audioPlayer.controls = true;
-    document.body.appendChild(audioPlayer);
 
     // Send the audio to the backend
     sendAudioToBackend(recordingBlob);

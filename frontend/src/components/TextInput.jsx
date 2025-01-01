@@ -132,7 +132,7 @@ function TextInput() {
   };
 
   const handleEnter = (e) => {
-    if (e.key === "Enter" && prompt.trim()) {
+    if (e.key === "Enter" && prompt) {
       handleCombinedSubmit();
       setInputValue("");
       e.preventDefault();
@@ -187,7 +187,7 @@ function TextInput() {
             className={`${styles.iconWrapper} ${styles.iconRight}`}
             onClick={handleCombinedSubmit}
           >
-            {prompt.trim() ? (
+            {prompt ? (
               <FaArrowUp size={20} />
             ) : (
               <VoiceRecorder updatePrompt={updatePromptFromVoice} />
