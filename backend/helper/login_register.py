@@ -95,7 +95,9 @@ def get_user_details(email, container):
         ))
         if results:
             return {"username": results[0].get("username"), "password": results[0].get("password")}
-        else: return "fail"
+        else: 
+            logging.info("Results for get user details: ", results)
+            return "fail"
     except Exception as e:
         logging.info(f"Failed to get user details: {e}")
         return "Database error"

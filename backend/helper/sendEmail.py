@@ -33,13 +33,7 @@ def send_OTP_email(to_email, username, api_key):
     try:
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
-        logging.info("Email verification code sent.")
-        
-        # Set a timeout of 5 minutes for the token
-        time.sleep(5 * 60)
-        token = 0 # Reset the token after 5 minutes
-        logging.info("Token has expired.")
-        
+        logging.info("Email verification code sent.")        
         return token
     except Exception as e:
         logging.info(f"Email verification failed: {e}")
