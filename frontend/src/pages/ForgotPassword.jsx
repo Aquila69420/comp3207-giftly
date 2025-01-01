@@ -14,6 +14,7 @@ function ForgotPassword() {
     const [OTPConfirmed, setOTPConfirmed] = useState(false);
     const [username, setUsername] = useState("");
     const [token, setToken] = useState(0);
+    const [timer, setTimer] = useState(0);
 
     const emailValidationSchema = Yup.object({
         email: Yup.string().email("Invalid email").required("Email is required"),
@@ -30,6 +31,7 @@ function ForgotPassword() {
 
     const handleSubmitEmail = async (values) => {
         setSubmitEmailError("");
+        // Get the current time
         const response = await fetch(`${config.backendURL}/fetch_user_details`, {
             method: 'POST',
             headers: {
@@ -44,6 +46,7 @@ function ForgotPassword() {
             setToken(fetchedToken);
             setUsername(fetchedUsername);
             setEmailConfirmed(true);
+            setTimer(new Date().getTime() + 1000 * 60);
         } else {
             setSubmitEmailError("Email not found");
             setEmailConfirmed(false);
@@ -52,7 +55,10 @@ function ForgotPassword() {
     };
 
     const handleSubmitOTP = async (values) => {
-        if (values.OTP !== token) {
+        console.log("Token:", token);
+        console.log("Input token:", parseInt(values.OTP));
+        console.log("Timer:", timer);
+        if (parseInt(values.OTP) !== (token) || new Date().getTime() > timer) {
             setSubmitOTPError("Invalid OTP");
             setOTPConfirmed(false);
             return;
