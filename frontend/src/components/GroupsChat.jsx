@@ -1,27 +1,20 @@
-import React from 'react';
-import styles from '../styles/groups.module.css';
+import React from "react";
+import styles from "../styles/groups.module.css";
 
-const GroupsChat = ({ group, subgroup }) => {
+const GroupsChat = ({ group, occasion }) => {
+  if (!group) {
+    return (
+      <div className={styles.chatContainer}>
+        <p>Select a group to chat</p>
+      </div>
+    );
+  }
+
   return (
-    <div className={styles.chat}>
-      <h2 className={styles.chatHeader}>
-        {subgroup
-          ? `Chat for ${subgroup.name}`
-          : group
-          ? `Chat for ${group.groupname}`
-          : "Select a group or subgroup"}
-      </h2>
-      <div className={styles.chatArea}>
-        <p>Chat messages will appear here.</p>
-      </div>
-      <div className={styles.chatInput}>
-        <input
-          type="text"
-          placeholder="Type a message..."
-          className={styles.chatInputField}
-        />
-        <button className={styles.chatInputButton}>Send</button>
-      </div>
+    <div className={styles.chatContainer}>
+      <h3>Chat for: {group.groupname}</h3>
+      {occasion && <h4>Occasion: {occasion.occasionname}</h4>}
+      {/* ... your chat UI goes here ... */}
     </div>
   );
 };

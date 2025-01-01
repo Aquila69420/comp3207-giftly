@@ -1,84 +1,72 @@
 import React, { useState } from "react";
-import { FaEllipsisV, FaPlus } from "react-icons/fa";
 import { FiChevronDown, FiChevronRight } from "react-icons/fi";
+import { FaEllipsisV, FaPlus } from "react-icons/fa";
+import GroupsContextMenu from "./GroupsContextMenu";
+import AddOccasionModal from "./AddOccasionModal";
 import styles from "../styles/groups.module.css";
-
-/**
- * groups: [
- *   {
- *     id: 1,
- *     groupname: "Group 1",
- *     occasions: [
- *       {
- *         id: 11,
- *         occasionname: "Subgroup 1",
- *         divisions: [
- *           { id: 111, divisionName: "Division 1" },
- *           { id: 112, divisionName: "Division 2" },
- *         ],
- *       },
- *       ...
- *     ]
- *   },
- *   ...
- * ]
- */
 
 const GroupsSidebar = ({
   groups = [],
   activeGroup,
-  onGroupClick,       // invoked when user clicks a group
-  onCreateGroup,      // invoked when user wants to create a new group
-  onAddOccasion,      // invoked when user wants to add a new occasion
+  onGroupClick,
+  onOccasionClick,
+  onAddOccasion,
+  onCreateGroup,
 }) => {
-  // State to track whether the main "Giftly" heading is open
   const [isMainOpen, setIsMainOpen] = useState(true);
-
-  // Track which groups are expanded
   const [openGroups, setOpenGroups] = useState({});
-  // Track which occasions are expanded
   const [openOccasions, setOpenOccasions] = useState({});
 
-  // Simple toggler for groups
-  const handleGroupToggle = (groupId) => {
-    setOpenGroups((prev) => ({
-      ...prev,
-      [groupId]: !prev[groupId],
-    }));
-  };
+  // Context menu
+  const [menuConfig, setMenuConfig] = useState({
+    isOpen: false,
+    type: null,
+    item: null,
+  });
 
-  // Simple toggler for occasions (subgroups)
-  const handleOccasionToggle = (occasionId) => {
-    setOpenOccasions((prev) => ({
-      ...prev,
-      [occasionId]: !prev[occasionId],
-    }));
+  const openMenu = (type, item) => {
+    setMenuConfig({ isOpen: true, type, item });
   };
+  const closeMenu = () => setMenuConfig({ isOpen: false, type: null, item: null });
 
-  // If you want to open a modal or show a context menu for each item
-  const handleMenuClick = (itemType, item) => {
-    // itemType: "group" | "occasion" | "division" | "main-heading"
-    // item: the data object for that item
-    alert(`Menu click for ${itemType}\n${JSON.stringify(item, null, 2)}`);
-  };
-
-  // For adding a group
-  const [showGroupModal, setShowGroupModal] = useState(false);
+  // Track “Add Group” modal
+  const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
 
+  // Track “Add Occasion” modal
+  const [showAddOccasionModal, setShowAddOccasionModal] = useState(false);
+  const [targetGroupForOccasion, setTargetGroupForOccasion] = useState(null);
+
+  // Group toggler
+  const handleGroupToggle = (groupId) => {
+    setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
+  };
+
+  // Occasion toggler
+  const handleOccasionToggle = (occId) => {
+    setOpenOccasions((prev) => ({ ...prev, [occId]: !prev[occId] }));
+  };
+
+  // Create group
   const handleCreateGroupSubmit = () => {
     if (newGroupName.trim()) {
-      onCreateGroup(newGroupName.trim());
+      onCreateGroup?.(newGroupName.trim());
     }
     setNewGroupName("");
-    setShowGroupModal(false);
+    setShowCreateGroupModal(false);
+  };
+
+  // Called from the context menu when user clicks "Add Occasion"
+  const handleAddOccasionRequest = (group) => {
+    setTargetGroupForOccasion(group);
+    setShowAddOccasionModal(true);
+    closeMenu();
   };
 
   return (
     <div className={styles.sidebarContainer}>
-      {/* MAIN HEADING */}
+      {/* Main heading */}
       <div className={styles.mainHeading}>
-        {/* Left side: collapse/expand icon + text */}
         <div
           className={styles.headingLeft}
           onClick={() => setIsMainOpen(!isMainOpen)}
@@ -86,42 +74,34 @@ const GroupsSidebar = ({
           {isMainOpen ? <FiChevronDown /> : <FiChevronRight />}
           <h2 className={styles.mainHeadingText}>Giftly</h2>
         </div>
-
-        {/* Right side: the three-dot menu (and optional "add group" icon) */}
         <div className={styles.headingRight}>
-          {/* Three-dot menu for the main heading */}
+          {/* 3-dot menu for main heading if you want */}
           <div
             className={styles.iconWrapper}
             onClick={(e) => {
               e.stopPropagation();
-              handleMenuClick("main-heading", {});
+              openMenu("main-heading", {});
             }}
           >
             <FaEllipsisV />
           </div>
-          {/* Plus icon to open "create group" modal */}
+          {/* Add Group */}
           <div
             className={styles.iconWrapper}
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowGroupModal(true);
-            }}
+            onClick={() => setShowCreateGroupModal(true)}
           >
             <FaPlus />
           </div>
         </div>
       </div>
 
-      {/* Collapsible content: the groups list */}
       {isMainOpen && (
         <div className={styles.groupsWrapper}>
           {groups.map((group) => {
-            const groupOpen = openGroups[group.id] || false;
+            const isGroupOpen = openGroups[group.id] || false;
             const isActiveGroup = activeGroup?.id === group.id;
-
             return (
               <div key={group.id} className={styles.groupSection}>
-                {/* GROUP HEADER */}
                 <div
                   className={`${styles.groupHeading} ${
                     isActiveGroup ? styles.activeGroupBg : ""
@@ -132,83 +112,70 @@ const GroupsSidebar = ({
                   }}
                 >
                   <div className={styles.groupLeft}>
-                    {groupOpen ? <FiChevronDown /> : <FiChevronRight />}
+                    {isGroupOpen ? <FiChevronDown /> : <FiChevronRight />}
                     <span
                       className={
-                        isActiveGroup
-                          ? styles.activeGroupText
-                          : styles.groupText
+                        isActiveGroup ? styles.activeGroupText : styles.groupText
                       }
                     >
                       {group.groupname}
                     </span>
                   </div>
-
                   <div
                     className={styles.iconWrapper}
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleMenuClick("group", group);
+                      openMenu("group", group);
                     }}
                   >
                     <FaEllipsisV />
                   </div>
                 </div>
 
-                {/* OCCASIONS (SUBGROUPS) */}
-                {groupOpen &&
+                {/* Occasions */}
+                {isGroupOpen &&
                   Array.isArray(group.occasions) &&
-                  group.occasions.map((occasion) => {
-                    const occasionOpen = openOccasions[occasion.id] || false;
-
+                  group.occasions.map((occ) => {
+                    const isOccOpen = openOccasions[occ.id] || false;
                     return (
-                      <div key={occasion.id} className={styles.occasionSection}>
+                      <div key={occ.id} className={styles.occasionSection}>
                         <div
                           className={styles.occasionHeading}
                           onClick={() => {
-                            handleOccasionToggle(occasion.id);
-                            // If you want a callback: onOccasionClick?.(occasion);
+                            handleOccasionToggle(occ.id);
+                            onOccasionClick?.(occ);
                           }}
                         >
                           <div className={styles.occasionLeft}>
-                            {occasionOpen ? <FiChevronDown /> : <FiChevronRight />}
+                            {isOccOpen ? <FiChevronDown /> : <FiChevronRight />}
                             <span className={styles.occasionText}>
-                              {occasion.occasionname}
+                              {occ.occasionname}
                             </span>
                           </div>
                           <div
                             className={styles.iconWrapper}
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleMenuClick("occasion", occasion);
+                              openMenu("occasion", occ);
                             }}
                           >
                             <FaEllipsisV />
                           </div>
                         </div>
 
-                        {/* DIVISIONS */}
-                        {occasionOpen &&
-                          Array.isArray(occasion.divisions) &&
-                          occasion.divisions.map((division) => (
-                            <div
-                              key={division.id}
-                              className={styles.divisionItem}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                // If you want a callback: onDivisionClick?.(division);
-                              }}
-                            >
-                              <div className={styles.divisionLeft}>
-                                <span className={styles.divisionText}>
-                                  {division.divisionName}
-                                </span>
-                              </div>
+                        {/* Divisions */}
+                        {isOccOpen &&
+                          Array.isArray(occ.divisions) &&
+                          occ.divisions.map((div) => (
+                            <div key={div.id} className={styles.divisionItem}>
+                              <span className={styles.divisionText}>
+                                {div.divisionName || "Untitled Division"}
+                              </span>
                               <div
                                 className={styles.iconWrapper}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleMenuClick("division", division);
+                                  openMenu("division", div);
                                 }}
                               >
                                 <FaEllipsisV />
@@ -225,9 +192,9 @@ const GroupsSidebar = ({
       )}
 
       {/* CREATE GROUP MODAL */}
-      {showGroupModal && (
+      {showCreateGroupModal && (
         <div className={styles.modalBackdrop}>
-          <div className={styles.modal}>
+          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Create New Group</h3>
             <input
               type="text"
@@ -237,14 +204,11 @@ const GroupsSidebar = ({
               className={styles.modalInput}
             />
             <div className={styles.modalButtons}>
-              <button
-                onClick={handleCreateGroupSubmit}
-                className={styles.modalCreateButton}
-              >
+              <button onClick={handleCreateGroupSubmit} className={styles.modalCreateButton}>
                 Create
               </button>
               <button
-                onClick={() => setShowGroupModal(false)}
+                onClick={() => setShowCreateGroupModal(false)}
                 className={styles.modalCancelButton}
               >
                 Cancel
@@ -252,6 +216,25 @@ const GroupsSidebar = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ADD OCCASION MODAL */}
+      {showAddOccasionModal && targetGroupForOccasion && (
+        <AddOccasionModal
+          group={targetGroupForOccasion}
+          onClose={() => setShowAddOccasionModal(false)}
+          onAddOccasion={onAddOccasion}
+        />
+      )}
+
+      {/* CONTEXT MENU */}
+      {menuConfig.isOpen && (
+        <GroupsContextMenu
+          type={menuConfig.type}
+          item={menuConfig.item}
+          onClose={closeMenu}
+          onAddOccasionRequest={handleAddOccasionRequest}
+        />
       )}
     </div>
   );

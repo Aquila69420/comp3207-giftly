@@ -1,40 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import GroupsSidebar from '../components/GroupsSidebar';
-import GroupsChat from '../components/GroupsChat';
-import GroupsTopBar from '../components/GroupsTopbar';
-import styles from '../styles/groups.module.css';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import GroupsTopBar from "../components/GroupsTopbar";
+import GroupsSidebar from "../components/GroupsSidebar";
+import GroupsChat from "../components/GroupsChat";
+import styles from "../styles/groups.module.css";
 
 const Groups = () => {
+  const navigate = useNavigate();
+  const userID = localStorage.getItem("userID");
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeOccasion, setActiveOccasion] = useState(null);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
-  // Typically stored from user auth/login
-  const userID = localStorage.getItem('userID'); 
-  const [occasion] = useState("X's Birthday"); // Arbitrary example
 
   useEffect(() => {
+    if (!userID) return;
     const fetchGroups = async () => {
       try {
-        const response = await fetch('http://localhost:5000/groups/get', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("http://localhost:5000/groups/get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
         });
-        const data = await response.json();
-        console.log('data', data);
+        const data = await res.json();
         if (data.result) {
-          /**
-           * data.groups might look like:
-           * [
-           *   { id: 1, groupname: 'Group 1', occasions: [11, 12] },
-           *   { id: 2, groupname: 'Group 2', occasions: [21] }
-           * ]
-           * i.e., just IDs in the "occasions" array
-           */
           setGroups(data.groups);
           if (data.groups.length > 0) {
             setActiveGroup(data.groups[0]);
@@ -42,147 +31,163 @@ const Groups = () => {
         } else {
           setError(data.msg);
         }
-      } catch (error) {
-        console.error('Error fetching groups:', error);
-        setError('Error fetching groups');
+      } catch (err) {
+        setError("Error fetching groups: " + err.message);
       }
     };
     fetchGroups();
   }, [userID]);
 
-  /**
-   * 1. When user clicks a group in the sidebar:
-   *    - If we haven't already fetched that group's full occasions,
-   *      we fetch them now (groups/occasions/get).
-   *    - Update the group in `groups` state with the new occasions array
-   *      (actual objects, not just IDs).
-   *    - Set the group as activeGroup
-   */
+  // Lazily fetch occasions when a group is clicked
   const handleGroupClick = async (group) => {
-    // If the group is null or we already loaded its occasions, just set it active
     if (!group) return;
+    // Check if already loaded full occasions
+    const hasOccasionObjects =
+      Array.isArray(group.occasions) &&
+      group.occasions.length > 0 &&
+      typeof group.occasions[0] === "object";
 
-    // Check if we have real occasion objects or just IDs
-    const hasFullOccasions = Array.isArray(group.occasions) && group.occasions.length > 0 
-      && typeof group.occasions[0] === 'object'; // naive check
-
-    // Only fetch if we don't have real occasion objects yet
-    if (!hasFullOccasions) {
+    if (!hasOccasionObjects) {
       try {
-        const response = await fetch('http://localhost:5000/groups/occasions/get', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const res = await fetch("http://localhost:5000/groups/occasions/get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID, groupID: group.id }),
         });
-        const data = await response.json();
+        const data = await res.json();
         if (data.result) {
-          /**
-           * data.occasions might look like:
-           * [
-           *    { id: 11, occasionname: 'Subgroup 1', divisions: [...] },
-           *    { id: 12, occasionname: 'Subgroup 2', divisions: [...] }
-           * ]
-           */
-          const updatedGroup = {
-            ...group,
-            occasions: data.occasions, 
-          };
-
-          // Merge into groups state
-          setGroups((prevGroups) =>
-            prevGroups.map((g) => (g.id === group.id ? updatedGroup : g))
+          const updatedGroup = { ...group, occasions: data.occasions };
+          setGroups((prev) =>
+            prev.map((g) => (g.id === group.id ? updatedGroup : g))
           );
-          // Set the updated group as active
           setActiveGroup(updatedGroup);
         } else {
-          console.error(data.msg);
           setError(data.msg);
         }
       } catch (err) {
-        console.error('Error fetching occasions:', err);
-        setError('Error fetching occasions');
+        setError("Error fetching occasions: " + err.message);
       }
     } else {
-      // Already have full occasions, just set group active
       setActiveGroup(group);
+    }
+    setActiveOccasion(null); // reset activeOccasion
+  };
+
+  // Lazily fetch divisions for an occasion
+  const handleOccasionClick = async (occasion) => {
+    if (!occasion) return;
+    const hasDivisions =
+      Array.isArray(occasion.divisions) &&
+      occasion.divisions.length > 0 &&
+      typeof occasion.divisions[0] === "object";
+
+    if (!hasDivisions) {
+      try {
+        const res = await fetch("http://localhost:5000/groups/divisions/get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userID, occasionID: occasion.id }),
+        });
+        const data = await res.json();
+        if (data.result) {
+          // Merge divisions into the occasion
+          const updatedOccasion = { ...occasion, divisions: data.divisions };
+          // Update activeGroup's occasions
+          const updatedGroup = {
+            ...activeGroup,
+            occasions: activeGroup.occasions.map((occ) =>
+              occ.id === occasion.id ? updatedOccasion : occ
+            ),
+          };
+          // Update groups state
+          setGroups((prev) =>
+            prev.map((g) => (g.id === activeGroup.id ? updatedGroup : g))
+          );
+          setActiveGroup(updatedGroup);
+          setActiveOccasion(updatedOccasion);
+        } else {
+          setError(data.msg);
+        }
+      } catch (err) {
+        setError("Error fetching divisions: " + err.message);
+      }
+    } else {
+      setActiveOccasion(occasion);
     }
   };
 
-  // For the future: you could do a similar approach for fetching divisions
-  // if the "divisions" data in each occasion is also just IDs.
-
-  // Create group
-  const handleCreateGroup = async (newGroupName) => {
-    if (!newGroupName) return;
+  // Create a new group
+  const handleCreateGroup = async (groupName) => {
+    if (!groupName.trim()) return;
     try {
-      const response = await fetch('http://localhost:5000/groups/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userID, groupname: newGroupName }),
+      const res = await fetch("http://localhost:5000/groups/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userID, groupname: groupName.trim() }),
       });
-      const data = await response.json();
+      const data = await res.json();
       if (data.result) {
-        // Re-fetch all groups
-        const res2 = await fetch('http://localhost:5000/groups/get', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        // refetch groups
+        const res2 = await fetch("http://localhost:5000/groups/get", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
         });
         const data2 = await res2.json();
         if (data2.result) {
           setGroups(data2.groups);
-          if (data2.groups.length > 0) {
-            setActiveGroup(data2.groups[0]);
-          }
+          setActiveGroup(data.group);
         } else {
           setError(data2.msg);
         }
       } else {
-        console.error(data.msg);
+        setError(data.msg);
       }
-    } catch (error) {
-      console.error('Error creating group:', error);
+    } catch (err) {
+      setError("Error creating group: " + err.message);
     }
   };
 
-  // Add occasion to a group
-  const handleAddOccasion = async (group, occasionName, occasionDate, users) => {
+  // Add an occasion to a group
+  const handleAddOccasion = async (group, occasionName, occasionDate, chosenUserIDs) => {
     try {
-      const response = await fetch('http://localhost:5000/groups/occasions/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("http://localhost:5000/groups/occasions/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userID,
           groupID: group.id,
-          users,
+          users: chosenUserIDs, // array of user IDs
           occasionname: occasionName,
           occasiondate: occasionDate,
         }),
       });
-      const data = await response.json();
+      const data = await res.json();
       if (data.result) {
-        // data.group is the updated group with the new occasion
-        const updatedGroup = data.group;
-        setGroups((prevGroups) =>
-          prevGroups.map((grp) => (grp.id === group.id ? updatedGroup : grp))
+        // Add the new occasion to the group
+        const updatedGroup = {
+          ...group,
+          occasions: group.occasions.concat(data.occasion),
+        };
+        setGroups((prev) =>
+          prev.map((g) => (g.id === group.id ? updatedGroup : g))
         );
-        // Also set it active, if desired:
         setActiveGroup(updatedGroup);
+
       } else {
         setError(data.msg);
       }
-    } catch (error) {
-      console.error('Error adding occasion:', error);
+    } catch (err) {
+      setError("Error adding occasion: " + err.message);
     }
   };
 
   return (
     <div className={styles.groupsContainer}>
-      {/* Top Bar */}
       <GroupsTopBar
         onBack={() => navigate("/")}
         onSettings={() =>
-          navigate('/groups/settings', {
+          navigate("/groups/settings", {
             state: {
               groupID: activeGroup?.id,
               groupName: activeGroup?.groupname,
@@ -191,30 +196,22 @@ const Groups = () => {
             },
           })
         }
-        occasion={occasion}
+        occasion={activeOccasion?.occasionname || "No Occasion"}
       />
 
-      {/* Sidebar and Chat Area */}
       <div className={styles.groupsContent}>
         <GroupsSidebar
           groups={groups}
           activeGroup={activeGroup}
           onGroupClick={handleGroupClick}
-          onCreateGroup={handleCreateGroup}
+          onOccasionClick={handleOccasionClick}
           onAddOccasion={handleAddOccasion}
-          // If you need further click handlers:
-          // onSubgroupClick={...}
-          // onDivisionClick={...}
+          onCreateGroup={handleCreateGroup}
         />
-
-        {/* 
-          If you want to display a chat based on the active group/occasion:
-          pass them as props to your GroupsChat:
-        */}
         <GroupsChat group={activeGroup} occasion={activeOccasion} />
       </div>
 
-      {error && <p style={{ color: 'red', padding: '1rem' }}>{error}</p>}
+      {error && <div className={styles.errorMessage}>{error}</div>}
     </div>
   );
 };

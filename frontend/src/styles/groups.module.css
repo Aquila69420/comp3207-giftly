@@ -1,807 +1,57 @@
-.container {
-  display: flex;
-  height: 100vh;
-  background-color: #f9f9f9;
-}
-
-.sidebar {
-  width: 25%;
-  background-color: #f0f0f0;
-  padding: 20px;
-  border-right: 1px solid #ccc;
-}
-
-.sidebarTitle {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.groupList {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.groupItem {
-  cursor: pointer;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  transition: background-color 0.3s;
-}
-
-.groupItem:hover {
-  background-color: #e0e0e0;
-}
-
-.subgroupItem {
-  cursor: pointer;
-  padding: 8px;
-  margin-left: 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-}
-
-.subgroupItem:hover {
-  background-color: #d0d0d0;
-}
-
-.chat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-.chatHeader {
-  font-size: 20px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.chatArea {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  overflow-y: auto;
-  background-color: #ffffff;
-}
-
-.chatInput {
-  display: flex;
-  margin-top: 10px;
-}
-
-.chatInputField {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px 0 0 5px;
-  outline: none;
-}
-
-.chatInputButton {
-  padding: 10px 15px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  border-radius: 0 5px 5px 0;
-  transition: background-color 0.3s;
-}
-
-.chatInputButton:hover {
-  background-color: #0056b3;
-}
-
-/* New Chat Button */
-.newChatContainer {
-    padding: 10px;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .newChatButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .newChatButton:hover {
-    background-color: #0056b3;
-  }
-  
-  /* Modal Styles */
-  .modalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-  }
-  
-  .modalInput {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .modalButtons {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .modalCreateButton {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .modalCreateButton:hover {
-    background-color: #218838;
-  }
-  
-  .modalCancelButton {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .modalCancelButton:hover {
-    background-color: #c82333;
-  }
-
-  /* Sidebar Container */
-.sidebar {
-    width: 300px;
-    background-color: #f7f7f7;
-    border-right: 1px solid #ddd;
-    padding: 10px;
-    height: 100vh;
-    overflow-y: auto;
-  }
-  
-  /* Sidebar Header */
-  .sidebarHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
-  
-  .sidebarTitle {
-    font-size: 18px;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .addGroupButton {
-    background: none;
-    border: none;
-    font-size: 18px;
-    color: #007bff;
-    cursor: pointer;
-  }
-  
-  .addGroupButton:hover {
-    color: #0056b3;
-  }
-  
-  /* Group List */
-  .groupList {
-    list-style: none;
-    padding: 0;
-  }
-  
-  .groupItem {
-    margin-bottom: 15px;
-  }
-  
-  .groupName {
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #333;
-  }
-  
-  .groupName:hover {
-    color: #007bff;
-  }
-  
-  /* Subgroup List */
-  .subgroupList {
-    list-style: none;
-    padding-left: 15px;
-  }
-  
-  .subgroupItem {
-    font-size: 14px;
-    cursor: pointer;
-    color: #555;
-  }
-  
-  .subgroupItem:hover {
-    color: #007bff;
-  }
-  
-  /* Modal */
-  .modalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal {
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-    text-align: center;
-  }
-  
-  .modalInput {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .modalButtons {
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .modalCreateButton {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .modalCreateButton:hover {
-    background-color: #218838;
-  }
-  
-  .modalCancelButton {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .modalCancelButton:hover {
-    background-color: #c82333;
-  }
-  
-  
-/* Container */
+/* Container for the entire Groups page */
 .groupsContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  
-  /* Top Bar */
-  .groupsTopBar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f7f7f7;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .groupsBackButton,
-  .groupsSettingsButton {
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-  
-  .groupsOccasionLabel {
-    font-weight: bold;
-  }
-  
-  .groupsSecretSantaButton {
-    background-color: #ff6f61;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 5px;
-  }
-
-
-/* Main container for the Groups page */
-.groupsContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
-  
-  /* Top Bar */
-  .groupsTopBar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f7f7f7;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-    height: 60px;
-    flex-shrink: 0;
-  }
-  
-  /* Content container for Sidebar and Chat */
-  .groupsContent {
-    display: flex;
-    flex: 1; /* Ensures this section takes the remaining height */
-    overflow: hidden; /* Prevents overflow issues */
-  }
-  
-  /* Sidebar styling */
-  .groupsSidebar {
-    width: 300px;
-    background: #f7f7f7;
-    border-right: 1px solid #ddd;
-    overflow-y: auto;
-    flex-shrink: 0; /* Prevents sidebar from resizing */
-  }
-  
-  /* Chat area */
-  .groupsChat {
-    flex: 1; /* Allows the chat area to expand and take up the remaining space */
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    overflow: hidden; /* Prevents overflow in the chat area */
-  }
-  
-  /* Chat header */
-  .groupsChatHeader {
-    padding: 10px 20px;
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #ddd;
-    font-weight: bold;
-    flex-shrink: 0;
-  }
-  
-  /* Chat messages area */
-  .groupsChatArea {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto; /* Allows scrolling for chat messages */
-  }
-  
-  /* Chat input */
-  .groupsChatInput {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-    flex-shrink: 0;
-  }
-  
-  .groupsChatInputField {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 10px;
-  }
-  
-  .groupsChatInputButton {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .groupsChatInputButton:hover {
-    background-color: #0056b3;
-  }
-
-  /* Settings Page */
-.groupsSettingsPage {
     display: flex;
     flex-direction: column;
     height: 100vh;
     background-color: #f9f9f9;
-  }
-  
-  /* Top Bar */
-  .groupsTopBar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f7f7f7;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-    flex-shrink: 0;
-  }
-  
-  .groupsBackButton {
-    background: none;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    color: #007bff;
-  }
-  
-  .groupsBackButton:hover {
-    color: #0056b3;
-  }
-  
-  .groupsTopBarTitle {
-    font-size: 20px;
-    font-weight: bold;
     color: #333;
-    flex-grow: 1;
-    text-align: center;
-  }
-  
-  /* Main Content */
-  .groupsSettingsContent {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .groupsSettingsHeading {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
-  .groupsSettingsForm {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .groupsSettingsInput {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .groupsSettingsButton {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .groupsSettingsButton:hover {
-    background-color: #0056b3;
-  }
-
-  .activeGroup {
-    background-color: #e0e0e0; /* Highlight color */
-    font-weight: bold;
-  }
-
-  /* Delete Group Section */
-.deleteGroupSection {
-    margin-top: 30px;
-    text-align: center;
-  }
-  
-  .deleteGroupButton {
-    padding: 10px 20px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  
-  .deleteGroupButton:hover {
-    background-color: #c82333;
-  }
-  
-  /* Members Section */
-.membersHeading {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 30px;
-    margin-bottom: 10px;
-  }
-  
-  .membersList {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    max-width: 400px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .memberItem {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-    font-size: 16px;
-  }
-  
-  .memberItem:last-child {
-    border-bottom: none;
-  }
-
-  /* Editable Group Name */
-.groupsTopBarTitleContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    position: relative;
-  }
-  
-  .groupsTopBarTitle {
-    font-size: 20px;
-    font-weight: bold;
-    color: #333;
-    flex-grow: 1;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-
-  
-  .editIcon {
-    font-size: 14px;
-    color: #555;
-    cursor: pointer;
-    padding-left: 8px;
-  }
-  
-  .editIcon:hover {
-    color: #007bff;
-  }
-  
-  .editGroupName {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .editGroupNameInput {
-    padding: 8px;
-    font-size: 16px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .editGroupNameButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 8px 10px;
-    cursor: pointer;
-  }
-  
-  .editGroupNameButton:hover {
-    background-color: #0056b3;
-  }
-
-  
-  /* Remove Icon */
-.removeIcon {
-    color: #dc3545;
-    margin-left: 10px;
-    cursor: pointer;
-  }
-  
-  .removeIcon:hover {
-    color: #c82333;
-  }
-  
-  .leaveGroupButton {
-    background-color: #f5a623; /* Orange or any color of your choice */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-    margin-top: 20px;
-  }
-  
-  .leaveGroupButton:hover {
-    background-color: #e89420; /* Darker orange for hover */
-  }
-
-  .groupNameWrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  
-  .addOccasionButton {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-left: 8px;
-  }
-  
-  .redPlusIcon {
-    color: red;
-    font-size: 1rem;
-  }
-  
-  .modalBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .modalInput {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  
-  .modalButtons {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-  }
-  
-  .modalCreateButton {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .modalCancelButton {
-    background: #f5f5f5;
-    color: #333;
-    border: 1px solid #ccc;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  .membersList {
-    max-height: 150px;
-    overflow-y: auto;
-    margin: 10px 0;
-    padding: 0;
-  }
-  
-  .memberItem {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  
-  .memberItem input {
-    margin-right: 10px;
-  }
-
-  .occasionList {
-    padding-left: 20px;
-    list-style-type: none;
-  }
-  
-  .occasionItem {
-    margin: 10px 0;
-  }
-  
-  .divisionList {
-    padding-left: 20px;
-    list-style-type: square;
-  }
-  
-  .divisionItem {
-    margin: 5px 0;
-  }
-
-  
-  .groupHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .occasionHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding-left: 20px;
-  }
-  
-  .occasionList,
-  .divisionList {
-    list-style: none;
-    margin: 0;
-    padding: 0 0 0 20px;
-  }
-  
-  .divisionItem {
-    padding-left: 40px;
-    font-size: 0.9em;
-  }
-  
-  .expandIcon,
-  .chevronIcon {
-    cursor: pointer;
-    margin-left: 8px;
-  }
-
-
-  .sidebarContainer {
-    width: 250px;
-    background-color: #1e1e1e;
-    color: #fff;
     font-family: sans-serif;
+  }
+  
+  .errorMessage {
+    color: red;
+    padding: 0.5rem 1rem;
+  }
+  
+  /* TopBar */
+  .topBar {
+    display: flex;
+    align-items: center;
+    background-color: #eaeaea;
+    padding: 0.5rem 1rem;
+  }
+  
+  .backButton,
+  .settingsButton {
+    border: none;
+    background: none;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-right: 1rem;
+  }
+  
+  .topBarTitle {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .topBarTitle h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+  
+  /* Layout for sidebar + chat content */
+  .groupsContent {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  /* SIDEBAR */
+  .sidebarContainer {
+    width: 300px;
+    border-right: 1px solid #ccc;
+    background-color: #fff;
     display: flex;
     flex-direction: column;
   }
@@ -811,9 +61,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background-color: #f3f3f3;
     padding: 0.75rem 1rem;
-    background-color: #333;
     cursor: pointer;
+    border-bottom: 1px solid #e5e5e5;
   }
   
   .headingLeft {
@@ -822,150 +73,26 @@
     gap: 0.5rem;
   }
   
-  .headingRight {
-    cursor: pointer;
-  }
-  
-  /* GROUPS WRAPPER */
-  .groupsWrapper {
-    padding: 0.5rem 0;
-  }
-  
-  .groupSection {
-    margin-left: 0.75rem;
-  }
-  
-  /* GROUP HEADING */
-  .groupHeading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.3rem 0.5rem;
-    cursor: pointer;
-  }
-  
-  .groupLeft {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .groupRight {
-    cursor: pointer;
-  }
-  
-  .groupText {
-    color: #ccc;
-  }
-  
-  .activeGroupText {
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  /* OCCASION */
-  .occasionSection {
-    margin-left: 1.5rem;
-  }
-  
-  .occasionHeading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.3rem 0.5rem;
-    cursor: pointer;
-  }
-  
-  .occasionLeft {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  
-  .occasionRight {
-    cursor: pointer;
-  }
-  
-  .occasionText {
-    color: #bbb;
-  }
-  
-  .activeOccasionText {
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  /* DIVISION */
-  .divisionItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-left: 2rem;
-    padding: 0.3rem 0.5rem;
-    cursor: pointer;
-  }
-  
-  .divisionText {
-    color: #aaa;
-  }
-  
-  .activeDivisionText {
-    font-weight: bold;
-    color: #fff;
-  }
-  
-  .divisionMenu {
-    visibility: hidden;
-  }
-  
-  .divisionItem:hover .divisionMenu {
-    visibility: visible;
-    cursor: pointer;
-  }
-
-  /* Container for entire sidebar */
-.sidebarContainer {
-    width: 250px;
-    background: #1f1f1f;
-    color: #fff;
-    font-family: sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* MAIN HEADING (Giftly) */
-  .mainHeading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;
-    background-color: #333;
-    cursor: pointer;
-  }
-  
-  .headingLeft {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .mainHeadingText {
+    margin: 0;
+    font-size: 1.1rem;
   }
   
   .headingRight {
     display: flex;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
   
   .iconWrapper {
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
   }
   
-  .mainHeadingText {
-    font-size: 1.2rem;
-    margin: 0;
-  }
-  
-  /* Groups Wrapper */
+  /* GROUP WRAPPER */
   .groupsWrapper {
     padding: 0.5rem;
+    overflow-y: auto;
   }
   
   /* GROUPS */
@@ -976,19 +103,18 @@
   .groupHeading {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 0.4rem 0.6rem;
-    cursor: pointer;
+    align-items: center;
     border-radius: 4px;
     margin-bottom: 2px;
   }
   
   .groupHeading:hover {
-    background-color: #2d2d2d;
+    background-color: #eee;
   }
   
   .activeGroupBg {
-    background-color: #444;
+    background-color: #cde4ff;
   }
   
   .groupLeft {
@@ -998,15 +124,16 @@
   }
   
   .groupText {
-    color: #ccc;
+    font-size: 1rem;
+    color: #444;
   }
   
   .activeGroupText {
-    color: #fff;
+    color: #000;
     font-weight: bold;
   }
   
-  /* OCCASION (Subgroup) */
+  /* OCCASIONS */
   .occasionSection {
     margin-left: 1.5rem;
     margin-top: 0.2rem;
@@ -1015,14 +142,14 @@
   .occasionHeading {
     display: flex;
     justify-content: space-between;
+    padding: 0.3rem 0.6rem;
     align-items: center;
-    padding: 0.4rem 0.6rem;
-    cursor: pointer;
     border-radius: 4px;
+    cursor: pointer;
   }
   
   .occasionHeading:hover {
-    background-color: #2d2d2d;
+    background-color: #eee;
   }
   
   .occasionLeft {
@@ -1032,8 +159,8 @@
   }
   
   .occasionText {
-    color: #bbb;
     font-size: 0.95rem;
+    color: #555;
   }
   
   /* DIVISION */
@@ -1042,58 +169,60 @@
     justify-content: space-between;
     align-items: center;
     margin-left: 3rem;
-    padding: 0.3rem 0.5rem;
-    cursor: pointer;
+    padding: 0.2rem 0.6rem;
     border-radius: 4px;
-    transition: background 0.2s ease;
+    cursor: pointer;
   }
   
   .divisionItem:hover {
-    background-color: #2d2d2d;
-  }
-  
-  .divisionLeft {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    background-color: #eee;
   }
   
   .divisionText {
-    color: #aaa;
     font-size: 0.9rem;
+    color: #777;
   }
   
-  /* Modal Backdrop */
+  /* CHAT CONTENT */
+  .chatContainer {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+  
+  /* MODAL BACKDROP (used for create group, rename, etc.) */
   .modalBackdrop {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0,0,0,0.4);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 999;
   }
   
-  /* Modal Window */
+  /* MODAL */
   .modal {
     background-color: #fff;
-    color: #000;
+    color: #333;
     padding: 1rem;
     width: 300px;
-    border-radius: 4px;
+    border-radius: 5px;
   }
   
   .modalTitle {
     margin-top: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
   }
   
   .modalInput {
     width: 100%;
     padding: 0.4rem;
-    margin-bottom: 1rem;
+    margin: 0.5rem 0 1rem;
     border: 1px solid #ccc;
     border-radius: 4px;
   }
@@ -1106,21 +235,435 @@
   
   .modalCreateButton,
   .modalCancelButton {
-    padding: 0.4rem 0.8rem;
     border: none;
     border-radius: 4px;
+    padding: 0.4rem 0.8rem;
     cursor: pointer;
   }
   
   .modalCreateButton {
-    background-color: #28a745;
+    background-color: #007bff;
     color: #fff;
   }
   
   .modalCancelButton {
+    background-color: #aaa;
+    color: #fff;
+  }
+  
+  /* CONTEXT MENU */
+  .menuBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .menuContainer {
+    background: #fff;
+    color: #333;
+    padding: 1rem;
+    width: 240px;
+    border-radius: 5px;
+  }
+  
+  .menuTitle {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .menuList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .menuItem {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+  }
+  
+  .menuItem:last-child {
+    border-bottom: none;
+  }
+  
+  .menuItem:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* SETTINGS PAGE */
+  .groupsSettingsPage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .groupsTopBar {
+    display: flex;
+    align-items: center;
+    background-color: #eaeaea;
+    padding: 0.5rem 1rem;
+  }
+  
+  .groupsBackButton {
+    border: none;
+    background: none;
+    cursor: pointer;
+    margin-right: 1rem;
+    font-size: 1rem;
+  }
+  
+  .groupsTopBarTitleContainer {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  
+  .groupsTopBarTitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .editIcon {
+    margin-left: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .groupsSettingsContent {
+    padding: 1rem;
+    flex: 1;
+    overflow-y: auto;
+  }
+  
+  .error {
+    color: red;
+    margin: 0.5rem 0;
+  }
+  
+  .membersHeading {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .membersList {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .groupActionSection {
+    margin-top: 2rem;
+  }
+  
+  .deleteGroupButton,
+  .leaveGroupButton {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .deleteGroupButton:hover,
+  .leaveGroupButton:hover {
+    background-color: #c82333;
+  }
+  
+  /* Edit group name */
+  .editGroupName {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  
+  .editGroupNameInput {
+    padding: 0.3rem;
+  }
+  
+  .editGroupNameButton {
+    border: none;
+    background-color: #28a745;
+    color: #fff;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+  }
+
+  /* Container for page */
+.groupsContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f9f9f9;
+    color: #333;
+    font-family: sans-serif;
+  }
+  
+  /* Error message */
+  .errorMessage {
+    color: red;
+    padding: 0.5rem;
+  }
+  
+  /* TopBar & layout */
+  .topBar {
+    display: flex;
+    align-items: center;
+    background-color: #eaeaea;
+    padding: 0.5rem 1rem;
+  }
+  .groupsContent {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  .chatContainer {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    background-color: #fff;
+  }
+  
+  /* SIDEBAR */
+  .sidebarContainer {
+    width: 280px;
+    background-color: #fff;
+    border-right: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+  }
+  .mainHeading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f3f3f3;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+  }
+  .headingLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .headingRight {
+    display: flex;
+    gap: 0.5rem;
+  }
+  .mainHeadingText {
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .groupsWrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+  .groupSection {
+    margin-bottom: 0.5rem;
+  }
+  .groupHeading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .groupHeading:hover {
+    background-color: #eee;
+  }
+  .activeGroupBg {
+    background-color: #cde4ff;
+  }
+  .groupLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .groupText {
+    color: #444;
+  }
+  .activeGroupText {
+    color: #000;
+    font-weight: bold;
+  }
+  
+  /* Occasions */
+  .occasionSection {
+    margin-left: 1.5rem;
+    margin-top: 0.2rem;
+  }
+  .occasionHeading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .occasionHeading:hover {
+    background-color: #eee;
+  }
+  .occasionLeft {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .occasionText {
+    font-size: 0.95rem;
+    color: #555;
+  }
+  
+  /* Divisions */
+  .divisionItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .divisionItem:hover {
+    background-color: #eee;
+  }
+  .divisionText {
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  /* Icons */
+  .iconWrapper {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  /* Modals */
+  .modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  .modal {
+    background-color: #fff;
+    color: #333;
+    padding: 1rem;
+    width: 320px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .modalTitle {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.2rem;
+  }
+  .modalInput {
+    width: 100%;
+    padding: 0.4rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .modalButtons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+  .modalCreateButton,
+  .modalCancelButton {
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  .modalCreateButton {
+    background-color: #007bff;
+    color: #fff;
+  }
+  .modalCreateButton:hover {
+    background-color: #0056c7;
+  }
+  .modalCancelButton {
     background-color: #ccc;
     color: #333;
   }
+  .modalCancelButton:hover {
+    background-color: #bbb;
+  }
   
+  /* Context Menu */
+  .menuBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .menuContainer {
+    background-color: #fff;
+    color: #333;
+    padding: 1rem;
+    width: 240px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+  .menuTitle {
+    margin-top: 0;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+  .menuList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .menuItem {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+  }
+  .menuItem:hover {
+    background-color: #f2f2f2;
+  }
   
+  /* Checkboxes for user lists */
+  .checkboxList {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    background-color: #fafafa;
+  }
+  .checkboxItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.25rem;
+  }
   
