@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword"
 import Register from "./pages/Register";
 import "./styles/App.css";
 import OldHome from "./pages/OldHome";
@@ -31,6 +32,7 @@ function App() {
           }
         />
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword/>}/>
         <Route path="/register" element={<Register />} />
         <Route
           path="/oldhome"
