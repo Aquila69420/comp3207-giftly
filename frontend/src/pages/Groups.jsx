@@ -124,6 +124,7 @@ const Groups = () => {
       setActiveGroup(group);
     }
     setActiveOccasion(null); // reset activeOccasion
+    setActiveDivision(null); // reset activeDivision
   };
 
   // Lazily fetch divisions for an occasion
@@ -209,6 +210,7 @@ const Groups = () => {
         if (data2.result) {
           setGroups(data2.groups);
           setActiveGroup(data.group);
+          handleGroupClick(data.group);
         } else {
           setError(data2.msg);
         }

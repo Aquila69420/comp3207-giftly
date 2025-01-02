@@ -36,9 +36,9 @@ const GroupsChat = ({ userID, username, group, division }) => {
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // If you only care about group OR division, pick whichever has a chatChannelID
-  // e.g. group?.chatChannelID || division?.chatChannelID
-  const chatChannelID = group?.chatChannelID;
+  // Pick the chat channel ID based on the active division and then group
+  const chatChannelID = division?.chatChannelID || group?.chatChannelID;
+
   useEffect(() => {
     if (!userID) return;   // No user, skip
     if (!chatChannelID) return; // No channel, skip
