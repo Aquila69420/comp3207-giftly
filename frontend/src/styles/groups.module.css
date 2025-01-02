@@ -116,6 +116,14 @@
   .activeGroupBg {
     background-color: #cde4ff;
   }
+
+  .activeOccasionBg {
+    background-color: #cde4ff;
+  }
+
+  .activeDivisionBg {
+    background-color: #cde4ff;
+  }
   
   .groupLeft {
     display: flex;
@@ -132,6 +140,17 @@
     color: #000;
     font-weight: bold;
   }
+
+  .activeOccasionText {
+    color: #000;
+    font-weight: bold;
+  }
+
+  .activeDivisionText {
+    color: #000;
+    font-weight: bold;
+  }
+  
   
   /* OCCASIONS */
   .occasionSection {
@@ -162,6 +181,11 @@
     font-size: 0.95rem;
     color: #555;
   }
+
+  .activeOccasionText {
+    color: #000;
+    font-weight: bold;
+  }
   
   /* DIVISION */
   .divisionItem {
@@ -182,6 +206,7 @@
     font-size: 0.9rem;
     color: #777;
   }
+  
   
   /* CHAT CONTENT */
   .chatContainer {
@@ -667,3 +692,36 @@
     margin-bottom: 0.25rem;
   }
   
+  /* If you want the icon visible only on hover: */
+.groupHeading,
+.occasionHeading,
+.divisionItem {
+  position: relative;
+}
+
+/* Hide the icon by default */
+.groupHeading .iconWrapper,
+.occasionHeading .iconWrapper,
+.divisionItem .iconWrapper {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* Show on hover */
+.groupHeading:hover .iconWrapper,
+.occasionHeading:hover .iconWrapper,
+.divisionItem:hover .iconWrapper {
+  opacity: 1;
+}
+
+.animatedPanel {
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.spinnerContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 60px; /* Adjust based on your design */
+}

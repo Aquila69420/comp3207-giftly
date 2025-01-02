@@ -12,6 +12,8 @@ const Groups = () => {
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeOccasion, setActiveOccasion] = useState(null);
   const [error, setError] = useState(null);
+  const [activeDivision, setActiveDivision] = useState(null);
+  const [loadingOccasion, setLoadingOccasion] = useState(false);
 
   useEffect(() => {
     if (!userID) return;
@@ -37,6 +39,40 @@ const Groups = () => {
     };
     fetchGroups();
   }, [userID]);
+
+  // Refresh groups
+  const handleRefreshGroups = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/groups/get", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userID }),
+      });
+      const data = await res.json();
+      if (data.result) {
+        setGroups(data.groups);
+        console.log('Active group:', activeGroup.id);
+        // Keep the same active group if it's still in the updated list
+        if (activeGroup) {
+          const sameGroup = data.groups.find((g) => g.id === activeGroup.id);
+          if (sameGroup) {
+            // Merge any existing data from "activeGroup" (like occasions) if needed
+            // or re-fetch them again lazily in handleGroupClick
+            setActiveGroup(sameGroup);
+            console.log('Active group updated:', sameGroup.id);
+          } else {
+            setActiveGroup(null);
+          }
+        }
+
+      } else {
+        setError(data.msg);
+      }
+    } catch (err) {
+      setError("Error fetching groups: " + err.message);
+    }
+  };
+  
 
   // Lazily fetch occasions when a group is clicked
   const handleGroupClick = async (group) => {
@@ -81,7 +117,9 @@ const Groups = () => {
       occasion.divisions.length > 0 &&
       typeof occasion.divisions[0] === "object";
 
+    
     if (!hasDivisions) {
+      setLoadingOccasion(true);
       try {
         const res = await fetch("http://localhost:5000/groups/divisions/get", {
           method: "POST",
@@ -110,10 +148,25 @@ const Groups = () => {
         }
       } catch (err) {
         setError("Error fetching divisions: " + err.message);
+      } finally {
+        setLoadingOccasion(false);
       }
     } else {
       setActiveOccasion(occasion);
     }
+
+    if (occasion.divisions && occasion.divisions.length > 0) {
+      setActiveDivision(occasion.divisions[0]);
+    } else {
+      setActiveDivision(null);
+    }
+  
+    setActiveOccasion(occasion);
+  };
+
+  // Set the active division
+  const handleDivisionClick = (division) => {
+    setActiveDivision(division);
   };
 
   // Create a new group
@@ -203,10 +256,15 @@ const Groups = () => {
         <GroupsSidebar
           groups={groups}
           activeGroup={activeGroup}
+          activeOccasion={activeOccasion}
+          activeDivision={activeDivision}
           onGroupClick={handleGroupClick}
           onOccasionClick={handleOccasionClick}
+          onDivisionClick={handleDivisionClick}
           onAddOccasion={handleAddOccasion}
           onCreateGroup={handleCreateGroup}
+          refreshGroups={handleRefreshGroups}
+          loadingOccasion={loadingOccasion}
         />
         <GroupsChat group={activeGroup} occasion={activeOccasion} />
       </div>

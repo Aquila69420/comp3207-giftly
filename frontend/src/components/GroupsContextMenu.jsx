@@ -30,6 +30,7 @@ const GroupsContextMenu = ({
   item,
   onClose,
   onAddOccasionRequest,
+  onActionDone,
 }) => {
   const currentUserID = localStorage.getItem("userID");
   const isAdmin = item?.admin === currentUserID;
@@ -63,6 +64,7 @@ const GroupsContextMenu = ({
       const data = await response.json();
       if (data.result) {
         alert("Group deleted successfully");
+        onActionDone?.();
         // Possibly refresh groups or navigate away
         // ...
       } else {
@@ -90,6 +92,7 @@ const GroupsContextMenu = ({
       const data = await response.json();
       if (data.result || data.response) {
         alert("You left the group successfully");
+        onActionDone?.();
         // Possibly refresh groups
         // ...
       } else {
@@ -251,7 +254,7 @@ const GroupsContextMenu = ({
 
         {/* Rename group */}
         {showRenameModal && type === "group" && (
-          <RenameGroupModal group={item} onClose={() => setShowRenameModal(false)} />
+          <RenameGroupModal group={item} onClose={() => setShowRenameModal(false)} onActionDone={onActionDone} />
         )}
 
         {/* Date Change (occasion) */}

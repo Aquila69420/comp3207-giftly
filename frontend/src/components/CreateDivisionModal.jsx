@@ -112,14 +112,14 @@ const CreateDivisionModal = ({ occasion, onClose }) => {
         {showRecipientSelection && (
           <div className={styles.checkboxList}>
             {/* In real code, you'd get the list of users from the occasion or group */}
-            {(occasion?.users || []).map((userID) => (
-              <label key={userID} className={styles.checkboxItem}>
+            {(occasion?.users || []).map((user) => (
+              <label key={user.userID} className={styles.checkboxItem}>
                 <input
                   type="checkbox"
-                  checked={recipientIDs.includes(userID)}
-                  onChange={() => handleRecipientChange(userID)}
+                  checked={recipientIDs.includes(user.userID)}
+                  onChange={() => handleRecipientChange(user.userID)}
                 />
-                {userID}
+                {user.username}
               </label>
             ))}
             {/* Confirm recipients */}

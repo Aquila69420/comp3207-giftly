@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
 
-const RenameGroupModal = ({ group, onClose }) => {
+const RenameGroupModal = ({ group, onClose, onActionDone, }) => {
   const currentUserID = localStorage.getItem("userID");
   const [newName, setNewName] = useState(group.groupname || "");
 
@@ -21,7 +21,7 @@ const RenameGroupModal = ({ group, onClose }) => {
       const data = await response.json();
       if (data.result) {
         alert("Group renamed successfully");
-        // Possibly refresh or update the group in parent
+        onActionDone?.();
       } else {
         alert(`Error: ${data.msg}`);
       }

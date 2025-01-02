@@ -42,12 +42,12 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <h2 className={styles.modalTitle}>
-          {isGroup ? `Members of ${group.groupname}` : "Members"}
+          {isGroup ? `Group Members` : "Members"}
         </h2>
         <ul>
           {members.map((m) => (
             <li key={m.userID} style={{ marginBottom: "0.5rem" }}>
-              {m.username} ({m.userID})
+              {m.username}
               {isAdmin && m.userID !== currentUserID && (
                 <button
                   style={{
