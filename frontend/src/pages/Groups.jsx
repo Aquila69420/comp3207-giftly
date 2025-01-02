@@ -8,6 +8,7 @@ import styles from "../styles/groups.module.css";
 const Groups = () => {
   const navigate = useNavigate();
   const userID = localStorage.getItem("userID");
+  const username = localStorage.getItem("username");
   const [groups, setGroups] = useState([]);
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeOccasion, setActiveOccasion] = useState(null);
@@ -31,6 +32,7 @@ const Groups = () => {
         const data = await res.json();
         if (data.result) {
           setGroups(data.groups);
+
           if (data.groups.length > 0) {
             setActiveGroup(data.groups[0]);
           }
@@ -193,6 +195,7 @@ const Groups = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID, groupname: groupName.trim() }),
       });
+      console.log('Response:', res);
       const data = await res.json();
       if (data.result) {
         // refetch groups
@@ -287,7 +290,14 @@ const Groups = () => {
           loadingGroup={loadingGroup}
           
         />
-        <GroupsChat group={activeGroup} occasion={activeOccasion} />
+        <div style={{ flex: 1 }}>
+        <GroupsChat
+          userID={userID}
+          username={username}
+          group={activeGroup}         // or division={activeDivision}
+          division={activeDivision}   // optional 
+        />
+        </div>
       </div>
 
       {error && <div className={styles.errorMessage}>{error}</div>}
