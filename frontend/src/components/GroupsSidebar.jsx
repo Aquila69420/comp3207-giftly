@@ -29,7 +29,9 @@ const GroupsSidebar = ({
   onAddOccasion,
   onCreateGroup,
   refreshGroups, // optional callback to re-fetch or update state
-  loadingOccasion,
+  loadingDivisions,
+  loadingOccasions,
+  loadingGroup,
 }) => {
   const [expandedGroupId, setExpandedGroupId] = useState(null);
   const [expandedOccasionId, setExpandedOccasionId] = useState(null);
@@ -151,7 +153,14 @@ const GroupsSidebar = ({
       {/* Groups list */}
       {isMainOpen && (
         <div className={styles.groupsWrapper}>
-          {groups.map((group) => {
+          {/* Spinner for loading groups */}
+          {loadingGroup ? (
+            <div className={styles.spinnerContainer}>
+              <ClipLoader />
+            </div>
+          ) : (
+
+          groups.map((group) => {
             const isExpanded = expandedGroupId === group.id;
             const isActiveGroup = activeGroup?.id === group.id;
             return (
@@ -190,7 +199,15 @@ const GroupsSidebar = ({
                   }}
                 >
                   {Array.isArray(group.occasions) &&
+                  loadingOccasions ? (
+                    <div className={styles.spinnerContainer}>
+                      <ClipLoader />
+                    </div>
+                  ) : (
+                    
+                    
                     group.occasions?.map((occ) => {
+                      
                       const occIsExpanded = expandedOccasionId === occ.id;
                       const isActiveOccasion = activeOccasion?.id === occ.id;
                     
@@ -227,7 +244,7 @@ const GroupsSidebar = ({
                           </div>
                     
                           {/* Spinner for loading occasions */}
-                          {occIsExpanded && loadingOccasion ? (
+                          {occIsExpanded && loadingDivisions ? (
                             <div className={styles.spinnerContainer}>
                               <ClipLoader />
                             </div>
@@ -283,11 +300,13 @@ const GroupsSidebar = ({
                         </div>
                       );
                     })
-                    }
+                  )}
+
                 </div>
               </div>
             );
-          })}
+          })
+          )}
         </div>
       )}
 

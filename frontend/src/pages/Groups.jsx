@@ -13,11 +13,15 @@ const Groups = () => {
   const [activeOccasion, setActiveOccasion] = useState(null);
   const [error, setError] = useState(null);
   const [activeDivision, setActiveDivision] = useState(null);
-  const [loadingOccasion, setLoadingOccasion] = useState(false);
+  const [loadingDivisions, setLoadingDivisions] = useState(false);
+  const [loadingOccasions, setLoadingOccasions] = useState(false);
+
+  const [loadingGroup, setLoadingGroup] = useState(false);
 
   useEffect(() => {
     if (!userID) return;
     const fetchGroups = async () => {
+      setLoadingGroup(true);
       try {
         const res = await fetch("http://localhost:5000/groups/get", {
           method: "POST",
@@ -35,6 +39,8 @@ const Groups = () => {
         }
       } catch (err) {
         setError("Error fetching groups: " + err.message);
+      } finally {
+        setLoadingGroup(false);
       }
     };
     fetchGroups();
@@ -42,6 +48,7 @@ const Groups = () => {
 
   // Refresh groups
   const handleRefreshGroups = async () => {
+    setLoadingGroup(true);
     try {
       const res = await fetch("http://localhost:5000/groups/get", {
         method: "POST",
@@ -70,6 +77,8 @@ const Groups = () => {
       }
     } catch (err) {
       setError("Error fetching groups: " + err.message);
+    } finally { 
+      setLoadingGroup(false);
     }
   };
   
@@ -85,6 +94,7 @@ const Groups = () => {
 
     if (!hasOccasionObjects) {
       try {
+        setLoadingOccasions(true);
         const res = await fetch("http://localhost:5000/groups/occasions/get", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -102,6 +112,8 @@ const Groups = () => {
         }
       } catch (err) {
         setError("Error fetching occasions: " + err.message);
+      } finally {
+        setLoadingOccasions(false);
       }
     } else {
       setActiveGroup(group);
@@ -119,7 +131,7 @@ const Groups = () => {
 
     
     if (!hasDivisions) {
-      setLoadingOccasion(true);
+      setLoadingDivisions(true);
       try {
         const res = await fetch("http://localhost:5000/groups/divisions/get", {
           method: "POST",
@@ -149,7 +161,7 @@ const Groups = () => {
       } catch (err) {
         setError("Error fetching divisions: " + err.message);
       } finally {
-        setLoadingOccasion(false);
+        setLoadingDivisions(false);
       }
     } else {
       setActiveOccasion(occasion);
@@ -181,6 +193,7 @@ const Groups = () => {
       const data = await res.json();
       if (data.result) {
         // refetch groups
+        setLoadingGroup(true);
         const res2 = await fetch("http://localhost:5000/groups/get", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -198,6 +211,8 @@ const Groups = () => {
       }
     } catch (err) {
       setError("Error creating group: " + err.message);
+    } finally {
+      setLoadingGroup(false);
     }
   };
 
@@ -264,7 +279,10 @@ const Groups = () => {
           onAddOccasion={handleAddOccasion}
           onCreateGroup={handleCreateGroup}
           refreshGroups={handleRefreshGroups}
-          loadingOccasion={loadingOccasion}
+          loadingDivisions={loadingDivisions}
+          loadingOccasions={loadingOccasions}
+          loadingGroup={loadingGroup}
+          
         />
         <GroupsChat group={activeGroup} occasion={activeOccasion} />
       </div>
