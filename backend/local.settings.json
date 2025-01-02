@@ -24,7 +24,9 @@
       "Ebay_Sandbox_Client_ID": "DhruvKha-Giftly-SBX-999edef9a-bf74745e",
       "Ebay_Sandbox_Client_Secret": "SBX-99edef9a0d08-a15b-4448-9c5c-13cb",
       "Ebay_Production_Client_ID": "DhruvKha-Giftly-PRD-0c261000e-9a7667aa",
-      "Ebay_Production_Client_Secret": "PRD-c261000eef87-b143-451e-9ef3-6bc2"
+      "Ebay_Production_Client_Secret": "PRD-c261000eef87-b143-451e-9ef3-6bc2",
+      "STREAM_KEY": "5cs3zw7bzvyk",
+      "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq"
       },
       "Host": {
         "CORS": "*"

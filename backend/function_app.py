@@ -15,6 +15,8 @@ import random
 import io
 from PIL import Image
 from helper.groups import GroupsError
+from stream_chat import StreamChat
+
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -26,11 +28,18 @@ cart_container = database.get_container_client(os.getenv("CartContainer"))
 product_container = database.get_container_client(os.getenv("ProductContainer"))
 sendEmail_api_key = os.getenv("SendGrid_API_KEY")
 
+STREAM_KEY = os.getenv("STREAM_KEY", "YOUR_STREAM_KEY")
+STREAM_SECRET = os.getenv("STREAM_SECRET", "YOUR_STREAM_SECRET")
+
+chat_client = StreamChat(api_key=STREAM_KEY, api_secret=STREAM_SECRET)
+
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
+
+
 
 @app.function_name(name="wishlist_get")
 @app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
@@ -526,7 +535,7 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     groupname = data['groupname']
     try:
-        group = groups.create_group(userID, groupname)
+        group = groups.create_group(userID, groupname, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -592,7 +601,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     user_to_add = data['user_to_add']
     groupID = data['groupID']
     try:
-        group = groups.add_user(userID, user_to_add, groupID)
+        group = groups.add_user(userID, user_to_add, groupID, chat_client)
         body=json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
@@ -688,7 +697,7 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     user_to_remove = data['user_to_remove']
     try:
-        divisions, ocs, group = groups.groups_kick(userID, groupID, user_to_remove)
+        divisions, ocs, group = groups.groups_kick(userID, groupID, user_to_remove, chat_client)
         body=json.dumps({"result": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body=json.dumps({"result": False, "msg": str(e)})
@@ -721,7 +730,7 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     groupID = data['groupID']
     try:
-        divisions, ocs, group = groups.groups_leave(userID, groupID)
+        divisions, ocs, group = groups.groups_leave(userID, groupID, chat_client)
         body = json.dumps({"response": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions), 
                            "occasions": groups.occasions_cleaned(ocs), "group": groups.group_cleaned(group)})
     except GroupsError as e:
@@ -1057,3 +1066,46 @@ def groups_calendar_get(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200
     )
     return add_cors_headers(response)
+
+
+
+# STREAM Chat
+@app.function_name(name="get_token")
+@app.route(route='get_token', methods=[func.HttpMethod.POST])
+def get_token(req: func.HttpRequest) -> func.HttpResponse:
+    data = req.get_json()
+    username = data['username']
+    userID = data['userID']
+    if not userID:
+        return func.HttpResponse(
+            body=json.dumps({"result": False, "msg": "No userID provided"}),
+            mimetype="application/json",
+            status_code=400
+        )
+    token = chat_client.create_token(userID)
+    return func.HttpResponse(
+        body=json.dumps({"result": True, "msg": "OK", "token": token}),
+        mimetype="application/json",
+        status_code=200
+    )
+
+# # Create a group channel
+# @app.function_name(name="create_channel")
+# @app.route(route='groups/create_channel', methods=[func.HttpMethod.POST])
+# def create_channel(req: func.HttpRequest) -> func.HttpResponse:
+#     data = req.get_json()
+#     groupID = data['groupID']
+#     channel_name = data['channel_name']
+#     try:
+#         channel = client.create_channel(groupID, channel_name)
+#         return func.HttpResponse(
+#             body=json.dumps({"result": True, "msg": "OK", "channel": channel}),
+#             mimetype="application/json",
+#             status_code=200
+#         )
+#     except Exception as e:
+#         return func.HttpResponse(
+#             body=json.dumps({"result": False, "msg": str(e)}),
+#             mimetype="application/json",
+#             status_code=500
+#         )

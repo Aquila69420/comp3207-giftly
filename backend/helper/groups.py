@@ -98,7 +98,8 @@ def group_cleaned(groupDoc):
         'groupname': groupDoc['groupname'],
         'admin': groupDoc['admin'],
         'users': paired_users(groupDoc['users']),
-        'occasions': groupDoc['occasions']
+        'occasions': groupDoc['occasions'],
+        'chatChannelID': groupDoc.get('chatChannelID')
     }
 
 def groups_cleaned(groups):
@@ -148,18 +149,37 @@ def occasion_has_divisions(ocDoc):
         raise GroupsError("Occasion already has divisions")
     return ocDoc['divisions']
 
-def create_group(userID, groupname):
+def create_group(userID, groupname, chat_client):
     # Check if userID exists
     user_exists(userID)
 
+    group_id = str(uuid.uuid4())
+    channel_id = f"group-{group_id}"
     # Add Group
     group = groups_container.create_item(body={
-        'id': str(uuid.uuid4()),
+        'id': group_id,
         'groupname': groupname,
         'admin': userID,
         'users': [userID],
-        'occasions': []
+        'occasions': [],
+        'chatChannelID': channel_id
     })
+    channel_id = group['chatChannelID']
+    members = [str(u) for u in group['users']]
+    # Create the channel with the 'messaging' type (or your choice)
+    channel = chat_client.channel(
+        channel_type="messaging",
+        channel_id=channel_id,
+        data={
+            "name": group['groupname'],
+            "members": members,  # the list of userIDs
+        }
+    )
+    channel.create(userID)
+    group['chatChannelID'] = channel_id
+    # print(group)
+    print('Chat id:', channel_id)
+    groups_container.replace_item(item=group['id'], body=group) 
     return group
 
 def delete_group(userID, groupID):
@@ -174,7 +194,7 @@ def delete_group(userID, groupID):
         delete_occasion(occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
 
-def add_user(userID, user_to_add, groupID):
+def add_user(userID, user_to_add, groupID, chat_client):
     # Check both userIDs exist
     user_exists(userID)
     user_to_add_doc = username_exists(user_to_add)
@@ -199,6 +219,17 @@ def add_user(userID, user_to_add, groupID):
         {"op": "add", "path": "/users/-", "value": user_to_add}
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+    chat_client.upsert_user({
+        "id": str(user_to_add),
+        "username": user_to_add_doc['username']
+    })
+
+    channel_id = group.get('chatChannelID')
+    if channel_id:
+        channel = chat_client.channel("messaging", channel_id=channel_id)
+        channel.add_members([str(user_to_add)])
+    
     return group
 
 def get_groups(userID):
@@ -227,7 +258,7 @@ def change_groupname(userID, groupID, groupname):
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
     return group
 
-def groups_kick(userID, groupID, user_to_remove):
+def groups_kick(userID, groupID, user_to_remove, chat_client):
     # Check if group exists
     group = group_exists(groupID)
 
@@ -241,9 +272,9 @@ def groups_kick(userID, groupID, user_to_remove):
     # Check user is in group
     user_in_group(group, user_to_remove)
 
-    return remove_user_from_group(user_to_remove, group)
+    return remove_user_from_group(user_to_remove, group, chat_client)
 
-def groups_leave(userID, groupID):
+def groups_leave(userID, groupID, chat_client):
     # Check group exists
     group = group_exists(groupID)
 
@@ -253,10 +284,10 @@ def groups_leave(userID, groupID):
     # Check user is not admin
     group_is_not_admin(group, userID)
 
-    return remove_user_from_group(userID, group)
+    return remove_user_from_group(userID, group, chat_client)
 
 
-def remove_user_from_group(userID, group):
+def remove_user_from_group(userID, group, chat_client):
     groupID = group['id']
 
     # TODO: Remove from all divisions
@@ -277,6 +308,10 @@ def remove_user_from_group(userID, group):
         { "op": "remove", "path": f"/users/{index}"}
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+    channel_id = group.get('chatChannelID')
+    if channel_id:
+        channel = chat_client.channel("messaging", channel_id=channel_id)
+        channel.remove_members([str(userID)])
     return divisions, ocs, group
 
 def remove_user_from_occasion(userID, oc):
@@ -435,8 +470,35 @@ def group_gifting(userID, occasionID, recipients):
         'cart': "", #TODO: generate cart for division
         'recipients': recipients
     })
+
     # Add divison to occasion
     oc = occasion_add_division(oc, division['id'])
+
+    # divisionID = division['id']
+    # channel_id = f"division-{divisionID}"
+
+    # # Combine both .users and .recipients if you want them all to be in the chat 
+    # all_div_members = set(division['users'] + division['recipients'])
+    # members = [str(u) for u in all_div_members]
+
+    # channel = chat_client.channel("messaging", channel_id=channel_id, data={
+    #     "name": f"Division {divisionID}",
+    #     "members": members
+    # })
+    # channel.create()
+
+    # # Store it
+    # patch_ops = [
+    #     {"op": "set", "path": "/chatChannelID", "value": channel_id}
+    # ]
+    # divisions_container.patch_item(
+    #     item=divisionID, 
+    #     partition_key=divisionID,
+    #     patch_operations=patch_ops
+    # )
+
+
+
 
     return oc, [division]
 
