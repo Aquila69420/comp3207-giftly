@@ -58,6 +58,7 @@ const Groups = () => {
       const data = await res.json();
       if (data.result) {
         setGroups(data.groups);
+        
         console.log('Active group:', activeGroup.id);
         // Keep the same active group if it's still in the updated list
         if (activeGroup) {
@@ -66,9 +67,11 @@ const Groups = () => {
             // Merge any existing data from "activeGroup" (like occasions) if needed
             // or re-fetch them again lazily in handleGroupClick
             setActiveGroup(sameGroup);
+            handleGroupClick(sameGroup);
             console.log('Active group updated:', sameGroup.id);
           } else {
-            setActiveGroup(null);
+            setActiveGroup(data.groups[0]);
+            handleGroupClick(data.groups[0]);
           }
         }
 
