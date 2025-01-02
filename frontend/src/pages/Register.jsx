@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import styles from "../styles/register.module.css";
@@ -8,6 +8,8 @@ import config from "../config";
 
 
 function Register() {
+  const [registered, setRegistered] = useState(false);
+
   const navigate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("username")) {
@@ -46,6 +48,7 @@ function Register() {
     }),
     onSubmit: async (values) => {
       try {
+        setRegistered(true);
         const response = await fetch(`${config.backendURL}/register`, {
           method: "POST",
           headers: {
@@ -95,7 +98,32 @@ function Register() {
   return (
     <div className={styles.registerContainer}>
       <img src={logo} alt="logo" width={200} className={styles.logo} />
-      <form onSubmit={formik.handleSubmit} className={styles.box}>
+      {registered ? (
+        <div className={styles.actionContainer}>
+        <div className={styles.verificationContainer}>
+          <input
+            type="text"
+            name="emailVerificationCode"
+            placeholder="Email Verification Code"
+            value={formik.values.emailVerificationCode}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            className={styles.input}
+          />
+          <button
+            type="button"
+            onClick={handleVerifyEmail}
+            className={styles.buttonSecondary}
+          >
+            Verify
+          </button>
+          {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
+            <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
+          ) : null}
+        </div>
+      </div>
+      ) : (
+        <form onSubmit={formik.handleSubmit} className={styles.box}>
         <div className={styles.iconContainer}>Register</div>
         <div className={styles.inputLabel}>Username</div>
         <input
@@ -149,29 +177,6 @@ function Register() {
         {formik.touched.phone && formik.errors.phone ? (
           <div className={styles.error}>{formik.errors.phone}</div>
         ) : null}
-        <div className={styles.actionContainer}>
-          <div className={styles.verificationContainer}>
-            <input
-              type="text"
-              name="emailVerificationCode"
-              placeholder="Email Verification Code"
-              value={formik.values.emailVerificationCode}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={styles.input}
-            />
-            <button
-              type="button"
-              onClick={handleVerifyEmail}
-              className={styles.buttonSecondary}
-            >
-              Verify
-            </button>
-            {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
-              <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
-            ) : null}
-          </div>
-        </div>
         <select
           name="notifications"
           value={formik.values.notifications}
@@ -192,6 +197,7 @@ function Register() {
           Register
         </button>
       </form>
+      )}
     </div>
   );
 }
