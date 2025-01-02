@@ -122,21 +122,10 @@ const GroupsSidebar = ({
     <div className={styles.sidebarContainer}>
       {/* Collapsible main heading */}
       <div className={styles.mainHeading}>
-        <div className={styles.headingLeft} onClick={() => setIsMainOpen(!isMainOpen)}>
-          {isMainOpen ? <FiChevronDown /> : <FiChevronRight />}
-          <h2 className={styles.mainHeadingText}>Giftly</h2>
+        <div className={styles.headingLeft} >
+          <h2 className={styles.mainHeadingText}>Groups</h2>
         </div>
         <div className={styles.headingRight}>
-          {/* 3-dot menu for main heading (FaEllipsisH) - optional */}
-          <div
-            className={styles.iconWrapper}
-            onClick={(e) => {
-              e.stopPropagation();
-              openMenu("main-heading", {});
-            }}
-          >
-            <FaEllipsisH />
-          </div>
           {/* Add Group */}
           <div
             className={styles.iconWrapper}
