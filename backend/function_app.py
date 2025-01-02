@@ -183,6 +183,9 @@ def update_user_details(req: func.HttpRequest) -> func.HttpResponse:
         details = data['newPhone']
     else:
         details = data['newNotifications']
+    
+    print("Got the correct field, details and username", data, field, details, username)
+    
     output = login_register.update_user_details(username, field, details, user_container)
     response = func.HttpResponse(
         body=json.dumps({"response": output}),

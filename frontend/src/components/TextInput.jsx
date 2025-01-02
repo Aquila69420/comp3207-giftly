@@ -1,7 +1,5 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/textInput.module.css";
-import { CgAttachment } from "react-icons/cg";
-import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import InfinityLoader from "./InfinityLoader";

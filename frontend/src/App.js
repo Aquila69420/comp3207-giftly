@@ -37,14 +37,6 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route
-          path="/oldhome"
-          element={
-            <Protected>
-              <OldHome />
-            </Protected>
-          }
-        />
-        <Route
           path="/search"
           element={
             <Protected>

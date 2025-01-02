@@ -117,11 +117,8 @@ def update_user_details(username, field, details, container):
         user_id = user_details[0]['id']
         user_data = {}
         user_data['id'] = user_id
-        if field == "username":
-            user_data['username'] = details
-            user_data = fetch_other_details(user_details, user_data, ['password', 'email', 'phone', 'notifications'])
-        elif field == "password":
-            user_data['password'] = hash_password(details)
+        if field == "password":
+            user_data['password'] = hash_password(details).decode('utf-8')  
             user_data = fetch_other_details(user_details, user_data, ['username', 'email', 'phone', 'notifications'])
         elif field == "email":
             user_data['email'] = details
@@ -132,6 +129,7 @@ def update_user_details(username, field, details, container):
         else: 
             user_data['notifications'] = details
             fetch_other_details(user_details, user_data, ['username', 'password', 'email', 'phone'])
+        print(user_id, user_data, "this should show the error here if the not a json object")
         container.replace_item(
             item = user_id,
             body = user_data,

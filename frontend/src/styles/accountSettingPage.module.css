@@ -1,10 +1,8 @@
-
-
-.backbutton {
+.backButton {
   position: absolute;
   top: 20px;
   left: 25px;
-  background-color: #f9f9f9;
+  background-color: #e9e9e9;
   border-radius: 50%;
   display: flex;
   width: 50px;
@@ -13,6 +11,147 @@
   align-items: center;
   cursor: pointer;
 }
-.backbutton:hover {
-    background-color: #d3d2d2;
+.backButton:hover {
+  background-color: #999999;
+}
+
+.pageContainer {
+  padding: 20px;
+  max-width: 900px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+}
+
+.backButton {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pageHeader {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.updateSection {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.sectionHeader {
+  font-size: 20px;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  gap: 1rem;
+}
+
+.input {
+  width: 100%;
+  height: 45px;
+  box-sizing: border-box;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid lightgrey;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0px 0px 20px -18px;
+}
+
+.input:hover {
+  border: 2px solid rgb(70, 70, 70);
+  box-shadow: 0px 0px 20px -17px;
+}
+
+.input:active {
+  transform: scale(0.95);
+}
+
+.input:focus {
+  border: 2px solid rgb(70, 70, 70);
+}
+
+
+/* CSS */
+.button {
+  align-items: center;
+  appearance: button;
+  background-color: #0077ff;
+  border-radius: 8px;
+  border-style: none;
+  box-shadow: rgba(255, 255, 255, 0.26) 0 1px 2px inset;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  font-family: "RM Neue",sans-serif;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  padding: 10px 21px;
+  text-align: center;
+  text-transform: none;
+  transition: color .13s ease-in-out,background .13s ease-in-out,opacity .13s ease-in-out,box-shadow .13s ease-in-out;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  height: max-content;
+}
+
+.button:active {
+  background-color: #025bc9;
+}
+
+.button:hover {
+  background-color: #025bc9;;
+}
+
+.username{
+  color: #47536b;
+  display: flex;
+  justify-content: space-between;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  line-height: 1.4375em;
+  padding: 1rem;
+}
+
+.label {
+  color: #47536b;
+  display: flex;
+  justify-content: space-between;
+  font-family: Inter, sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.4375em;
+  padding: 0px;
+}
+.errorText{
+  color: red;
+  width: 100%;
+  display: flex;
+  justify-content: right;
+  margin: 1rem 0;
+}
+.successMessage{
+  color: green;
+  margin: 1rem 0;
+}
+
+.errorMessage{
+  color: red;
 }
