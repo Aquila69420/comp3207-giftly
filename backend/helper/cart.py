@@ -2,6 +2,25 @@ import uuid, json, os, logging
 import azure.functions as func
 
 def save(username, session_id, cart_content, container):
+    """
+    Save cart content to database
+
+    Parameters
+    ----------
+    username : str
+        The username of the user
+    session_id : str
+        The name of the cart
+    cart_content : dict
+        The content of the cart
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+
+    Returns
+    -------
+    str
+        The status of the operation
+    """
     try:
         user_cart_data = list(container.query_items(
             query="SELECT * FROM c WHERE c.username=@username",
@@ -33,6 +52,23 @@ def save(username, session_id, cart_content, container):
         return "database error"
 
 def load(username, session_id, container):
+    """
+    Load cart content from database
+
+    Parameters
+    ----------
+    username : str
+        The username of the user
+    session_id : str
+        The name of the cart
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+
+    Returns
+    -------
+    dict or str
+        The content of the cart or the status of the operation
+    """
     try:
         user_cart_data = list(container.query_items(
             query="SELECT * FROM c WHERE c.username=@username",
@@ -50,6 +86,23 @@ def load(username, session_id, container):
         return "database error"
     
 def delete(username, session_id, container):
+    """
+    Delete cart content from database
+
+    Parameters
+    ----------
+    username : str
+        The username of the user
+    session_id : str
+        The name of the cart
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+
+    Returns
+    -------
+    str
+        The status of the operation
+    """
     try:
         user_cart_data = list(container.query_items(
             query="SELECT * FROM c WHERE c.username=@username",

@@ -3,7 +3,6 @@ import json
 import requests
 
 with open('./local.settings.json', 'r') as file:
-# with open('backend/local.settings.json') as file:
     settings = json.load(file)
 
 sandbox_settings = {
@@ -24,7 +23,11 @@ with open('./ebay_search.json') as f:
 def get_oauth_token():
     """
     Get OAuth token for eBay API
-    return: str, the OAuth token
+    
+    Returns
+    -------
+    str
+        The OAuth token
     """
     oauth_url_sandbox = "https://api.sandbox.ebay.com/identity/v1/oauth2/token"
     oauth_url_production = "https://api.ebay.com/identity/v1/oauth2/token"
@@ -38,9 +41,18 @@ def get_oauth_token():
 def search_query(access_token, query):
     """
     Search for a query on eBay
-    param access_token: str, the OAuth token
-    param query: str, the query to search for
-    return: list of 5 dictionaries, each containing the details of a product
+    
+    Parameters
+    ----------
+    access_token : str
+        The OAuth token
+    query : str
+        The item(s) to search for
+    
+    Returns
+    -------
+    dict
+        The search results
     """
     search_url_sandbox = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search"
     search_url_production = "https://api.ebay.com/buy/browse/v1/item_summary/search"
@@ -54,8 +66,16 @@ def search_query(access_token, query):
 def search(query):
     """
     Search for a query on eBay
-    param item: str, the item to search for
-    return: list of 5 dictionaries, each containing the details of a product
+    
+    Parameters
+    ----------
+    query : str
+        The item(s) to search for
+
+    Returns
+    -------
+    dict
+        The search results
     """
     try: 
         # products = search_query(get_oauth_token(), query)['itemSummaries']
@@ -72,9 +92,6 @@ def parse_search_results(products):
         product_info['price'] = product['price']['value']
         product_info['currency'] = product['price']['currency']
         product_info['product_url'] = product['itemWebUrl']
-        product_info['image_url'] = product['image']['imageUrl'] # Should use product['image'] or product['thumbnailImages'][0]?
+        product_info['image_url'] = product['image']['imageUrl']
         products_info.append(product_info)
     return products_info
-
-
-# print(parse_search_results(demo_ebay_response['itemSummaries'])[0]['image_url']['imageUrl'])
