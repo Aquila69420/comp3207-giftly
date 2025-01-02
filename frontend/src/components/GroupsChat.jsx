@@ -11,7 +11,7 @@ import {
   Window
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
-import 'stream-chat-react/dist/css/v2/index.layout.css';
+import "../styles/layout.css";
 
 /**
  * GroupsChat component:
@@ -64,7 +64,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
           setLoading(false);
           return;
         } else {
-          console.log('Token fetched:', data.token);
+            // console.log('Token fetched:', data.token);
         }
         const token = data.token; // from your backend
 
