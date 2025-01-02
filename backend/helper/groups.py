@@ -126,7 +126,8 @@ def division_cleaned(divisionDoc):
         'groupID': divisionDoc['groupID'],
         'users': paired_users(divisionDoc['users']),
         'cart': divisionDoc['cart'],
-        'recipients': paired_users(divisionDoc['recipients'])
+        'recipients': paired_users(divisionDoc['recipients']),
+        'chatChannelID': divisionDoc.get('chatChannelID')
     }
 
 date_format_re = re.compile(r"^(\d{4})-(\d{2})-(\d{2})$")
@@ -178,7 +179,6 @@ def create_group(userID, groupname, chat_client):
     channel.create(userID)
     group['chatChannelID'] = channel_id
     # print(group)
-    print('Chat id:', channel_id)
     groups_container.replace_item(item=group['id'], body=group) 
     return group
 
@@ -193,6 +193,8 @@ def delete_group(userID, groupID):
     for occasionID in group['occasions']:
         delete_occasion(occasionID)
     groups_container.delete_item(item=groupID, partition_key=groupID)
+
+
 
 def add_user(userID, user_to_add, groupID, chat_client):
     # Check both userIDs exist
@@ -444,7 +446,7 @@ def occasion_datechange(occasionID, occasiondate):
     oc = occasions_container.patch_item(item=occasionID, partition_key=occasionID, patch_operations=ops)
     return oc
 
-def group_gifting(userID, occasionID, recipients):
+def group_gifting(userID, occasionID, recipients, chat_client):
     # Check occasion exists
     oc = occasion_exists(occasionID)
 
@@ -462,43 +464,38 @@ def group_gifting(userID, occasionID, recipients):
 
     # Add all users from the users in occasion to the division.
     # If recipients are in users of occasion, they are excluded.
+    divisionID = str(uuid.uuid4())
+    channel_id = f"division-{divisionID}"
+
     division = divisions_container.create_item({
-        'id': str(uuid.uuid4()),
+        'id': divisionID,
         'occasionID': oc['id'],
         'groupID': oc['groupID'],
         'users': [user for user in oc['users'] if user not in recipients],
         'cart': "", #TODO: generate cart for division
-        'recipients': recipients
+        'recipients': recipients,
+        'chatChannelID': channel_id
     })
 
     # Add divison to occasion
     oc = occasion_add_division(oc, division['id'])
 
-    # divisionID = division['id']
-    # channel_id = f"division-{divisionID}"
-
-    # # Combine both .users and .recipients if you want them all to be in the chat 
-    # all_div_members = set(division['users'] + division['recipients'])
-    # members = [str(u) for u in all_div_members]
-
-    # channel = chat_client.channel("messaging", channel_id=channel_id, data={
-    #     "name": f"Division {divisionID}",
-    #     "members": members
-    # })
-    # channel.create()
-
-    # # Store it
-    # patch_ops = [
-    #     {"op": "set", "path": "/chatChannelID", "value": channel_id}
-    # ]
-    # divisions_container.patch_item(
-    #     item=divisionID, 
-    #     partition_key=divisionID,
-    #     patch_operations=patch_ops
-    # )
-
-
-
+    members = [str(u) for u in division['users']]
+    
+    if len(recipients) == 1:
+        recipient = recipients[0]
+        recipient_doc = user_exists(recipient)
+        division_name = f"{recipient_doc['username']}'s Gift"
+    else:
+        recipient_docs = users_exist(recipients)
+        recipient_names = [recipient['username'] for recipient in recipient_docs]
+        division_name = " and ".join(recipient_names) + "'s Gift"
+    
+    channel = chat_client.channel("messaging", channel_id=channel_id, data={
+        "name": division_name,
+        "members": members
+    })
+    channel.create(userID)
 
     return oc, [division]
 

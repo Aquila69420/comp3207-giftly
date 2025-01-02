@@ -954,7 +954,7 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     occasionID = data['occasionID']
     recipients = data['recipients']
     try:
-        oc, divisions = groups.group_gifting(userID, occasionID, recipients)
+        oc, divisions = groups.group_gifting(userID, occasionID, recipients, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
