@@ -149,21 +149,6 @@ function DropdownSelection() {
         </select>
       </div>
 
-      {/* Price Range Section */}
-      <div className={styles.section}>
-        <label className={styles.label}>
-          Price Range: €{priceRange.toLocaleString()}
-        </label>
-        <input
-          type="range"
-          min="1"
-          max="10000"
-          value={priceRange}
-          onChange={(e) => setPriceRange(e.target.value)}
-          className={styles.rangeInput}
-        />
-      </div>
-
       {/* Themes Section */}
       <div className={styles.section}>
         <label className={styles.label}>Select Theme(s):</label>

@@ -74,11 +74,9 @@ function SearchResults() {
       </div>
 
       {/* Product grid */}
-      {/* TODO: Add target back in */}
       <div className={styles.productGrid}>
         {Object.keys(productsInfo).map(
           (source) =>
-            source !== "target" &&
             productsInfo[source].map((product) => (
               <ProductCard
                 key={product.product_url}

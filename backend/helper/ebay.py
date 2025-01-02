@@ -44,7 +44,7 @@ def search_query(access_token, query):
     """
     search_url_sandbox = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search"
     search_url_production = "https://api.ebay.com/buy/browse/v1/item_summary/search"
-    response = requests.get(search_url_production, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": query,"limit": 5, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
+    response = requests.get(search_url_production, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": query,"limit": 50, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
     if response.status_code == 200:
         return response.json()
     else:

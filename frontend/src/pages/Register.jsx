@@ -3,9 +3,9 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import styles from "../styles/register.module.css";
 import logo from "../image/giftly_logo_trans.png";
-import { MdAccountCircle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import config from "../config";
+
 
 function Register() {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ function Register() {
         .required("Email is required"),
       phone: Yup.string()
         .matches(
-          /^\+{1,3}\s\d{6,14}$/,
+          /^\+\d{1,3}\s\d{6,14}$/,
           "Phone number must be in the format +44 7765xxxxxx"
         )
         .required("Phone number is required"),
@@ -61,7 +61,6 @@ function Register() {
         });
         const result = await response.json();
         console.log("Register Response:", result);
-        navigate("/");
       } catch (error) {
         console.error("Error during registration:", error);
       }
@@ -82,6 +81,12 @@ function Register() {
       });
       const result = await response.json();
       console.log("Verification Response:", result);
+      if (result.response === "Verification successful.") {
+        navigate("/");
+      }
+      else {
+        console.log("Verification failed");
+      }
     } catch (error) {
       console.error("Error during email verification:", error);
     }
@@ -144,7 +149,29 @@ function Register() {
         {formik.touched.phone && formik.errors.phone ? (
           <div className={styles.error}>{formik.errors.phone}</div>
         ) : null}
-
+        <div className={styles.actionContainer}>
+          <div className={styles.verificationContainer}>
+            <input
+              type="text"
+              name="emailVerificationCode"
+              placeholder="Email Verification Code"
+              value={formik.values.emailVerificationCode}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              className={styles.input}
+            />
+            <button
+              type="button"
+              onClick={handleVerifyEmail}
+              className={styles.buttonSecondary}
+            >
+              Verify
+            </button>
+            {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
+              <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
+            ) : null}
+          </div>
+        </div>
         <select
           name="notifications"
           value={formik.values.notifications}
@@ -170,24 +197,3 @@ function Register() {
 }
 
 export default Register;
-
-/*        <div className={styles.actionContainer}>
-          <div className={styles.verificationContainer}>
-            <input
-              type="text"
-              name="emailVerificationCode"
-              placeholder="Email Verification Code"
-              value={formik.values.emailVerificationCode}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={styles.input}
-            />
-            <button
-              type="button"
-              onClick={handleVerifyEmail}
-              className={styles.buttonSecondary}
-            >
-              Verify
-            </button>
-          </div>
-        </div> */

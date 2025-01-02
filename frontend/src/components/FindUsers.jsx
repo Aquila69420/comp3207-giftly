@@ -1,50 +1,82 @@
-import React, { useState } from 'react';
-import config from '../config';
+import React, { useState } from "react";
+import config from "../config";
+import styles from "../styles/findUsers.module.css";
 
 function FindUsers() {
-  const [usernameToFind, setUsernameToFind] = useState('');
+  const [usernameToFind, setUsernameToFind] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [finalSuggestion, setFinalSuggestions] = useState([]);
-  let isMatch = finalSuggestion.includes(usernameToFind);
+  const [wishlist, setWishlist] = useState(null);
 
-  const getWishList = async (username) => {
+  const fetchWishlist = async (username) => {
     try {
       const response = await fetch(`${config.backendURL}/wishlist_get`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ username }),
       });
-
       const data = await response.json();
-      console.log(`Wishlist fetched: ${JSON.stringify(data)}`);
+
+      const productDetailsPromises = data.response.map(async (productId) => {
+        try {
+          const productResponse = await fetch(
+            `${config.backendURL}/get_product_by_id?id=${productId}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          const productInfo = await productResponse.json();
+          if (productInfo.response !== "Product not found") {
+            const word = productInfo.response.title;
+            const capitalizedTitle =
+              word.charAt(0).toUpperCase() + word.slice(1);
+            return { id: productId, title: capitalizedTitle };
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error(`Error fetching product ${productId}:`, error);
+          return null;
+        }
+      });
+
+      const productDetails = (await Promise.all(productDetailsPromises)).filter(
+        (detail) => detail !== null
+      );
+
+      setWishlist({ username, items: productDetails });
     } catch (error) {
-      console.log(`Error fetching Wishlist`);
+      console.error("Error fetching Wishlist:", error);
     }
   };
 
   const fetchSuggestions = async (query) => {
     if (!query) {
-      setSuggestions([]); // Clear suggestions if input is empty
-      setFinalSuggestions([]);
+      setSuggestions([]);
       return;
     }
     setIsLoading(true);
     try {
-      const response = await fetch(`${config.backendURL}/find_user_autocomplete`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
-      });
+      const response = await fetch(
+        `${config.backendURL}/find_user_autocomplete`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ query }),
+        }
+      );
       const result = await response.json();
-      setSuggestions(result.usernames || []); // Assume API returns { usernames: [] }
-      setFinalSuggestions(result.usernames || []);
+      setSuggestions(result.usernames || []);
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      console.error("Error fetching suggestions:", error);
     } finally {
       setIsLoading(false);
     }
@@ -68,91 +100,54 @@ function FindUsers() {
 
   const handleSuggestionClick = (username) => {
     setUsernameToFind(username);
-    setSuggestions([]); // Clear suggestions on selection
-  };  
+    setSuggestions([]);
+    fetchWishlist(username);
+  };
 
   return (
-    <div
-      style={{
-        position: 'absolute',
-        top: '10px',
-        left: '10px',
-        padding: '20px',
-        backgroundColor: '#f9f9f9',
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-        width: '250px',
-      }}
-    >
-      <input
-        type="text"
-        placeholder="Type username"
-        value={usernameToFind}
-        onChange={handleInputChange}
-        style={{
-          padding: '8px',
-          fontSize: '16px',
-          marginBottom: '10px',
-          borderRadius: '5px',
-          border: '1px solid #ccc',
-          width: '93%',
-        }}
-      />
-      {isLoading && <p style={{ fontSize: '14px', color: '#666' }}>Loading...</p>}
+    <div className={styles.container}>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          placeholder="Search for a username..."
+          value={usernameToFind}
+          onChange={handleInputChange}
+          className={styles.inputField}
+        />
+      </div>
+      {isLoading && <p className={styles.loadingText}>Loading...</p>}
       {suggestions.length > 0 && (
-        <ul
-          style={{
-            listStyleType: 'none',
-            padding: 0,
-            margin: 0,
-            border: '1px solid #ccc',
-            borderRadius: '5px',
-            backgroundColor: '#fff',
-            maxHeight: '150px',
-            overflowY: 'auto',
-            boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
-          }}
-        >
+        <ul className={styles.suggestionsList}>
           {suggestions.map((username, index) => (
             <li
               key={index}
-              style={{
-                padding: '8px',
-                cursor: 'pointer',
-                color: '#333',
-                fontSize: '14px',
-                borderBottom: index !== suggestions.length - 1 ? '1px solid #eee' : 'none',
-                backgroundColor: '#fff',
-                transition: 'background-color 0.2s ease',
-              }}
-              onMouseEnter={(e) => (e.target.style.backgroundColor = '#f0f0f0')}
-              onMouseLeave={(e) => (e.target.style.backgroundColor = '#fff')}
-              onClick={() => {
-                handleSuggestionClick(username);
-              }}
+              className={styles.suggestionItem}
+              onClick={() => handleSuggestionClick(username)}
             >
               {username}
             </li>
           ))}
         </ul>
       )}
-      <button
-        onClick={() => getWishList(usernameToFind)}
-        disabled={!isMatch} // Disable if there is no exact match
-        style={{
-          padding: '10px 20px',
-          fontSize: '16px',
-          cursor: isMatch ? 'pointer' : 'not-allowed', // Show "not-allowed" cursor if disabled
-          borderRadius: '5px',
-          backgroundColor: isMatch ? '#4CAF50' : '#ccc', // Gray out the button if disabled
-          color: 'white',
-          border: 'none',
-          marginTop: '10px',
-          width: '100%',
-        }}
-      >
-        Find User
-      </button>
+
+      {wishlist && (
+        <div className={styles.wishlistContainer}>
+          <h2 className={styles.wishlistHeader}>
+            Wishlist for {wishlist.username}
+          </h2>
+          {wishlist.items.length > 0 ? (
+            <ul className={styles.wishlistItems}>
+              {wishlist.items.map((item, index) => (
+                <li key={index} className={styles.wishlistItem}>
+                  <a href={`/product?id=${item.id}`}>{item.title}</a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.noWishlistText}>No items in the wishlist.</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }

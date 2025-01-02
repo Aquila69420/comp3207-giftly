@@ -4,8 +4,8 @@ import styles from "../styles/product.module.css";
 import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
+import InfinityLoader from "../components/InfinityLoader";
 
-// TODO: Implement proceed to cart and continue shopping functionality
 // Icons available at https://react-icons.github.io/react-icons/
 export default function Product() {
   const navigate = useNavigate();
@@ -20,6 +20,7 @@ export default function Product() {
   const [favorite, setFavorite] = useState(false);
   const [cart, setCart] = useState(false);
   const username = localStorage.getItem("username");
+  const [loading, setLoading] = useState(false);
   
   const getProductInfoById = async () => {
     // Fetch product info by id
@@ -121,6 +122,7 @@ export default function Product() {
     // Get session id
     const sessionId = localStorage.getItem("sessionId");
     // First see if cart is already stored
+    setLoading(true);
     const response = await fetch(`${config.backendURL}/load_cart`, {
       method: "POST",
       headers: {
@@ -160,11 +162,18 @@ export default function Product() {
       const result = await response.json();
       console.log("Response from backend:", result);
     }
+    setLoading(false);
     navigate("/cart")
   };
 
   return (
-    <div className={styles.product}>
+    <div>
+    {loading ? (
+      <div className="overlay">
+        <InfinityLoader loading={loading} />
+      </div>
+    ) : (
+      <div className={styles.product}>
       <div className={styles.image}>
         <img src={image} alt={title}/>
       </div>
@@ -187,6 +196,8 @@ export default function Product() {
         <button className={styles.navButton} onClick={saveCart}>Proceed to Cart</button>
         </div>
       </div>
+    </div>
+    )}
     </div>
   );
 }

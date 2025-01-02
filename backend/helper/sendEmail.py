@@ -1,10 +1,13 @@
 import os, logging
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+import random
+import time
 
 # IMPORTANT: Free 100 emails/day
 
 def send_verification_email(username, to_email, verification_code, api_key):
+    logging.info(f"Sending email to {to_email} with verification code {verification_code}")
     message = Mail(
         from_email='antoniomiguelpinto03@gmail.com',
         to_emails=to_email,
@@ -18,22 +21,24 @@ def send_verification_email(username, to_email, verification_code, api_key):
     except Exception as e:
         logging.info(f"Email verification failed: {e}")
         return False
-    
-def sendUserDetails(email, username, password, api_key):
+
+def send_OTP_email(to_email, username, api_key):
+    # Generate a random token
+    token = random.randint(100000, 999999)
     message = Mail(
         from_email='antoniomiguelpinto03@gmail.com',
-        to_emails=email,
-        subject='Giftly Account Details',
-        html_content=f'<p>Username: {username}, Password: {password}')
+        to_emails=to_email,
+        subject='Giftly Account Password Reset One Time Password',
+        html_content=f'<p>Dear {username}, \nPlease use this OTP to reset your password: <strong>{token}</strong></p>')
     try:
         sg = SendGridAPIClient(api_key)
         response = sg.send(message)
-        logging.info("Email verification code sent.")
-        return True
+        logging.info("Email verification code sent.")        
+        return token
     except Exception as e:
         logging.info(f"Email verification failed: {e}")
         return False
-    
+
 def sendUserNotification(username, notification, container, api_key):
     try:
         email = list(container.query_items(

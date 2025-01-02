@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import * as Yup from "yup";
 import styles from "../styles/login.module.css";
 import { useNavigate } from "react-router-dom";
-import { MdAccountCircle } from "react-icons/md";
 import Features from "../components/Features";
 import config from "../config";
 
@@ -13,11 +12,12 @@ function Login() {
   const nagivate = useNavigate();
   useEffect(() => {
     if (localStorage.getItem("username")) {
-      nagivate("/");
+      nagivate("/home");
     }
   }, []);
 
   const handleLogin = async (values) => {
+    console.log("Logging in with:", values);
     try {
       const response = await fetch(`${config.backendURL}/login`, {
         method: "POST",
@@ -29,7 +29,6 @@ function Login() {
       const result = await response.json();
 
       if (result.response === "User successfully logged in.") {
-        localStorage.setItem("username", values.username);
         const response = await fetch("http://localhost:5000/get_user_id", {
           method: "POST",
           headers: {
@@ -42,6 +41,7 @@ function Login() {
           setLoginError(data.msg);
           return;
         }
+        localStorage.setItem("username", values.username);
         localStorage.setItem("userID", data.userID);
         if (!sessionStorage.getItem("cart")) {
           sessionStorage.setItem("cart", JSON.stringify([]));
@@ -74,7 +74,7 @@ function Login() {
           <Features />
         </div>
         <div className={styles.box}>
-        <div className={styles.signIn}>Sign In</div>
+          <div className={styles.signIn}>Sign In</div>
           <Formik
             initialValues={{ username: "", password: "" }}
             onSubmit={handleLogin}
@@ -94,7 +94,7 @@ function Login() {
               />
               <div className={styles.passwordBox}>
                 <div>Password</div>
-                <Link to="/forgot-password">
+                <Link to={"/forgot-password"}>
                   <div className={styles.forgotPassword}>Forgot Password?</div>
                 </Link>
               </div>
@@ -113,7 +113,12 @@ function Login() {
               <button type="submit" className={styles.button}>
                 Login
               </button>
-              <div className={styles.center}><div>Don't have an account?</div> <div><Link to={"/register"}>Register</Link></div></div>
+              <div className={styles.center}>
+                <div>Don't have an account?</div>{" "}
+                <div>
+                  <Link to={"/register"}>Register</Link>
+                </div>
+              </div>
             </Form>
           </Formik>
         </div>

@@ -10,6 +10,8 @@ import { Link, useNavigate } from "react-router-dom";
 import DropdownSelection from "../components/DropdownSelection";
 import { FaShoppingBag } from "react-icons/fa";
 import { FaGift } from "react-icons/fa6";
+import { FaUserFriends } from "react-icons/fa";
+import FindUsers from "../components/FindUsers";
 
 function Home() {
   const [username, setUsername] = useState(localStorage.getItem("username")); // Default username
@@ -115,6 +117,13 @@ function Home() {
                     <FaGift size={30} />
                     <div>Gift Finder</div>
                   </div>
+                  <div
+                    className={styles.dropDownButton}
+                    onClick={() => setModel("Friend Wishlist Finder")}
+                  >
+                    <FaUserFriends size={30} />
+                    <div>Friend Wishlist Finder</div>
+                  </div>
                 </div>
               </div>
             )}
@@ -129,8 +138,10 @@ function Home() {
               </h1>
               <TextInput username={username} />
             </>
-          ) : (
+          ) : model === "Gift Finder" ? (
             <DropdownSelection />
+          ) : (
+            <div className={styles.content}><FindUsers /></div>
           )}
         </div>
       </div>

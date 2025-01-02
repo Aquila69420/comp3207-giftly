@@ -1,11 +1,10 @@
 import React, { useState, useRef } from "react";
 import styles from "../styles/textInput.module.css";
-import { CgAttachment } from "react-icons/cg";
-import { BsSoundwave } from "react-icons/bs";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import InfinityLoader from "./InfinityLoader";
 import config from "../config";
+import VoiceRecorder from "./VoiceRecorder";
 
 function TextInput() {
   const [prompt, setInputValue] = useState("");
@@ -131,11 +130,16 @@ function TextInput() {
   };
 
   const handleEnter = (e) => {
-    if (e.key === "Enter" && prompt.trim()) {
+    if (e.key === "Enter" && prompt) {
       handleCombinedSubmit();
       setInputValue("");
       e.preventDefault();
     }
+  };
+
+  // Callback function to update the search bar text
+  const updatePromptFromVoice = (transcription) => {
+    setInputValue(transcription);
   };
 
   return (
@@ -155,7 +159,20 @@ function TextInput() {
         />
         <div className={styles.iconContainer}>
           <div className={styles.iconWrapper} onClick={handleFileSelect}>
-          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z" fill="currentColor"></path></svg>
+            <svg
+              width="30"
+              height="30"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M9 7C9 4.23858 11.2386 2 14 2C16.7614 2 19 4.23858 19 7V15C19 18.866 15.866 22 12 22C8.13401 22 5 18.866 5 15V9C5 8.44772 5.44772 8 6 8C6.55228 8 7 8.44772 7 9V15C7 17.7614 9.23858 20 12 20C14.7614 20 17 17.7614 17 15V7C17 5.34315 15.6569 4 14 4C12.3431 4 11 5.34315 11 7V15C11 15.5523 11.4477 16 12 16C12.5523 16 13 15.5523 13 15V9C13 8.44772 13.4477 8 14 8C14.5523 8 15 8.44772 15 9V15C15 16.6569 13.6569 18 12 18C10.3431 18 9 16.6569 9 15V7Z"
+                fill="currentColor"
+              ></path>
+            </svg>
           </div>
           <input
             type="file"
@@ -168,34 +185,10 @@ function TextInput() {
             className={`${styles.iconWrapper} ${styles.iconRight}`}
             onClick={handleCombinedSubmit}
           >
-            {prompt.trim() ? (
+            {prompt ? (
               <FaArrowUp size={20} />
             ) : (
-              <svg
-                width="35"
-                height="35"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                style={{ color: "white" }}
-              >
-                <path
-                  d="M9.5 4C8.67157 4 8 4.67157 8 5.5V18.5C8 19.3284 8.67157 20 9.5 20C10.3284 20 11 19.3284 11 18.5V5.5C11 4.67157 10.3284 4 9.5 4Z"
-                  fill="currentColor"
-                ></path>
-                <path
-                  d="M13 8.5C13 7.67157 13.6716 7 14.5 7C15.3284 7 16 7.67157 16 8.5V15.5C16 16.3284 15.3284 17 14.5 17C13.6716 17 13 16.3284 13 15.5V8.5Z"
-                  fill="currentColor"
-                ></path>
-                <path
-                  d="M4.5 9C3.67157 9 3 9.67157 3 10.5V13.5C3 14.3284 3.67157 15 4.5 15C5.32843 15 6 14.3284 6 13.5V10.5C6 9.67157 5.32843 9 4.5 9Z"
-                  fill="currentColor"
-                ></path>
-                <path
-                  d="M19.5 9C18.6716 9 18 9.67157 18 10.5V13.5C18 14.3284 18.6716 15 19.5 15C20.3284 15 21 14.3284 21 13.5V10.5C21 9.67157 20.3284 9 19.5 9Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
+              <VoiceRecorder updatePrompt={updatePromptFromVoice} />
             )}
           </div>
         </div>

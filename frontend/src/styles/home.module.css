@@ -79,6 +79,7 @@
   border-radius: 30px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Adjust values as needed */
   border: 1px solid #ccc; 
+  z-index: 5;
 }
 
 .dropdownItem {
@@ -164,4 +165,5 @@
   position: absolute;
   top: 9rem;
   right: 1rem;
+
 }
