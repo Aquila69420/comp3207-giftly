@@ -4,7 +4,7 @@
   justify-content: center;
   gap: 20px; /* Space between image and info */
   padding: 20px;
-  background-color: #527D74; /* Light background */
+  background-color: #085b5e; /* Light background */
   min-height: 90vh;
 }
 
@@ -80,7 +80,7 @@
   border: none;
   cursor: pointer;
   font-size: 2rem;
-  color: #5F9389;
+  color: white;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -101,8 +101,10 @@
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  background-color: #5F9389;
+  background-color: #08caa5;
   color: white;
   transition: transform 0.2s ease-in-out;
   margin: 20px;
+  padding: 10px;
+  align-items: center;
 }
