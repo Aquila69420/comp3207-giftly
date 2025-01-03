@@ -82,11 +82,11 @@ function ForgotPassword() {
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ "username": username, "field": "password", password: values.password }),
+            body: JSON.stringify({ username: username, field: "password", newPassword: values.password }),
         });
-        const result = response.json();
+        const result = await response.json();
         console.log("Password update result:", result);
-        navigate("/login");
+        navigate("/");
         
     }
 
