@@ -324,11 +324,10 @@ def product_types(req: func.HttpRequest) -> func.HttpResponse:
     username = data['Username'].strip()
     occassions = [item.strip() for item in data['Occasions'].split(",")]
     recipient = data['Recipient'].strip()
-    price = data['Price'].strip()
     themes = [item.strip() for item in data['Themes'].split(",")]
     input = f"I want a gift for my {recipient} that matches ocassions {occassions}, that suits the themes of {themes}."
     output = gpt_req.llm_suggestion(input, suggestion_container, username)
-    fetched_products = products.get_products_with_price_limitation(output, price)
+    # fetched_products = products.get_products_with_price_limitation(output, price) no longer active
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",

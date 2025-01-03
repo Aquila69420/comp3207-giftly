@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import styles from "../styles/textInput.module.css";
 import { FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -6,8 +6,7 @@ import InfinityLoader from "./InfinityLoader";
 import config from "../config";
 import VoiceRecorder from "./VoiceRecorder";
 
-function TextInput() {
-  const [prompt, setInputValue] = useState("");
+function TextInput({ prompt, setPrompt }) {
   const navigate = useNavigate();
   const fileInputRef = useRef(null); // Ref for the file input element
 
@@ -132,14 +131,14 @@ function TextInput() {
   const handleEnter = (e) => {
     if (e.key === "Enter" && prompt) {
       handleCombinedSubmit();
-      setInputValue("");
+      setPrompt("");
       e.preventDefault();
     }
   };
 
   // Callback function to update the search bar text
   const updatePromptFromVoice = (transcription) => {
-    setInputValue(transcription);
+    setPrompt(transcription);
   };
 
   return (
@@ -153,7 +152,7 @@ function TextInput() {
         <textarea
           placeholder="I am looking for ..."
           value={prompt}
-          onChange={(e) => setInputValue(e.target.value)}
+          onChange={(e) => setPrompt(e.target.value)}
           onKeyDown={handleEnter}
           className={styles.inputField} // Apply styles
         />

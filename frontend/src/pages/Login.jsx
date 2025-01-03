@@ -115,7 +115,7 @@ function Login() {
               </button>
               <div className={styles.center}>
                 <div>Don't have an account?</div>{" "}
-                <div>
+                <div className={styles.registerText}>
                   <Link to={"/register"}>Register</Link>
                 </div>
               </div>
