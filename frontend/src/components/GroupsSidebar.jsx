@@ -6,6 +6,8 @@ import AddOccasionModal from "./AddOccasionModal";
 import styles from "../styles/groups.module.css";
 import { ClipLoader } from "react-spinners";
 
+import WizardAddOccasionModal from "./WizardAddOccasionModal";
+
 /*
   Props:
     groups: array of group objects
@@ -50,6 +52,14 @@ const GroupsSidebar = ({
   };
   const closeMenu = () => setMenuConfig({ isOpen: false, type: null, item: null });
 
+  const [showWizard, setShowWizard] = useState(false);
+  const [targetGroup, setTargetGroup] = useState(null);
+
+  const handleAddOccasionRequest = (group) => {
+    setTargetGroup(group);
+    setShowWizard(true);
+  };
+
   // "Add Group" modal
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
@@ -86,11 +96,11 @@ const GroupsSidebar = ({
   };
 
   // Called when context menu user picks "Add Occasion"
-  const handleAddOccasionRequest = (group) => {
-    setTargetGroupForOccasion(group);
-    setShowAddOccasionModal(true);
-    closeMenu();
-  };
+  // const handleAddOccasionRequest = (group) => {
+  //   setTargetGroupForOccasion(group);
+  //   setShowAddOccasionModal(true);
+  //   closeMenu();
+  // };
 
   // After we create an occasion, we want to refresh
   const handleAddOccasionDone = async (group, name, date, users) => {
@@ -327,11 +337,22 @@ const GroupsSidebar = ({
       )}
 
       {/* ADD OCCASION MODAL */}
-      {showAddOccasionModal && targetGroupForOccasion && (
+      {/* {showAddOccasionModal && targetGroupForOccasion && (
         <AddOccasionModal
           group={targetGroupForOccasion}
           onClose={() => setShowAddOccasionModal(false)}
           onAddOccasion={handleAddOccasionDone} // call the updated function
+        />
+      )} */}
+
+      {showWizard && targetGroup && (
+        <WizardAddOccasionModal
+          group={targetGroup}
+          onClose={() => setShowWizard(false)}
+          onCreated={(newOccasion) => {
+            // e.g. refresh the group or do a callback
+            refreshGroups?.();
+          }}
         />
       )}
 
