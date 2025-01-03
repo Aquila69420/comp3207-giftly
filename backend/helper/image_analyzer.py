@@ -5,9 +5,22 @@ from azure.core.credentials import AzureKeyCredential
 import requests
 
 endpoint = "https://giftly-ai.cognitiveservices.azure.com/"
-key = "EOXm8FHqmnU1F5kLdEOITVW8WFPVFRWc2YatMCyQ7Zc1DGUDiYU3JQQJ99ALACmepeSXJ3w3AAAEACOGkuNM"
+key = os.getenv("AzureVisionKey")
 
 def image_analysis(image_data):
+    """
+    Analyze an image for objects and brands
+
+    Parameters
+    ----------
+    image_data : bytes
+        The image data
+
+    Returns
+    -------
+    tuple
+        The brands and objects detected in the image
+    """
     try: 
         response = requests.post(f"{endpoint}/vision/v3.2/analyze?visualFeatures=Objects,Brands", headers={"Ocp-Apim-Subscription-Key": key,"Content-Type": "application/octet-stream"}, data=image_data)
         if response.status_code == 200: 

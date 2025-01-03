@@ -91,7 +91,6 @@ function Cart({ username }) {
   }, [cartItems]);
 
   return (
-    <div className={styles.cartContainer}>
       <div className={styles.cartContent}>
         <p className={styles.cartTitle}>Cart</p>
         <ul className={styles.cartList}>
@@ -109,19 +108,9 @@ function Cart({ username }) {
             )}
           </ul>
         </ul>
-        {/* <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div> */}
         <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div>
+        <button onClick={handleClear} className={`${styles.button} ${styles.clearButton}`}>Clear</button>
       </div>
-
-      <div className={styles.buttonsContainer}>
-        <button
-          onClick={handleClear}
-          className={`${styles.button} ${styles.clearButton}`}
-        >
-          Clear
-        </button>
-      </div>
-    </div>
   );
 }
 

@@ -17,7 +17,6 @@ from PIL import Image
 from helper.groups import GroupsError
 from stream_chat import StreamChat
 
-
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
@@ -34,16 +33,40 @@ STREAM_SECRET = os.getenv("STREAM_SECRET", "YOUR_STREAM_SECRET")
 chat_client = StreamChat(api_key=STREAM_KEY, api_secret=STREAM_SECRET)
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
+    """
+    Add CORS headers to the HTTP response.
+    
+    Parameters
+    ----------
+    response : func.HttpResponse
+        The HTTP response object to which CORS headers will be added.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with added CORS headers.
+    """
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
-
-
 @app.function_name(name="wishlist_get")
 @app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
 def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Retrieve the wishlist for a given username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with the username.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing the wishlist data in JSON format with CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     output = wishlist.get(username, wishlist_container)
@@ -57,6 +80,19 @@ def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="wishlist_update")
 @app.route(route='wishlist_update', methods=[func.HttpMethod.POST])
 def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Update the wishlist with a new gift for a specific user.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'username' and 'gift'.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the wishlist update operation, including CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     gift = data['gift']
@@ -71,6 +107,20 @@ def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="wishlist_remove")
 @app.route(route='wishlist_remove', methods=[func.HttpMethod.POST])
 def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Remove a gift from a user's wishlist.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'username' and 'gift' keys.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the removal operation in JSON format, 
+        including CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     gift = data['gift']
@@ -85,6 +135,19 @@ def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="save_cart")
 @app.route(route="save_cart", methods=[func.HttpMethod.POST])
 def save_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Save the cart content for a user session.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the cart data.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the result of the save operation.
+    """
     data = req.get_json()
     session_id = data['session_id']
     cart_content = data['cart_content']
@@ -100,6 +163,19 @@ def save_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="load_cart")
 @app.route(route="load_cart", methods=[func.HttpMethod.POST])
 def load_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Load the user's cart based on the provided session ID and username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'session_id' and 'username'.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing the cart data or an error message.
+    """
     data = req.get_json()
     session_id = data['session_id']
     username = data['username']
@@ -121,6 +197,19 @@ def load_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="delete_cart")
 @app.route(route="delete_cart", methods=[func.HttpMethod.POST])
 def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Delete a cart based on session ID and username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing JSON payload with 'session_id' and 'username'.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the delete operation in JSON format.
+    """
     data = req.get_json()
     session_id = data['session_id']
     username = data['username']
@@ -135,13 +224,23 @@ def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="find_user_autocomplete")
 @app.route(route="find_user_autocomplete", methods=[func.HttpMethod.POST])
 def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Find usernames that match the autocomplete query
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with the query parameter
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing a JSON payload with the list of matching usernames or an error message
+    """
     try:
         data = req.get_json()
         query = data.get('query', '')
         if not query:
             return func.HttpResponse(json.dumps({"usernames": []}), status_code=200, mimetype="application/json")
 
-        # Replace with your database query to find matching usernames
         matching_usernames = [
             user['username'] for user in user_container.query_items(
                 query="SELECT c.username FROM c WHERE STARTSWITH(c.username, @query)",
@@ -159,10 +258,22 @@ def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
         logging.error(f"Autocomplete error: {e}")
         return func.HttpResponse("Error processing request", status_code=500)
  
-
 @app.function_name(name="email_verification")
 @app.route(route='email_verification', methods=[func.HttpMethod.POST])
 def email_verification(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Verify the email using the provided username and code.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the JSON payload with 'username' and 'code'.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response containing the verification result in JSON format with CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     code = data['code']
@@ -307,7 +418,6 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
     username = data['username'].strip()
-    # TODO: uncomment this line for production
     output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
     fetched_products = products.get_products(output)
     response = func.HttpResponse(

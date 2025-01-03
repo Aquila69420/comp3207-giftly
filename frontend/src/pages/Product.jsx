@@ -4,6 +4,7 @@ import styles from "../styles/product.module.css";
 import {FaHeart, FaRegHeart } from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
+import { BsShop } from "react-icons/bs";
 import InfinityLoader from "../components/InfinityLoader";
 
 // Icons available at https://react-icons.github.io/react-icons/
@@ -192,8 +193,8 @@ export default function Product() {
           </button>
         </div>
         <div className={styles.nav}>
-        <button className={styles.navButton} onClick={() => window.history.back}>Continue Shopping</button>
-        <button className={styles.navButton} onClick={saveCart}>Proceed to Cart</button>
+        <button className={styles.navButton} onClick={() => window.history.back}>Continue Shopping <BsShop /></button>
+        <button className={styles.navButton} onClick={saveCart}>Proceed to Cart <IoCartOutline style={{ alignItems: 'center' }} /></button>
         </div>
       </div>
     </div>

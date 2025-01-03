@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  background-color: #5F9389;
+  background-color: #085b5e;
   border-bottom: 1px solid #ddd;
   position: sticky;
   top: 0;
@@ -19,6 +19,7 @@
 }
 
 .backButton {
+  color: white;
   background: none;
   border: none;
   font-size: 16px;
@@ -36,11 +37,11 @@
 
 .searchText {
   color: white;
-  background-color: #08caa6;
+  background-color: #085b5e;
   display: block; /* Ensures the input behaves as a block element */
   padding: 8px;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   border-radius: 10px;
   white-space: nowrap; /* Prevents the text from wrapping */
   overflow-x: auto; /* Makes the input scrollable if content overflows */
@@ -50,7 +51,7 @@
 }
 
 .productGrid {
-  background-color: #5F9389;
+  background-color: #085b5e;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;

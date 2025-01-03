@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import config from "../config";
 
 function Register() {
+  const [registered, setRegistered] = useState(false);
+
   const navigate = useNavigate();
   const [isRegistered, setIsRegistered] = useState(false); // State to track registration completion
 
@@ -48,6 +50,7 @@ function Register() {
     }),
     onSubmit: async (values) => {
       try {
+        setRegistered(true);
         const response = await fetch(`${config.backendURL}/register`, {
           method: "POST",
           headers: {
@@ -98,107 +101,106 @@ function Register() {
 
   return (
     <div className={styles.registerContainer}>
-      <img src={logo} alt="logo" width={175} className={styles.logo} />
-      {!isRegistered ? (
-        <form onSubmit={formik.handleSubmit} className={styles.box}>
-          <div className={styles.iconContainer}>Register</div>
-          <div className={styles.inputLabel}>Username</div>
+      <img src={logo} alt="logo" width={200} className={styles.logo} />
+      {registered ? (
+        <div className={styles.actionContainer}>
+        <div className={styles.verificationContainer}>
           <input
             type="text"
-            name="username"
-            placeholder="Username"
-            value={formik.values.username}
+            name="emailVerificationCode"
+            placeholder="Email Verification Code"
+            value={formik.values.emailVerificationCode}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             className={styles.input}
           />
-          {formik.touched.username && formik.errors.username ? (
-            <div className={styles.error}>{formik.errors.username}</div>
-          ) : null}
-          <div className={styles.username}>Password</div>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formik.values.password}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.password && formik.errors.password ? (
-            <div className={styles.error}>{formik.errors.password}</div>
-          ) : null}
-          <div className={styles.username}>Email</div>
-          <input
-            type="text"
-            name="email"
-            placeholder="Email"
-            value={formik.values.email}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.email && formik.errors.email ? (
-            <div className={styles.error}>{formik.errors.email}</div>
-          ) : null}
-          <div className={styles.username}>Phone Number</div>
-          <input
-            type="text"
-            name="phone"
-            placeholder="Phone number (ie: +44 7765xxxxxx)"
-            value={formik.values.phone}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.input}
-          />
-          {formik.touched.phone && formik.errors.phone ? (
-            <div className={styles.error}>{formik.errors.phone}</div>
-          ) : null}
-          <select
-            name="notifications"
-            value={formik.values.notifications}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            className={styles.select}
+          <button
+            type="button"
+            onClick={handleVerifyEmail}
+            className={styles.buttonSecondary}
           >
-            <option value="" disabled>
-              -- Opt for Notifications --
-            </option>
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-          </select>
-          {formik.touched.notifications && formik.errors.notifications ? (
-            <div className={styles.error}>{formik.errors.notifications}</div>
-          ) : null}
-          <button type="submit" className={styles.buttonPrimary}>
-            Register
+            Verify
           </button>
-        </form>
-      ) : (
-        <div className={styles.box}>
-          <div className={styles.iconContainer}>Email Verification</div>
-          <div className={styles.verificationContainer}>
-            <input
-              type="text"
-              name="emailVerificationCode"
-              placeholder="Email Verification Code"
-              value={formik.values.emailVerificationCode}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              className={styles.input}
-            />
-            <button
-              type="button"
-              onClick={handleVerifyEmail}
-              className={styles.buttonSecondary}
-            >
-              Verify
-            </button>
-            {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
-              <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
-            ) : null}
-          </div>
+          {formik.touched.emailVerificationCode && formik.errors.emailVerificationCode ? (
+            <div className={styles.error}>{formik.errors.emailVerificationCode}</div>
+          ) : null}
         </div>
+      </div>
+      ) : (
+        <form onSubmit={formik.handleSubmit} className={styles.box}>
+        <div className={styles.iconContainer}>Register</div>
+        <div className={styles.inputLabel}>Username</div>
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={formik.values.username}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.username && formik.errors.username ? (
+          <div className={styles.error}>{formik.errors.username}</div>
+        ) : null}
+        <div className={styles.username}>Password</div>
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.password && formik.errors.password ? (
+          <div className={styles.error}>{formik.errors.password}</div>
+        ) : null}
+        <div className={styles.username}>Email</div>
+        <input
+          type="text"
+          name="email"
+          placeholder="Email"
+          value={formik.values.email}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.email && formik.errors.email ? (
+          <div className={styles.error}>{formik.errors.email}</div>
+        ) : null}
+        <div className={styles.username}>Phone Number</div>
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone number (ie: +44 7765xxxxxx)"
+          value={formik.values.phone}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.input}
+        />
+        {formik.touched.phone && formik.errors.phone ? (
+          <div className={styles.error}>{formik.errors.phone}</div>
+        ) : null}
+        <select
+          name="notifications"
+          value={formik.values.notifications}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          className={styles.select}
+        >
+          <option value="" disabled>
+            -- Opt for Notifications --
+          </option>
+          <option value="false">No</option>
+          <option value="true">Yes</option>
+        </select>
+        {formik.touched.notifications && formik.errors.notifications ? (
+          <div className={styles.error}>{formik.errors.notifications}</div>
+        ) : null}
+        <button type="submit" className={styles.buttonPrimary}>
+          Register
+        </button>
+      </form>
       )}
     </div>
   );

@@ -11,6 +11,21 @@ client = AzureOpenAI(
 )
 
 def get_previous_suggestion(container, username):
+    """
+    Get the previous suggestion for the user
+
+    Parameters
+    ----------
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+    username : str
+        The username of the user
+
+    Returns
+    -------
+    str
+        The previous suggestion
+    """
     try:
         suggestion = list(container.query_items(
             query="SELECT c.suggestion FROM c WHERE c.username=@username",
@@ -29,6 +44,18 @@ def get_previous_suggestion(container, username):
         return ""
 
 def update_suggestion(container, username, suggestion):
+    """
+    Update the suggestion for the user
+
+    Parameters
+    ----------
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+    username : str
+        The username of the user
+    suggestion : str
+        The suggestion to be updated
+    """
 
     user = list(container.query_items(
         query="SELECT * FROM c WHERE c.username=@username",
@@ -54,6 +81,23 @@ def update_suggestion(container, username, suggestion):
         logging.info("Update user suggestion")    
 
 def llm_suggestion(prompt, container, username):
+    """
+    Get a suggestion from the LLM model
+
+    Parameters
+    ----------
+    prompt : str
+        The prompt for the model
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+    username : str
+        The username of the user
+
+    Returns
+    -------
+    str
+        The suggestion from the model
+    """
     logging.info(f"Prompt by {username}: {prompt}")
     previous_suggestion = get_previous_suggestion(container, username)
     response = client.chat.completions.create(

@@ -2,6 +2,21 @@ from helper.oxylabs import *
 import helper.ebay as ebay
 
 def get_products(products):
+    """
+    Retrieve product information from various vendors.
+
+    Parameters
+    ----------
+    products : list
+        A list of product names to search for.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the search results from each vendor. 
+        The keys are vendor names (e.g., 'ebay', 'amazon', 'google', 'walmart') 
+        and the values are the formatted search results from each vendor.
+    """
     # products -> GPT output
     # run each vendor individually: ebay.py, oxylabs.py (amazon, google, etc.), shopify.py
     # format the output to include link, price per unit, name
