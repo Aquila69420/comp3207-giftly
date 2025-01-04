@@ -71,7 +71,7 @@ function App() {
           path="/cart"
           element={
             <Protected>
-              <Cart />
+              <Cart sessionId={localStorage.getItem("sessionId")} context="personal-cart"/>
             </Protected>
           }
         />

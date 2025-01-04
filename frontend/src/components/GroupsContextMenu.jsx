@@ -6,6 +6,8 @@ import InviteUserModal from "../components/InviteUserModal";
 import RenameGroupModal from "../components/RenameGroupModal";
 import styles from "../styles/groups.module.css";
 
+import Cart from "../components/Cart";
+
 /**
  * Props:
  *  type: "group" | "occasion" | "division" | "main-heading"
@@ -42,6 +44,9 @@ const GroupsContextMenu = ({
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
+
+  const [showCartModal, setShowCartModal] = useState(false); // State for cart modal
+
 
   //
   // ========== GROUP ACTIONS ==========
@@ -213,6 +218,7 @@ const GroupsContextMenu = ({
     menuItems = [
       { label: "Show Members", onClick: () => setShowMembersModal(true) },
       { label: "Leave", onClick: () => alert("Leave division: " + item?.id) },
+      { label: "Show Cart", onClick: () => setShowCartModal(true) },
     ];
   }
 
@@ -263,6 +269,28 @@ const GroupsContextMenu = ({
             occasion={item}
             onClose={() => setShowDateModal(false)}
           />
+        )}
+
+        {showCartModal && (
+          console.log('Session ID: ', item?.id),
+          <div className={styles.modalBackdrop} onClick={() => setShowCartModal(false)}>
+            <div
+              className={styles.modalContainer}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowCartModal(false)}
+              >
+                &times;
+              </button>
+              <Cart 
+                key={Math.random().toString(36).substring(7)}
+                sessionId={item?.id} // Pass division ID as sessionId
+                context="shared-cart"
+              />
+            </div>
+          </div>
         )}
 
         {/* Create Division (occasion) */}

@@ -162,7 +162,9 @@ export default function Product({ previousState }) {
       console.log("Adding to cart:", id);
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
       cart.push({ id, url, title, price, image });
+      let cartWithKey = "cart" + sessionStorage.getItem("sessionId");
       sessionStorage.setItem("cart", JSON.stringify(cart));
+      
     };
 
     const removeFromCart = async () => {
@@ -170,6 +172,7 @@ export default function Product({ previousState }) {
       console.log("Removing from cart:", id);
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
       const updatedCart = cart.filter((item) => item.id !== id);
+      let cartWithKey = "cart" + sessionStorage.getItem("sessionId");
       sessionStorage.setItem("cart", JSON.stringify(updatedCart));
     };
 
