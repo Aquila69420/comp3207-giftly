@@ -77,7 +77,8 @@ const GroupsTopBar = ({ userID }) => {
     <div style={styles.topBarContainer}>
       {/* Back Button */}
       <button style={styles.backButton} onClick={handleBack}>
-        &larr; Back
+        {/* &larr; Back */}
+        <IoMdArrowRoundBack size={25} />
       </button>
 
       {/* Center: upcoming occasion info */}
