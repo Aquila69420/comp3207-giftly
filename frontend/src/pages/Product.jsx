@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useSearchParams, useNavigate } from "react-router-dom";
 import styles from "../styles/product.module.css";
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart} from "react-icons/fa";
 import { IoCartOutline, IoCart } from "react-icons/io5";
 import config from "../config";
 import { CiShop } from "react-icons/ci";
 import InfinityLoader from "../components/InfinityLoader";
 import { FaShare } from "react-icons/fa";
+import SharedCartMenu from "../components/SharedCartMenu";
+
 
 export default function Product({ previousState }) {
   const navigate = useNavigate();
@@ -21,7 +23,9 @@ export default function Product({ previousState }) {
   const [favorite, setFavorite] = useState(false);
   const [cart, setCart] = useState(false);
   const username = localStorage.getItem("username");
+  const userId = localStorage.getItem("userID");
   const [loading, setLoading] = useState(false);
+
 
   const getProductInfoById = async () => {
     const productId = searchParams.get("id");
@@ -46,6 +50,89 @@ export default function Product({ previousState }) {
       navigate("/404");
     }
   };
+
+  
+  const handleSharedCartDivisionSelect = async (divisionId) => {
+    // Get session id
+    const sessionId = divisionId;
+
+    const item = { id, url, title, price, image };
+
+    // First see if cart is already stored
+    const response = await fetch(`${config.backendURL}/load_cart`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username, session_id: sessionId }),
+    });
+    const result = await response.json();
+    console.log("Response from backend: 1", result);
+    const cart = result.response;
+    if (result.response !== "failed") {
+
+      let cartContent = cart[divisionId];
+
+      let action = "add";
+
+      if (cartContent) {
+        let itemExists = false;
+        cartContent.forEach((cartItem) => {
+          if (cartItem.id === item.id) {
+            itemExists = true;
+          }
+        });
+        if (itemExists) {
+          // Item already exists in cart alert "Do you want to remove it?"
+          const confirmRemove = window.confirm(
+            "Item already exists in shared cart. Do you want to remove it?"
+          );
+          if (confirmRemove) {
+            action = "remove";
+          } else {
+            return;
+          }
+        }
+        cartContent.push(item);
+      }
+
+
+      const response = await fetch(`${config.backendURL}/update_cart`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session_id: divisionId,
+          username,
+          item,
+          action,
+        }),
+      });
+      const result = await response.json();
+      console.log("Response from backend: 2", result);
+      if (result.response === "Cart updated") {
+        alert("Shared cart updated!");
+      } else {
+        alert("Failed to update shared cart.");
+      }
+    }
+    else {
+      const response = await fetch(`${config.backendURL}/save_cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+          cart_content: [item],
+          session_id: sessionId,
+        }),
+      });
+      const result = await response.json();
+      console.log("Response from backend:", result);
+    }
+  }
+    
+
 
   useEffect(() => {
     if (!data.id) {
@@ -178,6 +265,10 @@ export default function Product({ previousState }) {
                   <IoCartOutline color="black" />
                 )}
               </button>
+
+              
+
+
             </div>
             <div className={styles.nav}>
               <button
@@ -190,6 +281,11 @@ export default function Product({ previousState }) {
               <button className={styles.navButton1} onClick={saveCart}>
                 <div>Proceed to Cart</div> <IoCartOutline size={30} />
               </button>
+
+              <SharedCartMenu
+                userId={userId}
+                onDivisionSelect={handleSharedCartDivisionSelect}
+              />
               <button className={styles.navButton1}>
                 <div>Share With Group</div> <FaShare size={30} />
               </button>

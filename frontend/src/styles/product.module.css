@@ -96,6 +96,20 @@
   transform: scale(1.2); /* Enlarge slightly on hover */
 }
 
+
+.sharedCartButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 2rem;
+  color: #2196f3;
+  transition: transform 0.2s ease-in-out;
+}
+
+.sharedCartButton:hover {
+  transform: scale(1.2); /* Enlarge slightly on hover */
+}
+
 .nav {
   margin-top: 20px;
   display: flex;
