@@ -161,6 +161,7 @@ const Groups = () => {
           );
           setActiveGroup(updatedGroup);
           setActiveOccasion(updatedOccasion);
+          setActiveDivision(updatedOccasion.divisions[0]);
         } else {
           setError(data.msg);
         }
@@ -171,13 +172,15 @@ const Groups = () => {
       }
     } else {
       setActiveOccasion(occasion);
+      setActiveDivision(occasion.divisions[0]);
     }
 
-    if (occasion.divisions && occasion.divisions.length > 0) {
-      setActiveDivision(occasion.divisions[0]);
-    } else {
-      setActiveDivision(null);
-    }
+    // if (occasion.divisions && occasion.divisions.length > 0) {
+    //   setActiveDivision(occasion.divisions[0]);
+    //   console.log('Active divisionn:', occasion.divisions[0]);
+    // } else {
+    //   setActiveDivision(null);
+    // }
   
     setActiveOccasion(occasion);
   };
