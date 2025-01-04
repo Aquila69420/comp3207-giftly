@@ -131,3 +131,54 @@ def delete(username, session_id, container):
     except Exception as e:
         logging.info(f"cart load error: {e}")
         return "database error"
+    
+
+def update(username, session_id, item, action, container):
+    """
+    Update a specific item in a cart (add or remove) for a user.
+
+    Parameters
+    ----------
+    username : str
+        The username of the user.
+    session_id : str
+        The name of the cart.
+    item_name : item const item = { id, url, title, price, image };
+        The item to update.
+    action : str
+        The action to perform: 'add' to add the item, 'remove' to remove the item.
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database.
+
+    Returns
+    -------
+    str
+        The status of the operation.
+    """
+    try:
+        user_cart_data = list(container.query_items(
+            query="SELECT * FROM c WHERE c.username=@username",
+            parameters=[{'name': '@username', 'value': username}],
+            enable_cross_partition_query=False
+        ))
+        if user_cart_data:
+            if session_id in user_cart_data[0]['carts'].keys():
+                if action == 'add':
+                    user_cart_data[0]['carts'][session_id].append(item)
+                elif action == 'remove':
+                    user_cart_data[0]['carts'][session_id].remove(item)
+                else:
+                    return "Invalid action"
+                container.replace_item(
+                    item = user_cart_data[0]['id'],
+                    body = user_cart_data[0],
+                    pre_trigger_include = None,
+                    post_trigger_include = None
+                )
+                return "Cart updated"
+            else:
+                return f"{username} does not have stored cart named {session_id}"
+        else: return f"{username} does not have any carts stored"
+    except Exception as e:
+        logging.info(f"cart update error: {e}")
+        return "database error"

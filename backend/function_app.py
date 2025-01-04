@@ -158,7 +158,58 @@ def save_cart(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200
     )
-    return add_cors_headers(response) 
+    return add_cors_headers(response)
+
+@app.function_name(name="update_cart")
+@app.route(route="update_cart", methods=[func.HttpMethod.POST])
+def update_cart_http(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Azure Function to handle adding or removing an item from a cart.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the cart update data.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the result of the update operation.
+    """
+    try:
+        # Parse the request data
+        data = req.get_json()
+        username = data.get('username')
+        session_id = data.get('session_id')
+        item = data.get('item')
+        action = data.get('action')  # 'add' or 'remove'
+
+        # Validate input
+        if not all([username, session_id, item, action]):
+            return func.HttpResponse(
+                body=json.dumps({"error": "Missing required fields."}),
+                mimetype="application/json",
+                status_code=400
+            )
+
+        # Update the cart
+        output = cart.update(username, session_id, item, action, cart_container)
+
+        # Return response
+        response = func.HttpResponse(
+            body=json.dumps({"response": output}),
+            mimetype="application/json",
+            status_code=200
+        )
+        return add_cors_headers(response)
+    except Exception as e:
+        logging.info(f"update_cart_http error: {e}")
+        return func.HttpResponse(
+            body=json.dumps({"error": "An error occurred."}),
+            mimetype="application/json",
+            status_code=500
+        )
+
 
 @app.function_name(name="load_cart")
 @app.route(route="load_cart", methods=[func.HttpMethod.POST])
@@ -180,7 +231,7 @@ def load_cart(req: func.HttpRequest) -> func.HttpResponse:
     session_id = data['session_id']
     username = data['username']
     output = cart.load(username, session_id, cart_container)
-    if output==f"{username} does not have stored cart corresponding to session {session_id}" or output==f"{username} does not have any carts stored":
+    if output==f"{username} does not have stored cart corresponding to session {session_id}" or output==f"{username} does not have any carts stored" or output==f"{username} does not have stored cart named {session_id}":
         response = func.HttpResponse(
             body=json.dumps({"response": "failed", "message": output}),
             mimetype="application/json",
@@ -1238,6 +1289,36 @@ def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
     )
     return add_cors_headers(response)
 
+
+@app.function_name(name="get_all_groups_occasions_divisions")
+@app.route(route='groups/get_all', methods=[func.HttpMethod.POST])
+def get_all_groups_occasions_divisions(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get all groups, occasions and divisions for a user
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", groups: [], occasions: [], divisions: []}
+        data: {result: False, msg: "User does not exist"}'''
+    data = req.get_json()
+    userID = data['userID']
+    try:
+        result = groups.get_all(userID)
+        body = json.dumps({"result": True, "msg": "OK", "groups": result["grps"], "occasions": result["occs"], "divisions": result["divs"]})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
 @app.function_name(name='groups_calendar_get')
 @app.route(route='groups/calendar/get', methods=[func.HttpMethod.POST])
 def groups_calendar_get(req: func.HttpRequest) -> func.HttpResponse:
@@ -1285,24 +1366,3 @@ def get_token(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200
     )
-
-# # Create a group channel
-# @app.function_name(name="create_channel")
-# @app.route(route='groups/create_channel', methods=[func.HttpMethod.POST])
-# def create_channel(req: func.HttpRequest) -> func.HttpResponse:
-#     data = req.get_json()
-#     groupID = data['groupID']
-#     channel_name = data['channel_name']
-#     try:
-#         channel = client.create_channel(groupID, channel_name)
-#         return func.HttpResponse(
-#             body=json.dumps({"result": True, "msg": "OK", "channel": channel}),
-#             mimetype="application/json",
-#             status_code=200
-#         )
-#     except Exception as e:
-#         return func.HttpResponse(
-#             body=json.dumps({"result": False, "msg": str(e)}),
-#             mimetype="application/json",
-#             status_code=500
-#         )

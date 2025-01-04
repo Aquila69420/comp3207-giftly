@@ -240,6 +240,15 @@ def group_cleaned(groupDoc):
     dict
         The cleaned group document
     """
+    if not isinstance(groupDoc, dict):
+        raise ValueError("groupDoc must be a dictionary")
+    
+    # Ensure all required keys exist
+    required_keys = ['id', 'groupname', 'admin', 'users', 'occasions']
+    for key in required_keys:
+        if key not in groupDoc:
+            raise KeyError(f"Missing required key '{key}' in groupDoc")
+
     return {
         'id': groupDoc['id'],
         'groupname': groupDoc['groupname'],
@@ -1049,3 +1058,43 @@ def get_calendar(userID):
         "groupname": groupnames[oc['groupID']]
     } for oc in ocs]
     return deadlines
+
+def get_all(userID):
+    """
+    Retrieve all groups, occasions, and divisions for a user. in a structured format
+
+    
+
+    Parameters
+    ----------
+    userID : str
+        The ID of the user to retrieve data for.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the user's groups, occasions, and divisions.
+    """
+    # Check if user exists
+    user_exists(userID)
+
+    # Query database for all groups with user
+    groups = get_groups(userID)
+
+    occasions = []
+    divisions = []
+
+    for group in groups:
+        groupID = group['id']
+        ocs = get_occasions(userID, groupID)
+        for oc in ocs:
+            ocID = oc['id']
+            divisions += get_divisions(userID, ocID)
+        occasions += ocs
+
+    return {
+        "grps": groups,
+        "occs": occasions,
+        "divs": divisions
+    }
+
