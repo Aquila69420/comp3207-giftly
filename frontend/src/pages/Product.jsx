@@ -168,7 +168,7 @@ export default function Product({ previousState }) {
             <img src={image} alt={title} />
           </div>
           <div className={styles.productInfo}>
-            <h1 className={styles.title}>{title}</h1>
+            <h1 className={styles.title}>{title.at(0).toUpperCase()}{title.substring(1)}</h1>
             <p className={styles.price}>{price}</p>
             <div className={styles.productActions}>
               <button
