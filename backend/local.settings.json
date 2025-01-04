@@ -14,6 +14,7 @@
     "GroupsContainer": "groups",
     "GroupsOccasionsContainer": "groups_occasions",
     "GroupsDivisionsContainer": "groups_divisions",
+    "GroupsInvitationsContainer": "groups_invitations",
     "FunctionAppKey": "sjAHwpUaI5N3sVkQfzgfSQJPaaV6OGnVPDaoCz9kG0_lAzFuDrD-oA==",
     "OpenAIEndPoint": "https://amcp1u21-openai-quiplash.openai.azure.com/",
     "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
@@ -28,7 +29,8 @@
     "AZURE_SPEECH_KEY": "8fK4ZX2S2EXa6METEW0DlcRVz1SNW72Wg027cu3mzJ9YYvobuW70JQQJ99ALAC5RqLJXJ3w3AAAYACOGpXKw",
     "AZURE_SPEECH_REGION": "westeurope",
     "STREAM_KEY": "5cs3zw7bzvyk",
-    "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq"
+    "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq",
+    "JWT_SECRET_KEY": "c75d9070fd11afaf7c871431edf3b4bc7060eb4c67663f18d176ef668400c699"
   },
   "Host": {
     "CORS": "*"
