@@ -22,8 +22,8 @@
 }
   
 .itemImage {
-    width: 100px;
-    height: 100px;
+    width: 150px;
+    height: 150px;
     border-radius: 10px;
     margin-right: 20px;
 }
@@ -36,6 +36,7 @@
     font-weight: bold;
     color: var(--deep-sea-green);
     text-decoration: none;
+    font-size: 1rem;
 }
   
 .itemTitle:hover {
@@ -45,6 +46,7 @@
 .itemPrice {
     margin-top: 5px;
     color: var(--deep-sea-green);
+    font-size: 1rem;
 }
 
   
