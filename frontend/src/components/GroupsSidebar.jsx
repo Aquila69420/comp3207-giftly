@@ -64,10 +64,6 @@ const GroupsSidebar = ({
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
 
-  // "Add Occasion" modal
-  const [showAddOccasionModal, setShowAddOccasionModal] = useState(false);
-  const [targetGroupForOccasion, setTargetGroupForOccasion] = useState(null);
-
   // Expand/collapse a group
   const handleGroupToggle = (groupId, group) => {
     // If we click the same group, toggle it closed; 
@@ -94,20 +90,7 @@ const GroupsSidebar = ({
     setNewGroupName("");
     setShowCreateGroupModal(false);
   };
-
-  // Called when context menu user picks "Add Occasion"
-  // const handleAddOccasionRequest = (group) => {
-  //   setTargetGroupForOccasion(group);
-  //   setShowAddOccasionModal(true);
-  //   closeMenu();
-  // };
-
-  // After we create an occasion, we want to refresh
-  const handleAddOccasionDone = async (group, name, date, users) => {
-    await onAddOccasion?.(group, name, date, users);
-    refreshGroups?.();
-  };
-
+  
   function getDivisionLabel(division) {
     if (!division.recipients || division.recipients.length === 0) {
       return "Loading...";
