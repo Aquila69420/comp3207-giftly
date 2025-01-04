@@ -7,6 +7,7 @@
     "AzureCosmosDBConnectionString": "AccountEndpoint=https://giftly-cosmos-db.documents.azure.com:443/;AccountKey=5Xqauq6VxMFwGNj8Rh5mU4o6sJUa7xhPthkBHCsN3BkVlsYGajE1cUTvO6XyHF97bHNwZ6rumHvRACDbi1eTTw==;",
     "DatabaseName": "giftly",
     "UserContainer": "user",
+    "PollsContainer": "polls",
     "SuggestionContainer": "suggestion",
     "WishListContainer": "wishlist",
     "CartContainer": "cart",
