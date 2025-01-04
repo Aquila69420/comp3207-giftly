@@ -114,7 +114,7 @@ function Home() {
 
       const result = await response.json();
       setModel("Gift Finder");
-      setPrompt(result.response.slice(4));
+      setPrompt(result.response);
       console.log("Response from backend:", result);
     } catch (error) {
       console.error("Error sending input data:", error);
