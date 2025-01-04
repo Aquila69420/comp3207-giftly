@@ -106,7 +106,7 @@ function Cart({ username }) {
 
   return (
       <div className={styles.cartContent}>
-        <p className={styles.cartTitle}>Cart</p>
+        <p className={styles.cartTitle}>Gift Shopping Cart</p>
         <ul className={styles.cartList}>
           <ul className={styles.cartList}>
             {cartItems.length > 0 ? (
@@ -123,7 +123,7 @@ function Cart({ username }) {
           </ul>
         </ul>
         <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div>
-        <button onClick={handleClear} className={`${styles.button} ${styles.clearButton}`}>Clear</button>
+        <button onClick={handleClear} className={styles.button}>Clear</button>
       </div>
   );
 }

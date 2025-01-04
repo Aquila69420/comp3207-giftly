@@ -162,6 +162,10 @@
   }
 }
 
+.registerText{
+  text-decoration: underline  ;
+}
+
 .button-85:after {
   z-index: -1;
   content: "";
