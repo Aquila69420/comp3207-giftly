@@ -86,7 +86,7 @@ function ForgotPassword() {
         });
         const result = response.json();
         console.log("Password update result:", result);
-        navigate("/login");
+        navigate("/");
         
     }
 

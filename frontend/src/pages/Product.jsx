@@ -133,20 +133,34 @@ export default function Product() {
     });
     const result = await response.json();
     if (result.response !== "failed") {
-      // If cart is already existing, create a new cart
-      const response = await fetch(`${config.backendURL}/save_cart`, {
+      // If cart is already existing, delete and then create a new cart
+      const deleteResponse = await fetch(`${config.backendURL}/delete_cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
-          cart_content: cart,
-          session_id: sessionId+1,
+          session_id: sessionId,
+          username: username
         }),
       });
-      const result = await response.json();
-      console.log("Response from backend:", result);
+      const deleteResult = await deleteResponse.json();
+      if (deleteResult.response === "Cart deleted") {
+        console.log("Cart deleted successfully");
+        const response = await fetch(`${config.backendURL}/save_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            cart_content: cart,
+            session_id: sessionId,
+          }),
+        });
+        const result = await response.json();
+        console.log("Response from backend:", result);
+      }
     }
     else {
       const response = await fetch(`${config.backendURL}/save_cart`, {
