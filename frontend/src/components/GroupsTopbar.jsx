@@ -1,6 +1,7 @@
 // src/components/GroupsTopBar.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoMdArrowRoundBack } from "react-icons/io";
 import CalendarModal from './CalendarModal';
 
 // We'll assume you pass `userID` as props, so we can fetch the deadlines
@@ -77,7 +78,8 @@ const GroupsTopBar = ({ userID }) => {
     <div style={styles.topBarContainer}>
       {/* Back Button */}
       <button style={styles.backButton} onClick={handleBack}>
-        &larr; Back
+        {/* &larr; Back */}
+        <IoMdArrowRoundBack size={25} />
       </button>
 
       {/* Center: upcoming occasion info */}
