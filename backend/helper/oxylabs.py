@@ -77,7 +77,7 @@ def parse_amazon_products(products):
         product_info['name'] = product['title']
         product_info['price'] = product['price']
         product_info['currency'] = product['currency']
-        product_info['product_url'] = product['url']
+        product_info['product_url'] = 'https://www.amazon.com' + product['url']
         product_info['image_url'] = product['url_image']
         products_info.append(product_info)
     return products_info
@@ -176,7 +176,7 @@ def parse_walmart_products(products):
     Returns
     -------
     list
-        A list of dictionaries containing parsed product information, including name, price, currency, product URL, and image URL.
+        A list of dictionaries containing parsed    product information, including name, price, currency, product URL, and image URL.
     """
     products_info = []
     for product in products:
