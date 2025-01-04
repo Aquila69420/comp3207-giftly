@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import logo from "../image/giftly_logo_trans.png";
-import styles from "../styles/searchResults.module.css";
+import styles from "../styles/SearchResults.module.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
 import config from "../config";
