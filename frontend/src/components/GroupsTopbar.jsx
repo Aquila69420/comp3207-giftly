@@ -1,6 +1,7 @@
 // src/components/GroupsTopBar.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IoMdArrowRoundBack } from "react-icons/io";
 import CalendarModal from './CalendarModal';
 
 // We'll assume you pass `userID` as props, so we can fetch the deadlines

@@ -61,7 +61,7 @@ function Cart({ username }) {
           },
           body: JSON.stringify({
             username: username,
-            cart_content: cart,
+            cart_content: cartItems,
             session_id: sessionId,
           }),
         });
