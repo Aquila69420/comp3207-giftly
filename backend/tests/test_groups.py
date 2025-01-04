@@ -1,12 +1,30 @@
+import sys
 import requests
 import json
+import datetime
 testIP = "http://localhost:5000/groups"
+import bcrypt
+
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(12))
+
 
 def getURL(*path):
     url = testIP
     for p in path:
         url += '/' + p
     return url
+
+def test_create_group():
+    url = getURL("create")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "groupname": "test_group"
+    }))
+    r.raise_for_status()
+    print(r.json())
+    return r.json()['group']['id']
 
 def test_add_user():
     url = getURL("add_user")
@@ -145,7 +163,74 @@ def test_calendar_get(id):
     r.raise_for_status()
     print(r.json())
 
+def test_package():
+    print(hash_password("anthony1"))
+
+def test_generate_invite():
+    url = getURL("invite", "generate")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "groupID": "1fa53c2a-fa0f-4739-9698-2eb28834a0be",
+        "expiryTime": 1,
+        "one_time": False
+    }))
+    data = r.json()
+    if data['result']:
+        print(data['token'])
+        return data['token']
+    return None
+
+def test_accept_invite(token):
+    url = getURL("invite", "accept")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "username": "atharva",
+        "token": token
+    }))
+    print(r.json())
+
+def test_validate_token(token):
+    url = getURL("invite", "validate")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "token": token
+    }))
+    print(r.json())
+
+def test_revoke_token(token):
+    url = getURL("invite", "revoke")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({
+        "userID": "fd91053e-3ba2-4b49-92d1-399d5f03a2f0",
+        "token": token
+    }))
+    print(r.json())
+
+def tokens_clear():
+    url = getURL("invite", "clear_expired")
+    print(url)
+    r = requests.post(url=url, data=json.dumps({}))
+    print(r.json())
+
+def test_get_invites():
+    url = getURL("invite", "get")
+    print(url)
+    r = requests.get(url=url, data=json.dumps({
+        "groupID": "1fa53c2a-fa0f-4739-9698-2eb28834a0be"
+    }))
+    r.raise_for_status()
+    print(r.json())
+
 if __name__ == '__main__':
     # test_delete_occasion("1d2ad927-5560-4326-89ec-3f49dc2dd5e7")
     # id = test_add_occasion()
-    test_calendar_get("fd91053e-3ba2-4b49-92d1-399d5f03a2f0")
+    # test_calendar_get("fd91053e-3ba2-4b49-92d1-399d5f03a2f0")
+
+    # token = test_generate_invite()
+    test_get_invites()
+
+    # test_revoke_token(token)
+    # test_accept_invite(token)
+
+    # tokens_clear()

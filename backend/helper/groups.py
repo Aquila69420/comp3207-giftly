@@ -1,11 +1,13 @@
 from azure.cosmos import CosmosClient
-import os, uuid, logging, json, random, re, datetime
+import os, uuid, logging, json, random, re, datetime, jwt, secrets
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
 groups_container = database.get_container_client(os.getenv("GroupsContainer"))
 occasions_container = database.get_container_client(os.getenv("GroupsOccasionsContainer"))
 divisions_container = database.get_container_client(os.getenv("GroupsDivisionsContainer"))
+invitations_container = database.get_container_client(os.getenv("GroupsInvitationsContainer"))
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
 # Custom Exception type to Catch
 class GroupsError(Exception):
@@ -65,6 +67,35 @@ def occasion_exists(occasionID):
     if not occasions:
         raise GroupsError("The occasion does not exist")
     return occasions[0]
+
+def token_exists(tokenID):
+    tokens = list(invitations_container.query_items(
+            query="SELECT * FROM c WHERE c.id=@tokenID",
+            parameters=[{'name': '@tokenID', 'value': tokenID}],
+            enable_cross_partition_query=True
+        ))
+    if not tokens:
+        raise GroupsError("This token does not exist")
+    tokenDoc = tokens[0]
+    validate_tokenDoc(tokenDoc)
+    return tokenDoc
+
+def validate_tokenDoc(tokenDoc):
+    if tokenDoc['revoked']:
+        raise GroupsError("Token has been revoked")
+    if tokenDoc['used'] and tokenDoc['one_time']:
+        raise GroupsError("Token has been used")
+    if tokenDoc['expires_at'] <= datetime.datetime.now(tz=datetime.timezone.utc).isoformat():
+        raise GroupsError("Token has expired")
+
+def token_decode(token):
+    try:
+        data = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
+        raise GroupsError("Token has expired")
+    except jwt.InvalidTokenError:
+        raise GroupsError("Token is invalid")
+    return data
 
 def group_is_admin(groupDoc, userID):
     if groupDoc['admin'] != userID:
@@ -588,3 +619,106 @@ def get_calendar(userID):
         "groupname": groupnames[oc['groupID']]
     } for oc in ocs]
     return deadlines
+
+def generate_invite(userID, groupID, expiryTime, one_time):
+    # TODO: If invite for group already exists, replace it with refreshed link
+    # Group Exists
+    group = group_exists(groupID)
+
+    # Is admin
+    group_is_admin(group, userID)
+
+    # Generate url
+    timestamp = datetime.datetime.now(tz=datetime.timezone.utc)
+    expiry = timestamp + datetime.timedelta(minutes=expiryTime)
+    id = str(uuid.uuid4())
+    token_data = {
+        "id": id,
+        "exp": expiry,
+        "groupID": groupID,
+        "created_by": userID,
+        "one_time": one_time
+    }
+    token = jwt.encode(token_data, JWT_SECRET_KEY, algorithm="HS256")
+
+    # Add to DB
+    invitations_container.create_item({
+        "id": id,
+        "groupID": groupID,
+        "used": False,
+        "revoked": False,
+        "one_time": one_time,
+        "created_at": timestamp.isoformat(),
+        "expires_at": expiry.isoformat(),
+        "created_by": userID,
+        "token": token
+    })
+
+    return token
+
+def validate_invite(token):
+    data = token_decode(token)
+    
+    # Get token JSON document from DB - token_exits(...) validates the token
+    tokenID = data['id']
+    token = token_exists(tokenID)
+
+def revoke_invite(userID, token):
+    data = token_decode(token)
+    tokenID = data['id']
+    # Token to tokenDoc
+    tokenDoc = token_exists(tokenID)
+    # Revoke from created_by only
+    if tokenDoc['created_by'] != userID:
+        raise GroupsError("User is not the creator of this token")
+
+    # Revoke via Patch Operation
+    ops = [
+        {"op": "set", "path": "/revoked", "value": True}
+    ]
+    invitations_container.patch_item(item=tokenID, partition_key=tokenID, patch_operations=ops)
+
+def accept_invite(username, token, chat_client):
+    data = token_decode(token)
+    admin = data['created_by']
+    groupID = data['groupID']
+    tokenID = data['id']
+
+    # Validate Token
+    token_exists(tokenID)
+
+    group = add_user(admin, username, groupID, chat_client)
+
+    # On successful adding of user, set token to used via patch operation
+    ops = [
+        {"op": "set", "path": "/used", "value": True}
+    ]
+    invitations_container.patch_item(item=tokenID, partition_key=tokenID, patch_operations=ops)
+    return group
+
+
+def get_invitations(groupID):
+    tokenDocs = list(invitations_container.query_items(
+        query="SELECT * FROM c where c.groupID = @groupID",
+        parameters=[{"name": "@groupID", "value": groupID}],
+        enable_cross_partition_query=True
+    ))
+    def f(doc):
+        try:
+            validate_tokenDoc(doc)
+            return doc['token']
+        except GroupsError:
+            return None
+    tokens = list(filter(None, map(f, tokenDocs)))
+    return tokens
+
+def clear_expired_invite():
+    timestamp = datetime.datetime.now(tz=datetime.timezone.utc).isoformat()
+    to_remove = list(invitations_container.query_items(
+        query="SELECT * FROM c WHERE c.expires_at <= @time OR c.revoked = true OR (c.used = true AND c.one_time = true)",
+        parameters=[{"name": "@time", "value": timestamp}],
+        enable_cross_partition_query=True
+    ))
+    for invDoc in to_remove:
+        id = invDoc['id']
+        invitations_container.delete_item(item=id, partition_key=id)

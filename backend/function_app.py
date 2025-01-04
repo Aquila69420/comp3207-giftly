@@ -1197,3 +1197,184 @@ def get_token(req: func.HttpRequest) -> func.HttpResponse:
 #             mimetype="application/json",
 #             status_code=500
 #         )
+
+###############GROUPS_INVITATION###############
+@app.function_name(name="groups_invite_generate")
+@app.route(route='groups/invite/generate', methods=[func.HttpMethod.POST])
+def groups_invite_generate(req: func.HttpRequest) -> func.HttpResponse:
+    '''Generate a URL to invite a user to a group
+    
+    # Parameters
+    req: func.HttpRequest
+    with data:
+    {
+        userID: userID of user that generates link
+        groupID: groupID of group to join via the link,
+        expiryTime: expiryTime of the link in minutes (time to live)
+        one_time: if link can be used only once
+    }
+    
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", "token": token}
+        data: {result: False, msg: "User is not admin of the group"}
+        data: {result: False, msg: "Group does not exist"}'''
+    data = req.get_json()
+    userID = data['userID']
+    groupID = data['groupID']
+    expiryTime = data['expiryTime']
+    one_time = data['one_time']
+    try:
+        token = groups.generate_invite(userID, groupID, expiryTime, one_time)
+        body = json.dumps({"result": True, "msg": "OK", "token": token})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name("groups_invite_validate")
+@app.route(route='groups/invite/validate', methods=[func.HttpMethod.POST])
+def groups_invite_validate(req: func.HttpRequest) -> func.HttpResponse:
+    '''Validate and Use an invitation token
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {token: token}
+    
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "Token is expired"}
+        data: {result: False, msg: "This token does not exist"}
+        data: {result: False, msg: "this token has been used"}
+        data: {result: False, msg: "Token has been revoked"}'''
+    data = req.get_json()
+    token = data['token']
+    try:
+        groups.validate_invite(token)
+        body = json.dumps({"result": True, "msg": "OK"})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name("groups_invite_revoke")
+@app.route(route='groups/invite/revoke', methods=[func.HttpMethod.POST])
+def groups_invite_revoke(req: func.HttpRequest) -> func.HttpResponse:
+    '''Revoke an invitation via the token
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID, token: token}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK"}
+        data: {result: False, msg: "Token does not exist"}
+        data: {result: False, msg: "Token has expired"}'''
+    data = req.get_json()
+    userID = data['userID']
+    token = data['token']
+    try:
+        groups.revoke_invite(userID, token)
+        body = json.dumps({"result": True, "msg": "OK"})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name("groups_invite_accept")
+@app.route(route='groups/invite/accept', methods=[func.HttpMethod.POST])
+def groups_invite_accept(req: func.HttpRequest) -> func.HttpResponse:
+    '''User accepts invite via token
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, token: token}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", group: {...}}
+        data: all responses from groups_add_user
+        data: responses for token'''
+    data = req.get_json()
+    username = data['username']
+    token = data['token']
+    try:
+        group = groups.accept_invite(username, token, chat_client)
+        body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name("groups_invite_get")
+@app.route(route='groups/invite/get', methods=[func.HttpMethod.GET])
+def groups_invite_get(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get invitation tokens for a group
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {groupID: groupID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, "msg": "OK", tokens: []}'''
+    data = req.get_json()
+    groupID = data['groupID']
+    tokens = groups.get_invitations(groupID)
+    body = json.dumps({"result": True, "msg": "OK", "tokens": tokens})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name("groups_invite_clear_expired")
+@app.route(route='groups/invite/clear_expired', methods=[func.HttpMethod.POST])
+def groups_invite_clear_expired(req: func.HttpRequest) -> func.HttpResponse:
+    '''Clear invitations container of expired or revoked invitations
+    
+    # Parameters
+    req: func.httpRequest
+    with
+        data: {}
+        
+    # Returns
+    func.httpResponse
+    with
+        data: {result: True, msg: "OK"}'''
+    groups.clear_expired_invite()
+    body = json.dumps({"result": True, "msg": "OK"})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
