@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import OccasionDateChangeModal from "../components/OccasionDateChangeModal";
-import CreateDivisionModal from "../components/CreateDivisionModal";
 import ShowMembersModal from "../components/ShowMembersModal";
 import InviteUserModal from "../components/InviteUserModal";
 import RenameGroupModal from "../components/RenameGroupModal";
@@ -38,7 +37,6 @@ const GroupsContextMenu = ({
   const isAdmin = item?.admin === currentUserID;
 
   const [showDateModal, setShowDateModal] = useState(false);
-  const [showCreateDivisionModal, setShowCreateDivisionModal] = useState(false);
 
   // Additional modals
   const [showMembersModal, setShowMembersModal] = useState(false);
@@ -160,12 +158,7 @@ const GroupsContextMenu = ({
     }
   };
 
-  const handleRenameOccasion = async () => {
-    // e.g. you'd open a rename modal or do something similar
-    alert("Rename occasion: " + item?.id);
-    onClose();
-  };
-
+ 
   //
   // ========== BUILD MENU ITEMS DYNAMICALLY ==========
   //
@@ -199,7 +192,6 @@ const GroupsContextMenu = ({
     menuItems = [
       { label: "Leave Occasion", onClick: handleLeaveOccasion },
       { label: "Show Members", onClick: () => setShowMembersModal(true) },
-      { label: "Rename", onClick: handleRenameOccasion },
       {
         label: "Date Change",
         onClick: () => setShowDateModal(true),
@@ -207,10 +199,6 @@ const GroupsContextMenu = ({
       {
         label: "Delete Occasion",
         onClick: handleDeleteOccasion,
-      },
-      {
-        label: "Create Division",
-        onClick: () => setShowCreateDivisionModal(true),
       },
     ];
   } 
@@ -291,14 +279,6 @@ const GroupsContextMenu = ({
               />
             </div>
           </div>
-        )}
-
-        {/* Create Division (occasion) */}
-        {showCreateDivisionModal && type === "occasion" && (
-          <CreateDivisionModal
-            occasion={item}
-            onClose={() => setShowCreateDivisionModal(false)}
-          />
         )}
       </div>
     </div>
