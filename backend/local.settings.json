@@ -30,7 +30,11 @@
     "AZURE_SPEECH_KEY": "8fK4ZX2S2EXa6METEW0DlcRVz1SNW72Wg027cu3mzJ9YYvobuW70JQQJ99ALAC5RqLJXJ3w3AAAYACOGpXKw",
     "AZURE_SPEECH_REGION": "westeurope",
     "STREAM_KEY": "5cs3zw7bzvyk",
-    "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq"
+    "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq",
+    "GOOGLE_CLIENT_ID": "743246536728-cs1j2jj5lq69gba5ah4o9hs8pgusll2p.apps.googleusercontent.com",
+    "GOOGLE_CLIENT_SECRET": "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",
+    "GOOGLE_REDIRECT_URI": "http://localhost:3000"
+
   },
   "Host": {
     "CORS": "*"

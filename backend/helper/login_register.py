@@ -1,6 +1,8 @@
 import uuid, json, os, logging
 import azure.functions as func
 import bcrypt
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 def hash_password(password):
     """
@@ -282,3 +284,101 @@ def update_user_details(username, field, details, container):
     except Exception as e:
         logging.info(f"update user details error: {e}")
         return "database error"
+    
+
+
+
+def verify_google_token(credential):
+    """
+    Verify the Google OAuth token.
+
+    Parameters
+    ----------
+    credential : str
+        The Google OAuth JWT credential received from the frontend.
+
+    Returns
+    -------
+    dict or None
+        The decoded token if valid, None otherwise.
+    """
+    try:
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        decoded_token = id_token.verify_oauth2_token(credential, requests.Request(), client_id)
+        return decoded_token
+    except ValueError as e:
+        logging.error(f"Invalid Google token: {e}")
+        return None
+
+
+def fetch_or_create_user_google(decoded_token, container):
+    """
+    Fetch or create a user based on Google OAuth token.
+
+    Parameters
+    ----------
+    decoded_token : dict
+        The decoded Google JWT token containing user information.
+    container : object
+        The database container where user data is stored.
+
+    Returns
+    -------
+    dict
+        The user data from the database.
+    """
+    email = decoded_token.get("email")
+    name = decoded_token.get("name")
+    google_id = decoded_token.get("sub")  # Google's unique user ID
+
+    try:
+        # Check if user already exists
+        user_data = list(container.query_items(
+            query="SELECT * FROM c WHERE c.email=@Email",
+            parameters=[{'name': '@Email', 'value': email}],
+            enable_cross_partition_query=True
+        ))
+        if user_data:
+            logging.info(f"User already exists: {user_data[0]}")
+            return user_data[0]
+
+        # Create new user
+        new_user = {
+            'id': str(uuid.uuid4()),
+            'username': name,
+            'email': email,
+            'google_id': google_id,
+            'notifications': True,  # Default value for new users
+        }
+        container.create_item(body=new_user)
+        logging.info(f"New user created: {new_user}")
+        return new_user
+    except Exception as e:
+        logging.error(f"Error fetching or creating user: {e}")
+        return None
+
+def handle_google_login(credential, container):
+    """
+    Handle the Google login process.
+
+    Parameters
+    ----------
+    credential : str
+        The Google OAuth JWT credential received from the frontend.
+    container : object
+        The database container where user data is stored.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the user data or an error message.
+    """
+    decoded_token = verify_google_token(credential)
+    if not decoded_token:
+        return {"error": "Invalid Google token"}
+
+    user = fetch_or_create_user_google(decoded_token, container)
+    if not user:
+        return {"error": "Failed to create or fetch user"}
+
+    return {"user": user, "message": "Login successful"}
