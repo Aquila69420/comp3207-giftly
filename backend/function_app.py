@@ -649,7 +649,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     groupname = data['groupname']
     try:
-        group = groups.change_groupname(userID, groupID, groupname)
+        group = groups.change_groupname(userID, groupID, groupname, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -1242,7 +1242,7 @@ def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     occasionID = data['occasionID']
     try:
-        oc, divisions = groups.exclusion_gifting(userID, occasionID)
+        oc, divisions = groups.exclusion_gifting(userID, occasionID, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
