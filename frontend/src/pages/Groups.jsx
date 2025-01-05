@@ -18,6 +18,8 @@ const Groups = () => {
   const [loadingOccasions, setLoadingOccasions] = useState(false);
 
   const [loadingGroup, setLoadingGroup] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en"); // Default to English
+
 
   useEffect(() => {
     if (!userID) return;
@@ -227,6 +229,13 @@ const Groups = () => {
     }
   };
 
+  const handleLanguageChange = (language) => {
+    // Update the user's language and chat language
+
+    // Update the user's language
+    setSelectedLanguage(language);
+  };
+
   // Add an occasion to a group
   const handleAddOccasion = async (group, occasionName, occasionDate, chosenUserIDs) => {
     try {
@@ -263,7 +272,10 @@ const Groups = () => {
 
   return (
     <div className={styles.groupsContainer}>
-      <GroupsTopBar userID={userID} />
+      <GroupsTopBar 
+        userID={userID} 
+        onLanguageChange={handleLanguageChange}
+      />
 
       <div className={styles.groupsContent}>
         <GroupsSidebar
@@ -287,7 +299,8 @@ const Groups = () => {
           userID={userID}
           username={username}
           group={activeGroup}         // or division={activeDivision}
-          division={activeDivision}   // optional 
+          division={activeDivision}   // optional
+          language={selectedLanguage} 
         />
         </div>
       </div>

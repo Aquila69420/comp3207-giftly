@@ -441,6 +441,7 @@ def create_group(userID, groupname, chat_client):
         }
     )
     channel.create(userID)
+    channel.update({"auto_translation_enabled": True})
     group['chatChannelID'] = channel_id
     # print(group)
     groups_container.replace_item(item=group['id'], body=group) 
