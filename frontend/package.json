@@ -19,6 +19,7 @@
     "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1",
     "react-spinners": "^0.15.0",
+    "react-world-flags": "^1.6.0",
     "stream-chat": "^8.49.0",
     "stream-chat-react": "^12.8.1",
     "web-vitals": "^2.1.0",
