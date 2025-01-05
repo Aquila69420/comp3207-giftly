@@ -6,7 +6,6 @@ import CalendarModal from './CalendarModal';
 
 import LanguagePicker from "./LanguagePicker"; // Import the LanguagePicker component
 
-import Flag from 'react-world-flags';
 
 
 // We'll assume you pass `userID` as props, so we can fetch the deadlines
@@ -18,7 +17,6 @@ const GroupsTopBar = ({ userID, onLanguageChange }) => {
   const [error, setError] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
 
-  const [language, setLanguage] = useState("en"); // State for selected language
 
 
   // Next upcoming occasion (the earliest future date)
@@ -50,7 +48,6 @@ const GroupsTopBar = ({ userID, onLanguageChange }) => {
   };
 
   const handleLanguageChange = (newLanguage) => {
-    setLanguage(newLanguage);
     onLanguageChange(newLanguage);
   };
 

@@ -68,7 +68,6 @@ const GroupsSidebar = ({
   const handleGroupToggle = (groupId, group) => {
     // If we click the same group, toggle it closed; 
     // otherwise expand the new group, collapse the old.
-    console.log("occasionId", expandedOccasionId);
     if (expandedOccasionId !== null) {
       setExpandedOccasionId(null);
     } else {

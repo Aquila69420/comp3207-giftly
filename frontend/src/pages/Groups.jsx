@@ -18,7 +18,9 @@ const Groups = () => {
   const [loadingOccasions, setLoadingOccasions] = useState(false);
 
   const [loadingGroup, setLoadingGroup] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("en"); // Default to English
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    localStorage.getItem("language") || "en"
+  )
 
 
   useEffect(() => {
@@ -233,6 +235,7 @@ const Groups = () => {
     // Update the user's language and chat language
 
     // Update the user's language
+    localStorage.setItem("language", language);
     setSelectedLanguage(language);
   };
 

@@ -64,7 +64,7 @@ const GroupsChat = ({ userID, username, group, division, language }) => {
           setLoading(false);
           return;
         } else {
-            console.log('Token fetched:', data.token);
+            // console.log('Token fetched:', data.token);
         }
         const token = data.token; // from your backend
 

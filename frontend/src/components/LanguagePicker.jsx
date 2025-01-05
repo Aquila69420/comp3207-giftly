@@ -3,12 +3,6 @@ import Flag from "react-world-flags";
 
 const LanguagePicker = ({ onLanguageChange }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState({
-    code: "en",
-    label: "English",
-    flag: "GB",
-  });
-
   const languages = [
     { code: "af", label: "Afrikaans", flag: "ZA" },
     { code: "sq", label: "Albanian", flag: "AL" },
@@ -68,6 +62,18 @@ const LanguagePicker = ({ onLanguageChange }) => {
     { code: "vi", label: "Vietnamese", flag: "VN" },
   ];
 
+  const defaultLanguageCode = localStorage.getItem("language") || "en";
+
+  const defaultLanguage = useState(
+    languages.find((lang) => lang.code === defaultLanguageCode) || languages[0]
+  )
+  console.log('default lang', defaultLanguage)
+  const [selectedLanguage, setSelectedLanguage] = useState({
+    code: defaultLanguage[0].code,
+    label: defaultLanguage[0].label,
+    flag: defaultLanguage[0].flag,
+  });
+
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
@@ -76,6 +82,7 @@ const LanguagePicker = ({ onLanguageChange }) => {
     setSelectedLanguage(language);
     setIsOpen(false);
     if (onLanguageChange) {
+      localStorage.setItem("language", language.code);  
       onLanguageChange(language.code);
     }
   };
