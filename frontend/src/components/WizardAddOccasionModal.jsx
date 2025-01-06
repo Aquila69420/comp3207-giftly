@@ -114,48 +114,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
     );
   };
 
-  // Step 2: pick membership (everyone is default, current user is forced in)
-  const renderStepInvolved = () => {
-    return (
-      <div>
-        <h3>Select People Involved</h3>
-        <ul>
-          {group.users.map((member) => {
-            const checked = involvedUserIDs.includes(member.userID);
-            const disabled = (member.userID === currentUserID); // you can't uncheck yourself
-            return (
-              <li key={member.userID}>
-                <label>
-                  <input
-                    type="checkbox"
-                    disabled={disabled}
-                    checked={checked}
-                    onChange={() => {
-                      if (disabled) return;
-                      if (checked) {
-                        // remove
-                        setInvolvedUserIDs(involvedUserIDs.filter(id => id !== member.userID));
-                      } else {
-                        // add
-                        setInvolvedUserIDs([...involvedUserIDs, member.userID]);
-                      }
-                    }}
-                  />
-                  {member.username}
-                  {disabled && " (You)"}
-                </label>
-              </li>
-            );
-          })}
-        </ul>
-        <button onClick={handleNext} className={styles.modalCreateButton}>
-          Next
-        </button>
-      </div>
-    );
-  };
-
-  // Step 3: pick recipients if type=group_gifting
+  // Step 2: pick recipients if type=group_gifting
   const renderStepRecipients = () => {
     if (occasionType !== "group_gifting") {
       // skip
@@ -194,6 +153,49 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
         <button onClick={handleNext} className={styles.modalCreateButton}>
           Next
         </button>
+      </div>
+    );
+  };
+
+  // Step 3: pick membership (everyone is default, current user is forced in)
+  const renderStepInvolved = () => {
+    return (
+      <div>
+      <h3>Select People Involved</h3>
+      <ul>
+        {group.users
+        .filter(member => !recipientIDs.includes(member.userID)) // Exclude recipientIDs
+        .map((member) => {
+          const checked = involvedUserIDs.includes(member.userID);
+          const disabled = (member.userID === currentUserID); // you can't uncheck yourself
+          return (
+          <li key={member.userID}>
+            <label>
+            <input
+              type="checkbox"
+              disabled={disabled}
+              checked={checked}
+              onChange={() => {
+              if (disabled) return;
+              if (checked) {
+                // remove
+                setInvolvedUserIDs(involvedUserIDs.filter(id => id !== member.userID));
+              } else {
+                // add
+                setInvolvedUserIDs([...involvedUserIDs, member.userID]);
+              }
+              }}
+            />
+            {member.username}
+            {disabled && " (You)"}
+            </label>
+          </li>
+          );
+        })}
+      </ul>
+      <button onClick={handleNext} className={styles.modalCreateButton}>
+        Next
+      </button>
       </div>
     );
   };
@@ -326,17 +328,17 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
     // if user chose "Other/Custom" => pick type
     stepContent = renderStepType();
   } else if (
-    (stepIndex === 1 && selectedTemplate?.type !== null) ||
-    (stepIndex === 2 && selectedTemplate?.type === null && occasionType)
-  ) {
-    // The second step is picking membership
-    stepContent = renderStepInvolved();
-  } else if (
-    // The third step might be recipients if type=group_gifting
-    (stepIndex === 2 && selectedTemplate?.type !== null && selectedTemplate.type === "group_gifting") ||
-    (stepIndex === 3 && occasionType === "group_gifting" && selectedTemplate?.type === null)
+    // The second step might be recipients if type=group_gifting
+    (stepIndex === 1 && selectedTemplate?.type !== null && selectedTemplate.type === "group_gifting") ||
+    (stepIndex === 2 && occasionType === "group_gifting" && selectedTemplate?.type === null)
   ) {
     stepContent = renderStepRecipients();
+  } else if (
+    (stepIndex === 2 && selectedTemplate?.type !== null) ||
+    (stepIndex === 3 && selectedTemplate?.type === null && occasionType)
+  ) {
+    // The third step is picking membership
+    stepContent = renderStepInvolved();
   } else {
     // final step => name & date
     stepContent = renderStepNameDate();
