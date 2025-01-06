@@ -206,6 +206,29 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
     );
   };
 
+  const getOccassionNamePlaceholder = () => {
+    if (!selectedTemplate) return "Occasion Name";
+
+    const { label } = selectedTemplate;
+    if (label === "Other/Custom" || label === "Secret Santa" || label === "Christmas") {
+      return "Occasion Name";
+    }
+
+    if (recipientIDs.length === 1) {
+      const recipient = group.users.find(u => u.userID === recipientIDs[0]);
+      if (recipient) {
+      return `${recipient.username}'s ${label}`;
+      }
+    } else if (recipientIDs.length === 2) {
+      const recipients = recipientIDs.map(rid => group.users.find(u => u.userID === rid).username);
+      if (recipients.length === 2) {
+      return `${recipients[0]} & ${recipients[1]}'s ${label}`;
+      }
+    }
+
+    return "Occasion Name";
+  };
+
   // Step 4: name & date
   const renderStepNameDate = () => {
     return (
@@ -214,10 +237,10 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
         {/* Suggest name based on recipients or template */}
         <input
           type="text"
-          placeholder="Occasion Name"
+          placeholder={getOccassionNamePlaceholder()}
           value={occasionName}
           onChange={(e) => setOccasionName(e.target.value)}
-          style={{ display: "block", marginBottom: "0.5rem" }}
+          style={{ display: "block", marginBottom: "0.5rem", width: "fit-content"}}
         />
         <input
           type="date"
