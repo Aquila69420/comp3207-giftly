@@ -7,10 +7,16 @@ import config from "../config";
 // Sample templates with default type
 const OCCASION_TEMPLATES = [
   { label: "Birthday", type: "group_gifting" },
+  { label: "Engagement", type: "group_gifting" },
   { label: "Wedding", type: "group_gifting" },
-  { label: "Graduation", type: "secret_santa" },
-  { label: "Anniversary", type: "exclusion_gifting" },
-  { label: "Christmas (Secret Santa)", type: "secret_santa" },
+  { label: "Graduation", type: "group_gifting" },
+  { label: "Anniversary", type: "group_gifting" },
+  { label: "Baby Shower", type: "group_gifting" },
+  { label: "Christmas", type: "exclusion_gifting" },
+  { label: "Secret Santa", type: "secret_santa" },
+  { label: "Housewarming", type: "group_gifting" },
+  { label: "Retirement", type: "group_gifting" },
+  { label: "Promotion", type: "group_gifting" },
   { label: "Other/Custom", type: null }, // we let them pick the type next
 ];
 
@@ -60,7 +66,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
         <h3>Choose an Occasion Template</h3>
         <ul style={{ listStyle: "none", padding: 0 }}>
           {OCCASION_TEMPLATES.map((tpl) => (
-            <li key={tpl.label} style={{ margin: "0.5rem 0" }}>
+            <li key={tpl.label} style={{ margin: "0.5rem 0"}}>
               <button
                 onClick={() => {
                   setSelectedTemplate(tpl);
@@ -69,7 +75,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
                   // go next
                   handleNext();
                 }}
-                style={{ cursor: "pointer" }}
+                style={{ cursor: "pointer", color: "white", backgroundColor: "#085b5e", border: "none", borderRadius: "10px" }}
               >
                 {tpl.label}
               </button>
