@@ -4,9 +4,9 @@ import { FaEllipsisH, FaPlus } from "react-icons/fa";
 import GroupsContextMenu from "./GroupsContextMenu";
 import AddOccasionModal from "./AddOccasionModal";
 import styles from "../styles/groups.module.css";
-import { ClipLoader } from "react-spinners";
-
+import GridLoader from "react-spinners/GridLoader";
 import WizardAddOccasionModal from "./WizardAddOccasionModal";
+import InfinityLoader from "./InfinityLoader";
 
 /*
   Props:
@@ -142,10 +142,10 @@ const GroupsSidebar = ({
       {isMainOpen && (
         <div className={styles.groupsWrapper}>
           {/* Spinner for loading groups */}
-          {/* TODO: Update loader */}
           {loadingGroup ? (
             <div className={styles.spinnerContainer}>
-              <ClipLoader /> 
+              <GridLoader color={"#5F9389"} loading={true} size={10} />
+              {/* <InfinityLoader customStyles={loaderStyle}/> */}
             </div>
           ) : (
 
@@ -187,14 +187,13 @@ const GroupsSidebar = ({
                       : "0px",
                   }}
                 >
-                  {Array.isArray(group.occasions) &&
+                  {Array.isArray(group.occasions) && 
                   loadingOccasions ? (
                     <div className={styles.spinnerContainer}>
-                      <ClipLoader />
+                      <GridLoader color={"#5F9389"} loading={true} size={10} />
+                      {/* <InfinityLoader customStyles={loaderStyle}/> */}
                     </div>
                   ) : (
-                    
-                    
                     group.occasions?.map((occ) => {
                       
                       const occIsExpanded = expandedOccasionId === occ.id;
@@ -235,7 +234,8 @@ const GroupsSidebar = ({
                           {/* Spinner for loading occasions */}
                           {occIsExpanded && loadingDivisions ? (
                             <div className={styles.spinnerContainer}>
-                              <ClipLoader />
+                              <GridLoader color={"#5F9389"} loading={true} size={10} />
+                              {/* <InfinityLoader  customStyles={loaderStyle}/> */}
                             </div>
                           ) : (
                             <div

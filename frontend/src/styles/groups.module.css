@@ -12,14 +12,6 @@
 }
 
 /* Container for the entire Groups page */
-.groupsContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    background-color: #f9f9f9;
-    color: #333;
-    font-family: sans-serif;
-  }
   
   .errorMessage {
     color: red;
@@ -70,15 +62,15 @@
   }
   
   /* MAIN HEADING */
-  .mainHeading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f3f3f3;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    border-bottom: 1px solid #e5e5e5;
-  }
+    .mainHeading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #f3f3f3;
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid #e5e5e5;
+    }
   
   .headingLeft {
     display: flex;
@@ -219,14 +211,7 @@
     font-size: 0.9rem;
     color: #777;
   }
-  
-  
-  /* CHAT CONTENT */
-  .chatContainer {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto;
-  }
+
   
   /* MODAL BACKDROP (used for create group, rename, etc.) */
   .modalBackdrop {
@@ -243,26 +228,11 @@
   }
   
   /* MODAL */
-  .modal {
-    background-color: #fff;
-    color: #333;
-    padding: 1rem;
-    width: 300px;
-    border-radius: 5px;
-  }
   
   .modalTitle {
     margin-top: 0;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
-  }
-  
-  .modalInput {
-    width: 100%;
-    padding: 0.4rem;
-    margin: 0.5rem 0 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
   }
   
   .modalButtons {
@@ -279,10 +249,6 @@
     cursor: pointer;
   }
   
-  .modalCreateButton {
-    background-color: #007bff;
-    color: #fff;
-  }
   
   .modalCancelButton {
     background-color: #aaa;
@@ -304,30 +270,10 @@
     z-index: 1000;
   }
   
-  .menuContainer {
-    background: #fff;
-    color: #333;
-    padding: 1rem;
-    width: 240px;
-    border-radius: 5px;
-  }
-  
   .menuTitle {
     margin-top: 0;
     margin-bottom: 0.5rem;
     font-size: 1.1rem;
-  }
-  
-  .menuList {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .menuItem {
-    padding: 0.4rem 0;
-    border-bottom: 1px solid #eee;
-    cursor: pointer;
   }
   
   .menuItem:last-child {
@@ -442,7 +388,6 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #f9f9f9;
     color: #333;
     font-family: sans-serif;
   }
@@ -453,18 +398,6 @@
     padding: 0.5rem;
   }
   
-  /* TopBar & layout */
-  .topBar {
-    display: flex;
-    align-items: center;
-    background-color: #eaeaea;
-    padding: 0.5rem 1rem;
-  }
-  .groupsContent {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
   .chatContainer {
     flex: 1;
     padding: 1rem;
@@ -550,9 +483,6 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  .occasionHeading:hover {
-    background-color: #eee;
-  }
   .occasionLeft {
     display: flex;
     align-items: center;
@@ -602,8 +532,8 @@
     z-index: 999;
   }
   .modal {
-    background-color: #fff;
-    color: #333;
+    background-color: var(--cararra);
+    color: var(--deep-sea-green);
     padding: 1rem;
     width: 320px;
     border-radius: 5px;
@@ -636,7 +566,7 @@
     font-size: 0.9rem;
   }
   .modalCreateButton {
-    background-color: #007bff;
+    background-color: var(--caribbean-green);
     color: #fff;
   }
   .modalCreateButton:hover {
@@ -644,37 +574,20 @@
   }
   .modalCancelButton {
     background-color: #ccc;
-    color: #333;
+    color: var(--deep-sea-green);
   }
   .modalCancelButton:hover {
     background-color: #bbb;
   }
   
   /* Context Menu */
-  .menuBackdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.3);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
   .menuContainer {
-    background-color: #fff;
-    color: #333;
+    background-color: var(--cararra);
+    color: var(--deep-sea-green);
     padding: 1rem;
     width: 240px;
     border-radius: 5px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  }
-  .menuTitle {
-    margin-top: 0;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
   }
   .menuList {
     list-style: none;
@@ -682,12 +595,10 @@
     padding: 0;
   }
   .menuItem {
-    padding: 0.4rem 0;
+    padding: 0.4rem 0.2rem;
     border-bottom: 1px solid #eee;
     cursor: pointer;
-  }
-  .menuItem:hover {
-    background-color: #f2f2f2;
+    border-radius: 10px;
   }
   
   /* Checkboxes for user lists */
