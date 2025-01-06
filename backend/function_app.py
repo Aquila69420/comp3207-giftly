@@ -953,8 +953,8 @@ def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     occasionID = data['occasionID']
     try:
-        oc = groups.occasions_leave(userID, occasionID)
-        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc)})
+        divisions, oc = groups.occasions_leave(userID, occasionID)
+        body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
