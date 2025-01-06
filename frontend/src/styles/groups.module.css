@@ -1,3 +1,16 @@
+:root {
+  --deep-sea-green: #085b5e;
+  --cararra: #e2e3dc;
+  --tulip-tree: #ebac3f;
+  --caribbean-green: #0ecfae;
+  --vesuvius: #b5540d;
+  --acapulco: #86b39b;
+  --straw: #d2c87a;
+  --jet-stream: #b2d2d0;
+  --wheat: #f1dcac;
+  --gray-chateau: #a5acaf;
+}
+
 /* Container for the entire Groups page */
 .groupsContainer {
     display: flex;
@@ -274,6 +287,7 @@
   .modalCancelButton {
     background-color: #aaa;
     color: #fff;
+    margin-right: 0.5rem;
   }
   
   /* CONTEXT MENU */

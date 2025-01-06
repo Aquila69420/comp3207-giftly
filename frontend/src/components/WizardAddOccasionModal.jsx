@@ -109,6 +109,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
             </label>
           </div>
         ))}
+        <button onClick={handleBack} className={styles.modalCancelButton}>Back</button>
         <button
           disabled={!occasionType}
           onClick={handleNext}
@@ -156,6 +157,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
             );
           })}
         </ul>
+        <button onClick={handleBack} className={styles.modalCancelButton}>Back</button>
         <button onClick={handleNext} className={styles.modalCreateButton}>
           Next
         </button>
@@ -199,6 +201,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
           );
         })}
       </ul>
+      <button onClick={handleBack} className={styles.modalCancelButton}>Back</button>
       <button onClick={handleNext} className={styles.modalCreateButton}>
         Next
       </button>
@@ -248,6 +251,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
           onChange={(e) => setOccasionDate(e.target.value)}
           style={{ display: "block", marginBottom: "0.5rem" }}
         />
+        <button onClick={handleBack} className={styles.modalCancelButton}>Back</button>
         <button
           onClick={handleCreate}
           className={styles.modalCreateButton}
@@ -257,6 +261,10 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
         </button>
       </div>
     );
+  };
+
+  const handleBack = () => {
+    setStepIndex((prev) => prev - 1);
   };
 
   const handleNext = () => {
