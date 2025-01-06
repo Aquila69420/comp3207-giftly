@@ -14,6 +14,10 @@ class GroupsError(Exception):
     def __init__(self, message):
         super().__init__(message)
 
+class UserInGroupError(GroupsError):
+    def __init__(self):
+        super().init__("The user is already in the group")
+
 def user_exists(userID):
     """
     Check if userID exists in the database
@@ -521,7 +525,7 @@ def add_user(userID, user_to_add, groupID, chat_client):
         The updated group document.
     Raises
     ------
-    GroupsError
+    UserInGroupError
         If the user to be added is already in the group.
     """
     # Check both userIDs exist
@@ -535,7 +539,7 @@ def add_user(userID, user_to_add, groupID, chat_client):
 
     # Check user_to_add is not already in group
     if user_to_add in group['users']:
-        raise GroupsError("The user is already in the group")
+        raise UserInGroupError()
 
     # UserID needs to be admin to add user to group
     group_is_admin(group, userID)
@@ -1228,13 +1232,15 @@ def accept_invite(username, token, chat_client):
     # Validate Token
     token_exists(tokenID)
 
-    group = add_user(admin, username, groupID, chat_client)
-
-    # On successful adding of user, set token to used via patch operation
-    ops = [
-        {"op": "set", "path": "/used", "value": True}
-    ]
-    invitations_container.patch_item(item=tokenID, partition_key=tokenID, patch_operations=ops)
+    try:
+        group = add_user(admin, username, groupID, chat_client)
+        # On successful adding of user, set token to used via patch operation
+        ops = [
+            {"op": "set", "path": "/used", "value": True}
+        ]
+        invitations_container.patch_item(item=tokenID, partition_key=tokenID, patch_operations=ops)
+    except UserInGroupError as e: # Catch if user is already in the group
+        group = group_exists(groupID) # Set group to return as the group
     return group
 
 
