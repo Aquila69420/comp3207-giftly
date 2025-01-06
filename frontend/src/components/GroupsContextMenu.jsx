@@ -124,7 +124,6 @@ const GroupsContextMenu = ({
       const data = await response.json();
       if (data.result) {
         alert(`Occasion deleted successfully`);
-        // Possibly refresh
       } else {
         alert(`Error: ${data.msg}`);
       }
@@ -132,6 +131,7 @@ const GroupsContextMenu = ({
       alert("Network error: " + err.message);
     } finally {
       onClose();
+      onActionDone?.(); // Call the onActionDone callback to refresh the data
     }
   };
 
@@ -157,6 +157,7 @@ const GroupsContextMenu = ({
       alert("Network error: " + err.message);
     } finally {
       onClose();
+      onActionDone?.(); // Call the onActionDone callback to refresh the data
     }
   };
 
@@ -231,25 +232,51 @@ const GroupsContextMenu = ({
 
         {/* Show members */}
         {showMembersModal && type === "group" && (
-          <ShowMembersModal group={item} onClose={() => setShowMembersModal(false)} />
+          <ShowMembersModal 
+          group={item} 
+          onClose={() => {
+            setShowMembersModal(false);
+            onClose();
+          }} />
         )}
         {showMembersModal && type === "occasion" && (
           // If you want to handle an occasion’s members, you'd do a similar approach
-          <ShowMembersModal group={null} occasion={item} onClose={() => setShowMembersModal(false)} />
+          <ShowMembersModal 
+          group={null} 
+          occasion={item} 
+          onClose={() => {
+            setShowMembersModal(false);
+            onClose();
+          }} />
         )}
         {showMembersModal && type === "division" && (
           // If divisions have a user list, you can do something similar
-          <ShowMembersModal group={null} division={item} onClose={() => setShowMembersModal(false)} />
+          <ShowMembersModal 
+          group={null} 
+          division={item} onClose={() => {
+            setShowMembersModal(false);
+            onClose();
+          }} />
         )}
 
         {/* Invite user */}
         {showInviteModal && type === "group" && (
-          <InviteUserModal group={item} onClose={() => setShowInviteModal(false)} />
+          <InviteUserModal 
+          group={item} 
+          onClose={() => {
+            setShowInviteModal(false); 
+            onClose();
+          }} />
         )}
 
         {/* Get shareable link */}
         { showLinkModal && type === "group" && (
-          <GetShareableLinkModal group={item} onClose={() => setShowLinkModal(false)}/>
+          <GetShareableLinkModal 
+          group={item} 
+          onClose={() => {
+            setShowLinkModal(false);
+            onClose();
+          }}/>
         )}
 
         {/* Rename group */}
@@ -268,7 +295,10 @@ const GroupsContextMenu = ({
         {showDateModal && type === "occasion" && (
           <OccasionDateChangeModal
             occasion={item}
-            onClose={() => setShowDateModal(false)}
+            onClose={() => {
+              setShowDateModal(false);
+              onClose();
+            }}
           />
         )}
 
@@ -281,7 +311,10 @@ const GroupsContextMenu = ({
             >
               <button
                 className={styles.closeButton}
-                onClick={() => setShowCartModal(false)}
+                onClick={() => {
+                  setShowCartModal(false);
+                  onClose();
+                }}
               >
                 &times;
               </button>
