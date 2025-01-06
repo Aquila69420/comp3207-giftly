@@ -96,7 +96,7 @@ const GetShareableLinkModal = ({ group, onClose }) => {
                         )}
                     </button>
                     <button onClick={onClose} className={styles.modalCancelButton}>
-                        Cancel
+                        Done
                     </button>
                 </div>
             </div>

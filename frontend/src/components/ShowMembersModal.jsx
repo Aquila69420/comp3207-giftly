@@ -1,23 +1,25 @@
-// src/components/ShowMembersModal.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { IoPersonRemoveOutline, IoPersonRemove } from "react-icons/io5";
 import styles from "../styles/groups.module.css";
 import config from "../config";
 
 const ShowMembersModal = ({ group, occasion, division, onClose }) => {
   const currentUserID = localStorage.getItem("userID");
+  const [kicked, setKicked] = useState(false);
+  const [members, setMembers] = useState([]);
 
-  // We'll treat group as the primary. If you also want to handle occasion or division,
-  // adjust accordingly:
+  useEffect(() => {
+    // Initialize members list from props
+    setMembers(group?.users || occasion?.users || division?.users || []);
+  }, [group, occasion, division]);
+
   const isGroup = !!group;
-  // If we have a group, we can see if the current user is admin:
   const isAdmin = group?.admin === currentUserID;
-
-  // We'll gather the members from group.users, or from occasion/division if you like
-  const members = group?.users || occasion?.users || division?.users || [];
 
   const handleKick = async (memberID) => {
     if (!window.confirm(`Kick user ${memberID} from group?`)) return;
     try {
+      setKicked(true);
       const response = await fetch(`${config.backendURL}/groups/kick`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -30,8 +32,10 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
       const data = await response.json();
       if (data.result) {
         alert("User removed from group");
-        // Refresh your group data in the parent if needed
+        // Remove the kicked user from the members list
+        setMembers((prevMembers) => prevMembers.filter((m) => m.userID !== memberID));
       } else {
+        setKicked(false);
         alert(`Error: ${data.msg}`);
       }
     } catch (err) {
@@ -53,7 +57,8 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
                 <button
                   style={{
                     marginLeft: "1rem",
-                    backgroundColor: "red",
+                    backgroundColor: "#085b5e",
+                    borderRadius: "10px",
                     color: "#fff",
                     border: "none",
                     padding: "0.25rem 0.5rem",
@@ -61,7 +66,7 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
                   }}
                   onClick={() => handleKick(m.userID)}
                 >
-                  X
+                  {!kicked ? <IoPersonRemoveOutline /> : <IoPersonRemove />}
                 </button>
               )}
             </li>

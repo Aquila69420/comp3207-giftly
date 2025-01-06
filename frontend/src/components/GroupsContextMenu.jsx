@@ -237,6 +237,7 @@ const GroupsContextMenu = ({
           onClose={() => {
             setShowMembersModal(false);
             onClose();
+            onActionDone?.();
           }} />
         )}
         {showMembersModal && type === "occasion" && (
@@ -256,6 +257,7 @@ const GroupsContextMenu = ({
           division={item} onClose={() => {
             setShowMembersModal(false);
             onClose();
+            onActionDone?.();
           }} />
         )}
 
@@ -266,7 +268,9 @@ const GroupsContextMenu = ({
           onClose={() => {
             setShowInviteModal(false); 
             onClose();
-          }} />
+            onActionDone?.();
+          }} 
+          />
         )}
 
         {/* Get shareable link */}
@@ -276,6 +280,7 @@ const GroupsContextMenu = ({
           onClose={() => {
             setShowLinkModal(false);
             onClose();
+            onActionDone?.();
           }}/>
         )}
 
@@ -285,7 +290,8 @@ const GroupsContextMenu = ({
               group={item} 
               onClose={() => {
                 setShowRenameModal(false);
-                onClose(); // Close the parent modal as well
+                onClose();
+                onActionDone?.();
               }} 
               onActionDone={onActionDone} 
             />
@@ -298,6 +304,7 @@ const GroupsContextMenu = ({
             onClose={() => {
               setShowDateModal(false);
               onClose();
+              onActionDone?.();
             }}
           />
         )}
