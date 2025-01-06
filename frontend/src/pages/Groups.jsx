@@ -4,6 +4,7 @@ import GroupsTopBar from "../components/GroupsTopbar";
 import GroupsSidebar from "../components/GroupsSidebar";
 import GroupsChat from "../components/GroupsChat";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const Groups = () => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Groups = () => {
     const fetchGroups = async () => {
       setLoadingGroup(true);
       try {
-        const res = await fetch("http://localhost:5000/groups/get", {
+        const res = await fetch(`${config.backendURL}/groups/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
@@ -52,7 +53,7 @@ const Groups = () => {
   const handleRefreshGroups = async () => {
     setLoadingGroup(true);
     try {
-      const res = await fetch("http://localhost:5000/groups/get", {
+      const res = await fetch(`${config.backendURL}/groups/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID }),
@@ -100,7 +101,7 @@ const Groups = () => {
     if (!hasOccasionObjects) {
       try {
         setLoadingOccasions(true);
-        const res = await fetch("http://localhost:5000/groups/occasions/get", {
+        const res = await fetch(`${config.backendURL}/groups/occasions/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID, groupID: group.id }),
@@ -139,7 +140,7 @@ const Groups = () => {
     if (!hasDivisions) {
       setLoadingDivisions(true);
       try {
-        const res = await fetch("http://localhost:5000/groups/divisions/get", {
+        const res = await fetch(`${config.backendURL}/groups/divisions/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID, occasionID: occasion.id }),
@@ -194,7 +195,7 @@ const Groups = () => {
   const handleCreateGroup = async (groupName) => {
     if (!groupName.trim()) return;
     try {
-      const res = await fetch("http://localhost:5000/groups/create", {
+      const res = await fetch(`${config.backendURL}/groups/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID, groupname: groupName.trim() }),
@@ -204,7 +205,7 @@ const Groups = () => {
       if (data.result) {
         // refetch groups
         setLoadingGroup(true);
-        const res2 = await fetch("http://localhost:5000/groups/get", {
+        const res2 = await fetch(`${config.backendURL}/groups/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
@@ -230,7 +231,7 @@ const Groups = () => {
   // Add an occasion to a group
   const handleAddOccasion = async (group, occasionName, occasionDate, chosenUserIDs) => {
     try {
-      const res = await fetch("http://localhost:5000/groups/occasions/create", {
+      const res = await fetch(`${config.backendURL}/groups/occasions/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

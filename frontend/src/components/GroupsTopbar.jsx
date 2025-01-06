@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IoMdArrowRoundBack } from "react-icons/io";
 import CalendarModal from './CalendarModal';
+import config from '../config';
 
 // We'll assume you pass `userID` as props, so we can fetch the deadlines
 // and we also accept an optional "onBack" callback or route to /home
@@ -25,7 +26,7 @@ const GroupsTopBar = ({ userID }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("http://localhost:5000/groups/calendar/get", {
+      const res = await fetch(`${config.backendURL}/groups/calendar/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID: uid }),

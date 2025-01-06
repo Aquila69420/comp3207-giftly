@@ -3,9 +3,10 @@ import OccasionDateChangeModal from "../components/OccasionDateChangeModal";
 import CreateDivisionModal from "../components/CreateDivisionModal";
 import ShowMembersModal from "../components/ShowMembersModal";
 import InviteUserModal from "../components/InviteUserModal";
+import GetShareableLinkModal from "../components/GetShareableLinkModal";
 import RenameGroupModal from "../components/RenameGroupModal";
 import styles from "../styles/groups.module.css";
-
+import config from "../config";
 import Cart from "../components/Cart";
 
 /**
@@ -43,6 +44,7 @@ const GroupsContextMenu = ({
   // Additional modals
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
 
   const [showCartModal, setShowCartModal] = useState(false); // State for cart modal
@@ -58,7 +60,7 @@ const GroupsContextMenu = ({
       return;
     }
     try {
-      const response = await fetch("http://localhost:5000/groups/delete", {
+      const response = await fetch(`${config.backendURL}/groups/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,7 +88,7 @@ const GroupsContextMenu = ({
   const handleLeaveGroup = async () => {
     if (!window.confirm(`Leave group: ${item.groupname}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/leave", {
+      const response = await fetch(`${config.backendURL}/groups/leave`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -116,7 +118,7 @@ const GroupsContextMenu = ({
   const handleDeleteOccasion = async () => {
     if (!window.confirm(`Delete occasion ID ${item?.id}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/occasions/delete", {
+      const response = await fetch(`${config.backendURL}/groups/occasions/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ occasionID: item?.id }),
@@ -138,7 +140,7 @@ const GroupsContextMenu = ({
   const handleLeaveOccasion = async () => {
     if (!window.confirm(`Leave occasion: ${item.occasionname}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/occasions/leave", {
+      const response = await fetch(`${config.backendURL}/groups/occasions/leave`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -182,6 +184,7 @@ const GroupsContextMenu = ({
         { label: "Delete Group", onClick: handleDeleteGroup },
         { label: "Rename Group", onClick: () => setShowRenameModal(true) },
         { label: "Invite Users", onClick: () => setShowInviteModal(true) },
+        { label: "Get link to group", onClick: () => setShowLinkModal(true) },
         { label: "Show Members", onClick: () => setShowMembersModal(true) },
         {
           label: "Add Occasion",
@@ -256,6 +259,11 @@ const GroupsContextMenu = ({
         {/* Invite user */}
         {showInviteModal && type === "group" && (
           <InviteUserModal group={item} onClose={() => setShowInviteModal(false)} />
+        )}
+
+        {/* Get shareable link */}
+        { showLinkModal && type === "group" && (
+          <GetShareableLinkModal group={item} onClose={() => setShowLinkModal(false)}/>
         )}
 
         {/* Rename group */}

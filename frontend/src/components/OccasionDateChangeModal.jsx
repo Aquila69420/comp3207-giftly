@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 /**
  * Props:
@@ -11,7 +12,7 @@ const OccasionDateChangeModal = ({ occasion, onClose }) => {
 
   const handleChangeDate = async () => {
     try {
-      const res = await fetch("http://localhost:5000/groups/occasions/datechange", {
+      const res = await fetch(`${config.backendURL}/groups/occasions/datechange`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ occasionID: occasion.id, occasiondate: newDate }),

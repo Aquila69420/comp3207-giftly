@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 /**
  * Props:
@@ -12,7 +13,7 @@ const CreateDivisionModal = ({ occasion, onClose }) => {
 
   const handleSecretSanta = async () => {
     try {
-      const res = await fetch("http://localhost:5000/groups/secret_santa", {
+      const res = await fetch(`${config.backendURL}/groups/secret_santa`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
@@ -35,7 +36,7 @@ const CreateDivisionModal = ({ occasion, onClose }) => {
 
   const handleExclusionGifting = async () => {
     try {
-      const res = await fetch("http://localhost:5000/groups/exclusion_gifting", {
+      const res = await fetch(`${config.backendURL}/groups/exclusion_gifting`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -60,7 +61,7 @@ const CreateDivisionModal = ({ occasion, onClose }) => {
     // The user might need to pick the recipients
     // For now, assume we have an array of recipientIDs
     try {
-      const res = await fetch("http://localhost:5000/groups/group_gifting", {
+      const res = await fetch(`${config.backendURL}/groups/group_gifting`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

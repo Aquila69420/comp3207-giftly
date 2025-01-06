@@ -12,6 +12,7 @@ import {
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import "../styles/layout.css";
+import config from '../config';
 
 /**
  * GroupsChat component:
@@ -51,8 +52,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
         setLoading(true);
 
         // 1) Get a token from your backend
-        //    (Your endpoint: http://localhost:5000/get_token)
-        const res = await fetch('http://localhost:5000/get_token', {
+        const res = await fetch(`${config.backendURL}/get_token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userID, username }),

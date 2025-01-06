@@ -1,6 +1,7 @@
 // src/components/InviteUserModal.jsx
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const InviteUserModal = ({ group, onClose }) => {
   const currentUserID = localStorage.getItem("userID");
@@ -9,7 +10,7 @@ const InviteUserModal = ({ group, onClose }) => {
   const handleInvite = async () => {
     if (!usernameToInvite.trim()) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/add_user", {
+      const response = await fetch(`${config.backendURL}/groups/add_user`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

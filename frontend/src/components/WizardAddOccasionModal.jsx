@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 // Sample templates with default type
 const OCCASION_TEMPLATES = [
@@ -237,7 +238,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
     console.log("Occasion Data:", occasionName, occasionDate, involvedUserIDs, occasionType, recipientIDs);
     try {
       // create occasion
-      const res = await fetch("http://localhost:5000/groups/occasions/create", {
+      const res = await fetch(`${config.backendURL}/groups/occasions/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -278,7 +279,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
   };
 
   const callSecretSanta = async (occasionID) => {
-    const res = await fetch("http://localhost:5000/groups/secret_santa", {
+    const res = await fetch(`${config.backendURL}/groups/secret_santa`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -291,7 +292,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
   };
 
   const callExclusionGifting = async (occasionID) => {
-    const res = await fetch("http://localhost:5000/groups/exclusion_gifting", {
+    const res = await fetch(`${config.backendURL}/groups/exclusion_gifting`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -304,7 +305,7 @@ const WizardAddOccasionModal = ({ group, onClose, onCreated }) => {
   };
 
   const callGroupGifting = async (occasionID, recipients) => {
-    const res = await fetch("http://localhost:5000/groups/group_gifting", {
+    const res = await fetch(`${config.backendURL}/groups/group_gifting`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
