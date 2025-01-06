@@ -140,9 +140,10 @@ const GroupsSidebar = ({
       {isMainOpen && (
         <div className={styles.groupsWrapper}>
           {/* Spinner for loading groups */}
+          {/* TODO: Update loader */}
           {loadingGroup ? (
             <div className={styles.spinnerContainer}>
-              <ClipLoader />
+              <ClipLoader /> 
             </div>
           ) : (
 

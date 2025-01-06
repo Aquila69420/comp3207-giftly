@@ -1722,8 +1722,9 @@ def groups_invite_get(req: func.HttpRequest) -> func.HttpResponse:
     func.HttpResponse
     with
         data: {result: True, "msg": "OK", tokens: []}'''
-    data = req.get_json()
-    groupID = data['groupID']
+    data = req.params
+    groupID = data.get('groupID')
+    logging.info(f"Getting invite tokens for group {groupID}")
     tokens = groups.get_invitations(groupID)
     body = json.dumps({"result": True, "msg": "OK", "tokens": tokens})
     response = func.HttpResponse(
