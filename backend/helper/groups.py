@@ -16,7 +16,7 @@ class GroupsError(Exception):
 
 class UserInGroupError(GroupsError):
     def __init__(self):
-        super().init__("The user is already in the group")
+        super().__init__("The user is already in the group")
 
 def user_exists(userID):
     """
