@@ -68,15 +68,9 @@ function Login() {
             sessionStorage.setItem("groupToJoin", JSON.stringify(data.group));
             navigate("/groups");
             return;
-          } else {
-            if (data.msg === "The user is already in the group") {
-              sessionStorage.removeItem("groupInviteToken");
-              // sessionStorage.setItem("groupToJoin", JSON.stringify(data.group)); // to implement ask anthony to modify the backend to return group if user is already in group
-              navigate("/groups");
-              return;
-            } else {
+          } 
+          else {
               console.error("Error joining group:", data.msg);
-            }
           }
         }
         setLoginError("");
@@ -123,14 +117,7 @@ function Login() {
             navigate("/groups");
             return;
           } else {
-            if (data.msg === "The user is already in the group") {
-              sessionStorage.removeItem("groupInviteToken");
-              // sessionStorage.setItem("groupToJoin", JSON.stringify(data.group)); // to implement ask anthony to modify the backend to return group if user is already in group
-              navigate("/groups");
-              return;
-            } else {
-              console.error("Error joining group:", data.msg);
-            }
+            console.error("Error joining group:", data.msg);
           }
         }
         navigate("/home");
