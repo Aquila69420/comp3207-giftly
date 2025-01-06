@@ -1691,7 +1691,7 @@ def groups_invite_accept(req: func.HttpRequest) -> func.HttpResponse:
     func.HttpResponse
     with
         data: {result: True, msg: "OK", group: {...}}
-        data: all responses from groups_add_user
+        data: all responses from groups_add_user (except if user is already in group, group is returned)
         data: responses for token'''
     data = req.get_json()
     username = data['username']
