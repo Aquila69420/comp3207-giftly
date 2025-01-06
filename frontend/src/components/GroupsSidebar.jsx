@@ -58,6 +58,8 @@ const GroupsSidebar = ({
   const handleAddOccasionRequest = (group) => {
     setTargetGroup(group);
     setShowWizard(true);
+    // Hide parent modal
+    closeMenu();
   };
 
   // "Add Group" modal

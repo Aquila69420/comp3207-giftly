@@ -179,15 +179,13 @@ const GroupsContextMenu = ({
         { label: "Invite Users", onClick: () => setShowInviteModal(true) },
         { label: "Get link to group", onClick: () => setShowLinkModal(true) },
         { label: "Show Members", onClick: () => setShowMembersModal(true) },
-        {
-          label: "Add Occasion",
-          onClick: () => onAddOccasionRequest?.(item),
-        },
+        {label: "Add Occasion", onClick: () => onAddOccasionRequest?.(item)},
       ];
     } else {
       menuItems = [
         { label: "Leave Group", onClick: handleLeaveGroup },
         { label: "Show Members", onClick: () => setShowMembersModal(true) },
+        {label: "Add Occasion", onClick: () => onAddOccasionRequest?.(item)},
       ];
     }
   } 
@@ -255,11 +253,18 @@ const GroupsContextMenu = ({
         )}
 
         {/* Rename group */}
-        {showRenameModal && type === "group" && (
-          <RenameGroupModal group={item} onClose={() => setShowRenameModal(false)} onActionDone={onActionDone} />
-        )}
+          {showRenameModal && type === "group" && (
+            <RenameGroupModal 
+              group={item} 
+              onClose={() => {
+                setShowRenameModal(false);
+                onClose(); // Close the parent modal as well
+              }} 
+              onActionDone={onActionDone} 
+            />
+          )}
 
-        {/* Date Change (occasion) */}
+          {/* Date Change (occasion) */}
         {showDateModal && type === "occasion" && (
           <OccasionDateChangeModal
             occasion={item}
