@@ -67,7 +67,7 @@ function Login() {
   const handleGoogleLoginSuccess = async (response) => {
     console.log("Google login response:", response);
     try {
-      const res = await fetch("http://localhost:5000/google/callback", {
+      const res = await fetch(`${config.backendURL}/google/callback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: response.credential }),
