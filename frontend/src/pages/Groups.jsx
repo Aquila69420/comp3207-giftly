@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import GroupsTopBar from "../components/GroupsTopbar";
 import GroupsSidebar from "../components/GroupsSidebar";
@@ -17,6 +17,7 @@ const Groups = () => {
   const [activeDivision, setActiveDivision] = useState(null);
   const [loadingDivisions, setLoadingDivisions] = useState(false);
   const [loadingOccasions, setLoadingOccasions] = useState(false);
+  const isFirstRender = useRef(true); //flag to avoid double invocation of useEffect due to StrictMode
 
   const [loadingGroup, setLoadingGroup] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState(
@@ -25,7 +26,10 @@ const Groups = () => {
 
   const fetchGroups = async () => {
     setLoadingGroup(true);
+    console.log("Fetch Group Triggered")
+    //http://localhost:3000/invite?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImEyYzYzOGM0LWVmYWMtNGMwMy04NDE5LTljNDdkYmMyMjIzYyIsImV4cCI6MTc0MTM2Njg5MiwiZ3JvdXBJRCI6IjFmYTUzYzJhLWZhMGYtNDczOS05Njk4LTJlYjI4ODM0YTBiZSIsImNyZWF0ZWRfYnkiOiJmZDkxMDUzZS0zYmEyLTRiNDktOTJkMS0zOTlkNWYwM2EyZjAiLCJvbmVfdGltZSI6ZmFsc2V9.s0ZODm7IRZPqmU_dmuIhVxjAQZbTkarOin12DtYsxcY
     try {
+      console.log("GROUPS.GET")
       const res = await fetch(`${config.backendURL}/groups/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,12 +43,12 @@ const Groups = () => {
           if (sessionStorage.getItem("groupToJoin")) {
             let group = JSON.parse(sessionStorage.getItem("groupToJoin"));
             // Extract the group  from session storage and join it
-            setActiveGroup(group);
             console.log("Group to join:", group);
-            console.log("Current active group:", activeGroup);
+            setActiveGroup(group);
             sessionStorage.removeItem("groupToJoin");
           }
           else {
+            console.log("CURRENT GROUP TO FIRST")
             setActiveGroup(data.groups[0]);
           }
         }
@@ -59,8 +63,16 @@ const Groups = () => {
   };
   
   useEffect(() => {
+    if(!isFirstRender.current) {
+      return;
+    }
     if (!userID) return;
+    console.log("Fetching groups for userID:", userID);
     fetchGroups();
+    return () => {
+      isFirstRender.current = false;
+      console.log("Cleanup effect for userID:", userID);
+    };
   }, [userID]);
 
   // Refresh groups
