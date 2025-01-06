@@ -39,7 +39,7 @@ const GetShareableLinkModal = ({ group, onClose }) => {
                     userID: currentUserID,
                     groupID: group.id,
                     expiryTime: 24 * 60 * 60, // 24 hours
-                    one_time: true,
+                    one_time: false,
                 }),
             });
             const data = await response.json();
@@ -73,8 +73,8 @@ const GetShareableLinkModal = ({ group, onClose }) => {
                 <div className={styles.modalInput}>
                     {loading ? (
                         <div className="overlay">
-                        <InfinityLoader loading={loading} />
-                      </div>
+                            <InfinityLoader loading={loading} />
+                        </div>
                     ) : (
                         <label>
                             {inviteLink.length > 45 ? `${inviteLink.substring(0, 45)}...` : inviteLink}

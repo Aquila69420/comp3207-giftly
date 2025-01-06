@@ -18,8 +18,8 @@ import AccountSettingPage from "./pages/AccountSettingPage";
 import ForgotPassword from "./pages/ForgotPassword";
 import Group from "./pages/Groups";
 import GroupsSettings from "./pages/GroupsSettings";
+import Invite from "./pages/Invite";
 
-// TODO: Implement load from back button for pages
 function App() {
   return (
     <Router>
@@ -43,6 +43,7 @@ function App() {
             </Protected>
           }
         />
+        <Route path="/invite" element={<Invite/>} />
         <Route
           path="/product"
           element={
