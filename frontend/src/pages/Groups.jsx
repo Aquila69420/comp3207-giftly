@@ -23,42 +23,43 @@ const Groups = () => {
     localStorage.getItem("language") || "en"
   )
 
+  const fetchGroups = async () => {
+    setLoadingGroup(true);
+    try {
+      const res = await fetch(`${config.backendURL}/groups/get`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userID }),
+      });
+      const data = await res.json();
+      if (data.result) {
+        setGroups(data.groups);
 
+        if (data.groups.length > 0) {
+          if (sessionStorage.getItem("groupToJoin")) {
+            let group = JSON.parse(sessionStorage.getItem("groupToJoin"));
+            // Extract the group  from session storage and join it
+            setActiveGroup(group);
+            console.log("Group to join:", group);
+            console.log("Current active group:", activeGroup);
+            sessionStorage.removeItem("groupToJoin");
+          }
+          else {
+            setActiveGroup(data.groups[0]);
+          }
+        }
+      } else {
+        setError(data.msg);
+      }
+    } catch (err) {
+      setError("Error fetching groups: " + err.message);
+    } finally {
+      setLoadingGroup(false);
+    }
+  };
+  
   useEffect(() => {
     if (!userID) return;
-    const fetchGroups = async () => {
-      setLoadingGroup(true);
-      try {
-        const res = await fetch(`${config.backendURL}/groups/get`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userID }),
-        });
-        const data = await res.json();
-        if (data.result) {
-          setGroups(data.groups);
-
-          if (data.groups.length > 0) {
-            if (sessionStorage.getItem("groupToJoin")) {
-              console.log("Joining group from session storage:", JSON.parse(sessionStorage.getItem("groupToJoin")));
-              // Extract the group  from session storage and join it
-              setActiveGroup(JSON.parse(sessionStorage.getItem("groupToJoin")));
-              console.log("Current active group:", activeGroup);
-              sessionStorage.removeItem("groupToJoin");
-            }
-            else {
-              setActiveGroup(data.groups[0]);
-            }
-          }
-        } else {
-          setError(data.msg);
-        }
-      } catch (err) {
-        setError("Error fetching groups: " + err.message);
-      } finally {
-        setLoadingGroup(false);
-      }
-    };
     fetchGroups();
   }, [userID]);
 
