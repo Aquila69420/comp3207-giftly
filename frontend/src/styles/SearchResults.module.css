@@ -1,258 +1,258 @@
 .container {
-  display: flex;
-  flex-direction: column;
-  width: 100dvw;
-  background-color: #ffffff;
-}
-
-.topBar {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ddd;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  justify-content: center;
-  box-sizing: border-box;
-}
-
-.backButton {
-  background-color: #f1f1f1;
-  border-radius: 50%;
-  display: flex;
-  width: 50px;
-  height: 50px;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  margin-right: 1rem;
-}
-
-.backButton:hover {
-  background-color: #ececec;
-}
-
-
-.searchBar {
-  display: flex;
-  justify-content: center; /* Centers the search bar */
-  max-width: 80%; /* Maximum width for the search bar container */
-  margin: 0 auto;
-  width: 100%;
-}
-
-.searchText {
-  color: white;
-  background-color: #085b5e;
-  display: block; /* Ensures the input behaves as a block element */
-  padding: 8px;
-  font-size: 16px;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  white-space: nowrap; /* Prevents the text from wrapping */
-  overflow-x: auto; /* Makes the input scrollable if content overflows */
-  min-width: max-content; /* Sets the minimum width to the content’s size */
-  max-width: 100%; /* Limits the width to the container’s size */
-  width: 100%; /* Allows dynamic resizing */
-}
-
-.productGrid {
-  background-color: #ffffff;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 10px;
-  padding: 20px;
-}
-
-.productCard {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.productImage {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
-
-.productName {
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-.searchButton {
-  color: #ebac3f;
-  border: none;
-  font-size: 2rem;
-  padding: 10px;
-}
-
-
-.container {
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-  background-color: #ffffff;
-  width: 100%;
-}
-
-.topBar {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  background-color: #ffffff;
-  border-bottom: 1px solid #ddd;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  justify-content: center;
-}
-
-.backButton {
-  background-color: #f1f1f1;
-  border-radius: 15px;
-  display: flex;
-  width: 50px;
-  height: 50px;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  margin: 0 2rem;
-}
-
-.backButton:hover {
-  background-color: #cecece;
-}
-
-.searchBar {
-  display: flex;
-  justify-content: center;
-  max-width: 80%;
-  margin: 0 auto;
-  width: 100%;
-}
-.featureBanner {
-  background-color: #01ad9d;
-  color: #ffffff;
-  font-size: 16px;
-  padding: 10px 20px;
-  border-radius: 0 0 10px 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  font-weight: bold;
-  text-align: center;
-}
-
-.featureText {
-  color: #ffffff;
-}
-.searchText {
-  color: white;
-  background-color: #e68b23;
-  padding: 8px;
-  font-size: 16px;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  width: 100%;
-}
-
-.productGrid {
-  background-color: #ffffff;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 50px;
-  box-sizing: border-box;
-}
-
-.productCard {
-  background-color: #ffffff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  box-sizing: border-box;
-}
-
-.productName {
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sortBar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 10px 20px;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #ddd;
-  box-sizing: border-box;
-}
-
-.sortSelect {
-  margin-left: 10px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-
-.searchBar {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  padding: 10px;
-  border-radius: 10px;
-  background: linear-gradient(45deg, #08caa5, #ebac3f);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  margin: 0 auto;
-}
-
-.searchText {
-  color: #ffffff;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  padding: 8px 12px;
-  flex-grow: 1;
-  border-radius: 5px;
-  font-size: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    width: 100dvw;
+    background-color: #ffffff;
+  }
   
-}
-
-.searchText::placeholder {
-  color: rgb(255, 255, 255);
-  opacity: 1; /* Firefox */
-}
-.titleValue{
-  padding: 1rem;
-  font-size: 2rem;
-}
-
-.searchButton {
-  color: #ffffff;
-  font-size: 1.5rem;
-  margin-left: 10px;
-  cursor: pointer;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
-  transition: background-color 0.3s ease;
-}
-
-.searchButton:hover {
-  background-color: rgba(255, 255, 255, 0.4);
-}
+  .topBar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+  
+  .backButton {
+    background-color: #f1f1f1;
+    border-radius: 50%;
+    display: flex;
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 1rem;
+  }
+  
+  .backButton:hover {
+    background-color: #ececec;
+  }
+  
+  
+  .searchBar {
+    display: flex;
+    justify-content: center; /* Centers the search bar */
+    max-width: 80%; /* Maximum width for the search bar container */
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .searchText {
+    color: white;
+    background-color: #085b5e;
+    display: block; /* Ensures the input behaves as a block element */
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    white-space: nowrap; /* Prevents the text from wrapping */
+    overflow-x: auto; /* Makes the input scrollable if content overflows */
+    min-width: max-content; /* Sets the minimum width to the content’s size */
+    max-width: 100%; /* Limits the width to the container’s size */
+    width: 100%; /* Allows dynamic resizing */
+  }
+  
+  .productGrid {
+    background-color: #ffffff;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 10px;
+    padding: 20px;
+  }
+  
+  .productCard {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .productImage {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+  }
+  
+  .productName {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .searchButton {
+    color: #ebac3f;
+    border: none;
+    font-size: 2rem;
+    padding: 10px;
+  }
+  
+  
+  .container {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    width: 100%;
+  }
+  
+  .topBar {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    justify-content: center;
+  }
+  
+  .backButton {
+    background-color: #f1f1f1;
+    border-radius: 15px;
+    display: flex;
+    width: 50px;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 0 2rem;
+  }
+  
+  .backButton:hover {
+    background-color: #cecece;
+  }
+  
+  .searchBar {
+    display: flex;
+    justify-content: center;
+    max-width: 80%;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .featureBanner {
+    background-color: #01ad9d;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .featureText {
+    color: #ffffff;
+  }
+  .searchText {
+    color: white;
+    background-color: #e68b23;
+    padding: 8px;
+    font-size: 16px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    width: 100%;
+  }
+  
+  .productGrid {
+    background-color: #ffffff;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 50px;
+    box-sizing: border-box;
+  }
+  
+  .productCard {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+  }
+  
+  .productName {
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .sortBar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    box-sizing: border-box;
+  }
+  
+  .sortSelect {
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  
+  .searchBar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #08caa5, #ebac3f);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    margin: 0 auto;
+  }
+  
+  .searchText {
+    color: #ffffff;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    padding: 8px 12px;
+    flex-grow: 1;
+    border-radius: 5px;
+    font-size: 1.3rem;
+    
+  }
+  
+  .searchText::placeholder {
+    color: rgb(255, 255, 255);
+    opacity: 1; /* Firefox */
+  }
+  .titleValue{
+    padding: 1rem;
+    font-size: 2rem;
+  }
+  
+  .searchButton {
+    color: #ffffff;
+    font-size: 1.5rem;
+    margin-left: 10px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    transition: background-color 0.3s ease;
+  }
+  
+  .searchButton:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+  }
