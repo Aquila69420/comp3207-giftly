@@ -142,13 +142,18 @@ export default function Product({ previousState }) {
     const updateWishlist = favorite
       ? `${config.backendURL}/wishlist_remove`
       : `${config.backendURL}/wishlist_update`;
-    await fetch(updateWishlist, {
+    const response = await fetch(updateWishlist, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ username: username, gift: id }),
     });
+    const result = await response.json();
+    if (updateWishlist.endsWith("/wishlist_update") && result.response === "Gift already in wishlist") {
+      alert("Gift already in wishlist");
+      setFavorite(true);
+    }
   };
 
   const updateCartStatus = async () => {

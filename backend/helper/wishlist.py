@@ -44,8 +44,8 @@ def add(username, new_gift, container):
     ----------
     username : str
         The username of the user whose wishlist is being updated
-    new_gift : dict
-        The new gift to be added to the wishlist
+    new_gift : int
+        The new gift (id) to be added to the wishlist
     container : object
         The database container object for querying and updating the wishlist
     
@@ -68,14 +68,17 @@ def add(username, new_gift, container):
             user_data['id'] = wishlist_id
             user_data['username'] = user_wishlist_data[0]['username']
             list_of_gifts = user_wishlist_data[0]['gifts']
-            list_of_gifts.append(new_gift)
-            user_data['gifts'] = list_of_gifts
-            container.replace_item(
-                item = wishlist_id,
-                body = user_data,
-                pre_trigger_include = None,
-                post_trigger_include = None
-            )
+            if new_gift not in list_of_gifts:
+                list_of_gifts.append(new_gift)
+                user_data['gifts'] = list_of_gifts
+                container.replace_item(
+                    item = wishlist_id,
+                    body = user_data,
+                    pre_trigger_include = None,
+                    post_trigger_include = None
+                )
+            else:
+                return "Gift already in wishlist"
         else:
             container.create_item(body={
                 'username': username,
