@@ -5,14 +5,20 @@ import { IoMdArrowRoundBack } from "react-icons/io";
 import CalendarModal from './CalendarModal';
 import config from '../config';
 
+import LanguagePicker from "./LanguagePicker"; // Import the LanguagePicker component
+
+
+
 // We'll assume you pass `userID` as props, so we can fetch the deadlines
 // and we also accept an optional "onBack" callback or route to /home
-const GroupsTopBar = ({ userID }) => {
+const GroupsTopBar = ({ userID, onLanguageChange }) => {
   const navigate = useNavigate();
   const [deadlines, setDeadlines] = useState([]); // from /groups/calendar/get
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showCalendar, setShowCalendar] = useState(false);
+
+
 
   // Next upcoming occasion (the earliest future date)
   const [upcomingOccasion, setUpcomingOccasion] = useState(null);
@@ -40,6 +46,10 @@ const GroupsTopBar = ({ userID }) => {
       setError("Failed to load deadlines: " + err.message);
     }
     setLoading(false);
+  };
+
+  const handleLanguageChange = (newLanguage) => {
+    onLanguageChange(newLanguage);
   };
 
   // find the earliest upcoming date (after "now") from deadlines
@@ -104,6 +114,10 @@ const GroupsTopBar = ({ userID }) => {
       <div style={styles.placeholderRight} />
 
       {error && <div style={{ color: "red" }}>{error}</div>}
+
+      <div style={styles.languagePickerContainer}>
+        <LanguagePicker onLanguageChange={handleLanguageChange} />
+      </div>
 
       {/* Calendar Modal */}
       {showCalendar && (

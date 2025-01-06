@@ -13,7 +13,7 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
   const isAdmin = group?.admin === currentUserID;
 
   // We'll gather the members from group.users, or from occasion/division if you like
-  const members = group?.users || [];
+  const members = group?.users || occasion?.users || division?.users || [];
 
   const handleKick = async (memberID) => {
     if (!window.confirm(`Kick user ${memberID} from group?`)) return;

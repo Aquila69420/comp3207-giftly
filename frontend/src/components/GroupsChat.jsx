@@ -32,7 +32,7 @@ import config from '../config';
  *      division={activeDivision}
  *   />
  */
-const GroupsChat = ({ userID, username, group, division }) => {
+const GroupsChat = ({ userID, username, group, division, language }) => {
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -77,6 +77,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
             id: userID,
             name: username,
             // you can add more fields if needed
+            language: language
           },
           token
         );
@@ -112,7 +113,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
       }
     };
     // eslint-disable-next-line
-  }, [userID, chatChannelID]);
+  }, [userID, chatChannelID, language]);
 
   if (!chatChannelID) {
     return <div style={{ padding: '1rem' }}>No chat channel found.</div>;

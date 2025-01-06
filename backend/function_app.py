@@ -11,11 +11,16 @@ from helper import cart
 from helper import sendEmail
 from helper import products
 from helper import groups
+from helper import polls
 import random
 import io
 from PIL import Image
 from helper.groups import GroupsError
 from stream_chat import StreamChat
+from helper.polls import PollsError
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
@@ -50,6 +55,80 @@ def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
+
+
+@app.function_name(name="google_login")
+@app.route(route="google/login", methods=[func.HttpMethod.GET])
+def google_login(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Redirect users to Google's OAuth 2.0 authentication page.
+    """
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+    google_redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
+
+    # Google OAuth 2.0 URL
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/auth"
+        f"?response_type=code"
+        f"&client_id={google_client_id}"
+        f"&redirect_uri={google_redirect_uri}"
+        f"&scope=openid email profile"
+    )
+    return func.HttpResponse(
+        status_code=302,
+        headers={"Location": auth_url},
+    )
+
+
+
+@app.function_name(name="google_callback")
+@app.route(route="google/callback", methods=[func.HttpMethod.POST])
+def google_callback(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Endpoint for handling Google login callback.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the Google credential.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the user data or error message.
+    """
+    try:
+        data = req.get_json()
+        credential = data.get("credential")
+        if not credential:
+            return func.HttpResponse(
+                body=json.dumps({"error": "No credential provided"}),
+                mimetype="application/json",
+                status_code=400,
+            )
+
+        result = login_register.handle_google_login(credential, user_container)
+        if "error" in result:
+            return func.HttpResponse(
+                body=json.dumps(result),
+                mimetype="application/json",
+                status_code=400,
+            )
+
+        return func.HttpResponse(
+            body=json.dumps(result),
+            mimetype="application/json",
+            status_code=200,
+        )
+    except Exception as e:
+        logging.error(f"Google login error: {e}")
+        return func.HttpResponse(
+            body=json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500,
+        )
+
+
 
 @app.function_name(name="wishlist_get")
 @app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
@@ -647,7 +726,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     groupname = data['groupname']
     try:
-        group = groups.change_groupname(userID, groupID, groupname)
+        group = groups.change_groupname(userID, groupID, groupname, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -1240,7 +1319,7 @@ def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     occasionID = data['occasionID']
     try:
-        oc, divisions = groups.exclusion_gifting(userID, occasionID)
+        oc, divisions = groups.exclusion_gifting(userID, occasionID, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -1366,3 +1445,132 @@ def get_token(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200
     )
+
+# POLLS
+
+@app.function_name(name="polls_create")
+@app.route(route='polls/create', methods=[func.HttpMethod.POST])
+def polls_create(req: func.HttpRequest) -> func.HttpResponse:
+    '''Create a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, title: title, options: [option1, option2, ...]}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}'''
+    data = req.get_json()
+    username = data['username']
+    title = data['title']
+    options = data['options']
+    try:
+        poll = polls.create_poll(username, title, options)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_vote")
+@app.route(route='polls/vote', methods=[func.HttpMethod.POST])
+def polls_vote(req: func.HttpRequest) -> func.HttpResponse:
+    '''Vote on a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, pollID: pollID, option: option}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}
+        data: {result: False, msg: "Poll does not exist"}
+        data: {result: False, msg: "Option does not exist"}'''
+    data = req.get_json()
+    username = data['username']
+    pollID = data['pollID']
+    option = data['option']
+    try:
+        poll = polls.vote(username, pollID, option)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_get")
+@app.route(route='polls/get', methods=[func.HttpMethod.POST])
+def polls_get(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {pollID: pollID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", polls: [...]}
+        data: {result: False, msg: "Poll does not exist"}'''
+    data = req.get_json()
+    pollID = data['pollID']
+    try:
+        poll = polls.get_poll(pollID)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_close")
+@app.route(route='polls/close', methods=[func.HttpMethod.POST])
+def polls_close(req: func.HttpRequest) -> func.HttpResponse:
+    '''Close a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, pollID: pollID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}
+        data: {result: False, msg: "Poll does not exist"}
+        data: {result: False, msg: "Poll is already closed"}'''
+    data = req.get_json()
+    username = data['username']
+    pollID = data['pollID']
+    try:
+        poll = polls.close_poll(username, pollID)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)

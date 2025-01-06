@@ -68,8 +68,12 @@ const GroupsSidebar = ({
   const handleGroupToggle = (groupId, group) => {
     // If we click the same group, toggle it closed; 
     // otherwise expand the new group, collapse the old.
-    setExpandedGroupId((prev) => (prev === groupId ? null : groupId));
-    setExpandedOccasionId(null); // Also reset any occasion expansions
+    if (expandedOccasionId !== null) {
+      setExpandedOccasionId(null);
+    } else {
+      setExpandedGroupId((prev) => (prev === groupId ? null : groupId));
+      setExpandedOccasionId(null); // Also reset any occasion expansions
+    }
     // Let parent know which group is "selected"
     onGroupClick?.(group);
   };

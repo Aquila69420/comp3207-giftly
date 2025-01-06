@@ -438,6 +438,7 @@ def create_group(userID, groupname, chat_client):
         data={
             "name": group['groupname'],
             "members": members,  # the list of userIDs
+            "auto_translation_enabled": True
         }
     )
     channel.create(userID)
@@ -554,7 +555,7 @@ def get_groups(userID):
             ))
     return groups
 
-def change_groupname(userID, groupID, groupname):
+def change_groupname(userID, groupID, groupname, chat_client):
     """
     Change the name of a group
     
@@ -583,6 +584,16 @@ def change_groupname(userID, groupID, groupname):
         {"op": "set", "path": "/groupname", "value": groupname}
     ]
     group = groups_container.patch_item(item=groupID, partition_key=groupID, patch_operations=ops)
+
+    # Update the channel name
+    channel_id = group.get('chatChannelID')
+    if channel_id:
+        channel = chat_client.channel("messaging", channel_id=channel_id)
+        channel.update({
+                "name": groupname,
+                "members": [str(u) for u in group['users']],
+                "auto_translation_enabled": True
+            })
     return group
 
 def groups_kick(userID, groupID, user_to_remove, chat_client):
@@ -900,7 +911,8 @@ def group_gifting(userID, occasionID, recipients, chat_client):
     
     channel = chat_client.channel("messaging", channel_id=channel_id, data={
         "name": division_name,
-        "members": members
+        "members": members,
+        "auto_translation_enabled": True
     })
     channel.create(userID)
 
@@ -982,7 +994,7 @@ def secret_santa(userID, occasionID):
     
     return oc, divisions
 
-def exclusion_gifting(userID, occasionID):
+def exclusion_gifting(userID, occasionID, chat_client):
     """
     Create divisions for an occasion by excluding one user at a time
     
@@ -1010,17 +1022,35 @@ def exclusion_gifting(userID, occasionID):
     users = oc['users']
     divisions = []
     for i in range(len(users)):
+        divisionID = str(uuid.uuid4())
+        channel_id = f"division-{divisionID}"
+
         division = divisions_container.create_item({
-            'id': str(uuid.uuid4()),
+            'id': divisionID,
             'occasionID': oc['id'],
             'groupID': oc['groupID'],
             'users': users[:i] + users[i+1:],
             'cart': "", #TODO: generate cart for division
-            'recipients': [users[i]]
+            'recipients': [users[i]],
+            'chatChannelID': channel_id
         })
         divisions.append(division)
         oc = occasion_add_division(oc, division['id'])
-    
+
+        members = [str(u) for u in division['users']]
+
+        recipient_doc = user_exists(users[i])
+        division_name = f"{recipient_doc['username']}'s Gift"
+
+        channel = chat_client.channel("messaging", channel_id=channel_id, data={
+            "name": division_name,
+            "members": members,
+            "auto_translation_enabled": True
+        })
+
+        channel.create(userID)
+
+
     return oc, divisions
 
 def get_calendar(userID):
