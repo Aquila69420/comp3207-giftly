@@ -22,7 +22,10 @@ const CartItem = ({ item, index }) => {
         body: JSON.stringify({"username": username, "gift": id}),
       });
       const data = await response.json();
-      console.log(`Gift added to wishlist: ${JSON.stringify(data)}`);
+      if (data.response === "Gift already in wishlist") {
+        alert("Gift already in wishlist");
+        setFavorite(true);
+      }
     };
   
     const removeFromWishlist = async () => {
