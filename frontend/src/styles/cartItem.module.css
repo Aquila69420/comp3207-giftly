@@ -1,3 +1,16 @@
+:root {
+  --deep-sea-green: #085b5e;
+  --cararra: #e2e3dc;
+  --tulip-tree: #ebac3f;
+  --caribbean-green: #0ecfae;
+  --vesuvius: #b5540d;
+  --acapulco: #86b39b;
+  --straw: #d2c87a;
+  --jet-stream: #b2d2d0;
+  --wheat: #f1dcac;
+  --gray-chateau: #a5acaf;
+}
+
 .cartItem {
     display: flex;
     align-items: center;
@@ -5,12 +18,14 @@
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
+    background-color: var(--acapulco);
 }
   
 .itemImage {
-    width: 50px;
-    height: 50px;
-    margin-right: 15px;
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    margin-right: 20px;
 }
   
 .itemDetails {
@@ -19,8 +34,9 @@
   
 .itemTitle {
     font-weight: bold;
-    color: #0073e6;
+    color: var(--deep-sea-green);
     text-decoration: none;
+    font-size: 1rem;
 }
   
 .itemTitle:hover {
@@ -29,7 +45,8 @@
   
 .itemPrice {
     margin-top: 5px;
-    color: #555;
+    color: var(--deep-sea-green);
+    font-size: 1rem;
 }
 
   

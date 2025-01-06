@@ -73,12 +73,12 @@ const CartItem = ({ item, index }) => {
             rel="noopener noreferrer"
             className={styles.itemTitle}
             >
-            {title}
+            {`${title.at(0).toUpperCase()}${title.substring(1)}`}
             </a>
             <p className={styles.itemPrice}>Price: {price}</p>
         </div>
-        <button className={styles.favoriteButton} onClick={updateWishlistStatus}>{favorite ? <FaHeart /> : <FaRegHeart />}</button>
-        <button className={styles.cartButton} onClick={updateCartStatus}>{cart ? <IoCart /> : <IoCartOutline />}</button>
+        <button className={styles.favoriteButton} onClick={updateWishlistStatus}>{favorite ? <FaHeart size={30}/> : <FaRegHeart size={30}/>}</button>
+        <button className={styles.cartButton} onClick={updateCartStatus}>{cart ? <IoCart size={30}/> : <IoCartOutline size={30}/>}</button>
         </li>
     );
 };

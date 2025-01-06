@@ -7,6 +7,7 @@
     "AzureCosmosDBConnectionString": "AccountEndpoint=https://giftly-cosmos-db.documents.azure.com:443/;AccountKey=5Xqauq6VxMFwGNj8Rh5mU4o6sJUa7xhPthkBHCsN3BkVlsYGajE1cUTvO6XyHF97bHNwZ6rumHvRACDbi1eTTw==;",
     "DatabaseName": "giftly",
     "UserContainer": "user",
+    "PollsContainer": "polls",
     "SuggestionContainer": "suggestion",
     "WishListContainer": "wishlist",
     "CartContainer": "cart",
@@ -18,6 +19,7 @@
     "FunctionAppKey": "sjAHwpUaI5N3sVkQfzgfSQJPaaV6OGnVPDaoCz9kG0_lAzFuDrD-oA==",
     "OpenAIEndPoint": "https://amcp1u21-openai-quiplash.openai.azure.com/",
     "OpenAIKey": "466cb690aa3c4ddfa1b1654c1d505123",
+    "AzureVisionKey": "EOXm8FHqmnU1F5kLdEOITVW8WFPVFRWc2YatMCyQ7Zc1DGUDiYU3JQQJ99ALACmepeSXJ3w3AAAEACOGkuNM",
     "SendGrid_API_KEY": "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",
     "Oxylabs_API_username": "janetjarron_4aquM",
     "Oxylabs_API_password": "Janetjarron_1992",
@@ -30,7 +32,11 @@
     "AZURE_SPEECH_REGION": "westeurope",
     "STREAM_KEY": "5cs3zw7bzvyk",
     "STREAM_SECRET": "s8wk5fjztwh9fvkbfyvnvhaw5hwbrk5nyx37dgnatnaf4uv9rsqpaa2wedfag5kq",
-    "JWT_SECRET_KEY": "c75d9070fd11afaf7c871431edf3b4bc7060eb4c67663f18d176ef668400c699"
+    "JWT_SECRET_KEY": "c75d9070fd11afaf7c871431edf3b4bc7060eb4c67663f18d176ef668400c699",
+    "GOOGLE_CLIENT_ID": "743246536728-cs1j2jj5lq69gba5ah4o9hs8pgusll2p.apps.googleusercontent.com",
+    "GOOGLE_CLIENT_SECRET": "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",
+    "GOOGLE_REDIRECT_URI": "http://localhost:3000"
+
   },
   "Host": {
     "CORS": "*"

@@ -1,6 +1,7 @@
 // src/components/ShowMembersModal.jsx
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const ShowMembersModal = ({ group, occasion, division, onClose }) => {
   const currentUserID = localStorage.getItem("userID");
@@ -12,12 +13,12 @@ const ShowMembersModal = ({ group, occasion, division, onClose }) => {
   const isAdmin = group?.admin === currentUserID;
 
   // We'll gather the members from group.users, or from occasion/division if you like
-  const members = group?.users || [];
+  const members = group?.users || occasion?.users || division?.users || [];
 
   const handleKick = async (memberID) => {
     if (!window.confirm(`Kick user ${memberID} from group?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/kick", {
+      const response = await fetch(`${config.backendURL}/groups/kick`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

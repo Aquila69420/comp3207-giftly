@@ -1,6 +1,7 @@
 // src/components/RenameGroupModal.jsx
 import React, { useState } from "react";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const RenameGroupModal = ({ group, onClose, onActionDone, }) => {
   const currentUserID = localStorage.getItem("userID");
@@ -9,7 +10,7 @@ const RenameGroupModal = ({ group, onClose, onActionDone, }) => {
   const handleRename = async () => {
     if (!newName.trim()) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/change_groupname", {
+      const response = await fetch(`${config.backendURL}/groups/change_groupname`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

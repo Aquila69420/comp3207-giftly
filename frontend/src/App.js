@@ -9,7 +9,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import "./styles/App.css";
-import OldHome from "./pages/OldHome";
 import SearchResults from "./pages/SearchResults";
 import Product from "./pages/Product";
 import Protected from "./components/Protected";
@@ -72,7 +71,7 @@ function App() {
           path="/cart"
           element={
             <Protected>
-              <Cart />
+              <Cart sessionId={localStorage.getItem("sessionId")} context="personal-cart"/>
             </Protected>
           }
         />

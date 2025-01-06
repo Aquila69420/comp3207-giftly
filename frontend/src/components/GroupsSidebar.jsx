@@ -6,6 +6,8 @@ import AddOccasionModal from "./AddOccasionModal";
 import styles from "../styles/groups.module.css";
 import { ClipLoader } from "react-spinners";
 
+import WizardAddOccasionModal from "./WizardAddOccasionModal";
+
 /*
   Props:
     groups: array of group objects
@@ -50,20 +52,28 @@ const GroupsSidebar = ({
   };
   const closeMenu = () => setMenuConfig({ isOpen: false, type: null, item: null });
 
+  const [showWizard, setShowWizard] = useState(false);
+  const [targetGroup, setTargetGroup] = useState(null);
+
+  const handleAddOccasionRequest = (group) => {
+    setTargetGroup(group);
+    setShowWizard(true);
+  };
+
   // "Add Group" modal
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
-
-  // "Add Occasion" modal
-  const [showAddOccasionModal, setShowAddOccasionModal] = useState(false);
-  const [targetGroupForOccasion, setTargetGroupForOccasion] = useState(null);
 
   // Expand/collapse a group
   const handleGroupToggle = (groupId, group) => {
     // If we click the same group, toggle it closed; 
     // otherwise expand the new group, collapse the old.
-    setExpandedGroupId((prev) => (prev === groupId ? null : groupId));
-    setExpandedOccasionId(null); // Also reset any occasion expansions
+    if (expandedOccasionId !== null) {
+      setExpandedOccasionId(null);
+    } else {
+      setExpandedGroupId((prev) => (prev === groupId ? null : groupId));
+      setExpandedOccasionId(null); // Also reset any occasion expansions
+    }
     // Let parent know which group is "selected"
     onGroupClick?.(group);
   };
@@ -84,20 +94,7 @@ const GroupsSidebar = ({
     setNewGroupName("");
     setShowCreateGroupModal(false);
   };
-
-  // Called when context menu user picks "Add Occasion"
-  const handleAddOccasionRequest = (group) => {
-    setTargetGroupForOccasion(group);
-    setShowAddOccasionModal(true);
-    closeMenu();
-  };
-
-  // After we create an occasion, we want to refresh
-  const handleAddOccasionDone = async (group, name, date, users) => {
-    await onAddOccasion?.(group, name, date, users);
-    refreshGroups?.();
-  };
-
+  
   function getDivisionLabel(division) {
     if (!division.recipients || division.recipients.length === 0) {
       return "Loading...";
@@ -327,11 +324,22 @@ const GroupsSidebar = ({
       )}
 
       {/* ADD OCCASION MODAL */}
-      {showAddOccasionModal && targetGroupForOccasion && (
+      {/* {showAddOccasionModal && targetGroupForOccasion && (
         <AddOccasionModal
           group={targetGroupForOccasion}
           onClose={() => setShowAddOccasionModal(false)}
           onAddOccasion={handleAddOccasionDone} // call the updated function
+        />
+      )} */}
+
+      {showWizard && targetGroup && (
+        <WizardAddOccasionModal
+          group={targetGroup}
+          onClose={() => setShowWizard(false)}
+          onCreated={(newOccasion) => {
+            // e.g. refresh the group or do a callback
+            refreshGroups?.();
+          }}
         />
       )}
 

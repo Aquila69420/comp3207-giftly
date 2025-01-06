@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FaArrowLeft, FaPencilAlt, FaCheck } from "react-icons/fa";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const GroupsSettings = () => {
   const navigate = useNavigate();
@@ -22,7 +23,7 @@ const GroupsSettings = () => {
       return;
     }
     try {
-      const response = await fetch("http://localhost:5000/groups/change_groupname", {
+      const response = await fetch(`${config.backendURL}/groups/change_groupname`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

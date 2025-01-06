@@ -7,6 +7,25 @@ import time
 # IMPORTANT: Free 100 emails/day
 
 def send_verification_email(username, to_email, verification_code, api_key):
+    """
+    Send a verification email to the specified email address.
+
+    Parameters
+    ----------
+    username : str
+        The username of the recipient.
+    to_email : str
+        The email address of the recipient.
+    verification_code : str
+        The verification code to be sent in the email.
+    api_key : str
+        The API key for the SendGrid service.
+
+    Returns
+    -------
+    bool
+        True if the email was sent successfully, False otherwise.
+    """
     logging.info(f"Sending email to {to_email} with verification code {verification_code}")
     message = Mail(
         from_email='antoniomiguelpinto03@gmail.com',
@@ -23,6 +42,23 @@ def send_verification_email(username, to_email, verification_code, api_key):
         return False
 
 def send_OTP_email(to_email, username, api_key):
+    """
+    Send a One Time Password (OTP) email for password reset.
+
+    Parameters
+    ----------
+    to_email : str
+        The recipient's email address.
+    username : str
+        The recipient's username.
+    api_key : str
+        The API key for the SendGrid service.
+
+    Returns
+    -------
+    int or bool
+        The OTP token if the email was sent successfully, otherwise False.
+    """
     # Generate a random token
     token = random.randint(100000, 999999)
     message = Mail(
@@ -40,6 +76,25 @@ def send_OTP_email(to_email, username, api_key):
         return False
 
 def sendUserNotification(username, notification, container, api_key):
+    """
+    Send an email notification to a user.
+    
+    Parameters
+    ----------
+    username : str
+        The username of the recipient.
+    notification : str
+        The notification message to be sent.
+    container : object
+        The database container to query for the user's email.
+    api_key : str
+        The API key for the SendGrid service.
+    
+    Returns
+    -------
+    str
+        A message indicating the result of the email notification delivery.
+    """
     try:
         email = list(container.query_items(
             query="SELECT * FROM c WHERE c.username=@username",
@@ -64,5 +119,3 @@ def sendUserNotification(username, notification, container, api_key):
     except Exception as e:
         logging.info(f"Notification delivery failed: {e}")
         return "Failed to deliver email notification."
-
-# send_verification_email("Antonio", "antoniomiguelpinto@gmail.com", 123123, "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")

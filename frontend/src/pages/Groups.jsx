@@ -4,6 +4,7 @@ import GroupsTopBar from "../components/GroupsTopbar";
 import GroupsSidebar from "../components/GroupsSidebar";
 import GroupsChat from "../components/GroupsChat";
 import styles from "../styles/groups.module.css";
+import config from "../config";
 
 const Groups = () => {
   const navigate = useNavigate();
@@ -18,13 +19,17 @@ const Groups = () => {
   const [loadingOccasions, setLoadingOccasions] = useState(false);
 
   const [loadingGroup, setLoadingGroup] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    localStorage.getItem("language") || "en"
+  )
+
 
   useEffect(() => {
     if (!userID) return;
     const fetchGroups = async () => {
       setLoadingGroup(true);
       try {
-        const res = await fetch("http://localhost:5000/groups/get", {
+        const res = await fetch(`${config.backendURL}/groups/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
@@ -52,7 +57,7 @@ const Groups = () => {
   const handleRefreshGroups = async () => {
     setLoadingGroup(true);
     try {
-      const res = await fetch("http://localhost:5000/groups/get", {
+      const res = await fetch(`${config.backendURL}/groups/get`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID }),
@@ -100,7 +105,7 @@ const Groups = () => {
     if (!hasOccasionObjects) {
       try {
         setLoadingOccasions(true);
-        const res = await fetch("http://localhost:5000/groups/occasions/get", {
+        const res = await fetch(`${config.backendURL}/groups/occasions/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID, groupID: group.id }),
@@ -139,7 +144,7 @@ const Groups = () => {
     if (!hasDivisions) {
       setLoadingDivisions(true);
       try {
-        const res = await fetch("http://localhost:5000/groups/divisions/get", {
+        const res = await fetch(`${config.backendURL}/groups/divisions/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID, occasionID: occasion.id }),
@@ -161,6 +166,7 @@ const Groups = () => {
           );
           setActiveGroup(updatedGroup);
           setActiveOccasion(updatedOccasion);
+          setActiveDivision(updatedOccasion.divisions[0]);
         } else {
           setError(data.msg);
         }
@@ -171,13 +177,15 @@ const Groups = () => {
       }
     } else {
       setActiveOccasion(occasion);
+      setActiveDivision(occasion.divisions[0]);
     }
 
-    if (occasion.divisions && occasion.divisions.length > 0) {
-      setActiveDivision(occasion.divisions[0]);
-    } else {
-      setActiveDivision(null);
-    }
+    // if (occasion.divisions && occasion.divisions.length > 0) {
+    //   setActiveDivision(occasion.divisions[0]);
+    //   console.log('Active divisionn:', occasion.divisions[0]);
+    // } else {
+    //   setActiveDivision(null);
+    // }
   
     setActiveOccasion(occasion);
   };
@@ -191,7 +199,7 @@ const Groups = () => {
   const handleCreateGroup = async (groupName) => {
     if (!groupName.trim()) return;
     try {
-      const res = await fetch("http://localhost:5000/groups/create", {
+      const res = await fetch(`${config.backendURL}/groups/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userID, groupname: groupName.trim() }),
@@ -201,7 +209,7 @@ const Groups = () => {
       if (data.result) {
         // refetch groups
         setLoadingGroup(true);
-        const res2 = await fetch("http://localhost:5000/groups/get", {
+        const res2 = await fetch(`${config.backendURL}/groups/get`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ userID }),
@@ -224,10 +232,18 @@ const Groups = () => {
     }
   };
 
+  const handleLanguageChange = (language) => {
+    // Update the user's language and chat language
+
+    // Update the user's language
+    localStorage.setItem("language", language);
+    setSelectedLanguage(language);
+  };
+
   // Add an occasion to a group
   const handleAddOccasion = async (group, occasionName, occasionDate, chosenUserIDs) => {
     try {
-      const res = await fetch("http://localhost:5000/groups/occasions/create", {
+      const res = await fetch(`${config.backendURL}/groups/occasions/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -260,7 +276,10 @@ const Groups = () => {
 
   return (
     <div className={styles.groupsContainer}>
-      <GroupsTopBar userID={userID} />
+      <GroupsTopBar 
+        userID={userID} 
+        onLanguageChange={handleLanguageChange}
+      />
 
       <div className={styles.groupsContent}>
         <GroupsSidebar
@@ -284,7 +303,8 @@ const Groups = () => {
           userID={userID}
           username={username}
           group={activeGroup}         // or division={activeDivision}
-          division={activeDivision}   // optional 
+          division={activeDivision}   // optional
+          language={selectedLanguage} 
         />
         </div>
       </div>

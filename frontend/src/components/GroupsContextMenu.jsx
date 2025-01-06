@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import OccasionDateChangeModal from "../components/OccasionDateChangeModal";
-import CreateDivisionModal from "../components/CreateDivisionModal";
 import ShowMembersModal from "../components/ShowMembersModal";
 import InviteUserModal from "../components/InviteUserModal";
+import GetShareableLinkModal from "../components/GetShareableLinkModal";
 import RenameGroupModal from "../components/RenameGroupModal";
 import styles from "../styles/groups.module.css";
+import config from "../config";
+import Cart from "../components/Cart";
 
 /**
  * Props:
@@ -36,12 +38,15 @@ const GroupsContextMenu = ({
   const isAdmin = item?.admin === currentUserID;
 
   const [showDateModal, setShowDateModal] = useState(false);
-  const [showCreateDivisionModal, setShowCreateDivisionModal] = useState(false);
 
   // Additional modals
   const [showMembersModal, setShowMembersModal] = useState(false);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const [showRenameModal, setShowRenameModal] = useState(false);
+
+  const [showCartModal, setShowCartModal] = useState(false); // State for cart modal
+
 
   //
   // ========== GROUP ACTIONS ==========
@@ -53,7 +58,7 @@ const GroupsContextMenu = ({
       return;
     }
     try {
-      const response = await fetch("http://localhost:5000/groups/delete", {
+      const response = await fetch(`${config.backendURL}/groups/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,7 +86,7 @@ const GroupsContextMenu = ({
   const handleLeaveGroup = async () => {
     if (!window.confirm(`Leave group: ${item.groupname}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/leave", {
+      const response = await fetch(`${config.backendURL}/groups/leave`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -111,7 +116,7 @@ const GroupsContextMenu = ({
   const handleDeleteOccasion = async () => {
     if (!window.confirm(`Delete occasion ID ${item?.id}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/occasions/delete", {
+      const response = await fetch(`${config.backendURL}/groups/occasions/delete`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ occasionID: item?.id }),
@@ -133,7 +138,7 @@ const GroupsContextMenu = ({
   const handleLeaveOccasion = async () => {
     if (!window.confirm(`Leave occasion: ${item.occasionname}?`)) return;
     try {
-      const response = await fetch("http://localhost:5000/groups/occasions/leave", {
+      const response = await fetch(`${config.backendURL}/groups/occasions/leave`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -155,12 +160,7 @@ const GroupsContextMenu = ({
     }
   };
 
-  const handleRenameOccasion = async () => {
-    // e.g. you'd open a rename modal or do something similar
-    alert("Rename occasion: " + item?.id);
-    onClose();
-  };
-
+ 
   //
   // ========== BUILD MENU ITEMS DYNAMICALLY ==========
   //
@@ -177,6 +177,7 @@ const GroupsContextMenu = ({
         { label: "Delete Group", onClick: handleDeleteGroup },
         { label: "Rename Group", onClick: () => setShowRenameModal(true) },
         { label: "Invite Users", onClick: () => setShowInviteModal(true) },
+        { label: "Get link to group", onClick: () => setShowLinkModal(true) },
         { label: "Show Members", onClick: () => setShowMembersModal(true) },
         {
           label: "Add Occasion",
@@ -194,7 +195,6 @@ const GroupsContextMenu = ({
     menuItems = [
       { label: "Leave Occasion", onClick: handleLeaveOccasion },
       { label: "Show Members", onClick: () => setShowMembersModal(true) },
-      { label: "Rename", onClick: handleRenameOccasion },
       {
         label: "Date Change",
         onClick: () => setShowDateModal(true),
@@ -203,16 +203,13 @@ const GroupsContextMenu = ({
         label: "Delete Occasion",
         onClick: handleDeleteOccasion,
       },
-      {
-        label: "Create Division",
-        onClick: () => setShowCreateDivisionModal(true),
-      },
     ];
   } 
   else if (type === "division") {
     menuItems = [
       { label: "Show Members", onClick: () => setShowMembersModal(true) },
       { label: "Leave", onClick: () => alert("Leave division: " + item?.id) },
+      { label: "Show Cart", onClick: () => setShowCartModal(true) },
     ];
   }
 
@@ -252,6 +249,11 @@ const GroupsContextMenu = ({
           <InviteUserModal group={item} onClose={() => setShowInviteModal(false)} />
         )}
 
+        {/* Get shareable link */}
+        { showLinkModal && type === "group" && (
+          <GetShareableLinkModal group={item} onClose={() => setShowLinkModal(false)}/>
+        )}
+
         {/* Rename group */}
         {showRenameModal && type === "group" && (
           <RenameGroupModal group={item} onClose={() => setShowRenameModal(false)} onActionDone={onActionDone} />
@@ -265,12 +267,26 @@ const GroupsContextMenu = ({
           />
         )}
 
-        {/* Create Division (occasion) */}
-        {showCreateDivisionModal && type === "occasion" && (
-          <CreateDivisionModal
-            occasion={item}
-            onClose={() => setShowCreateDivisionModal(false)}
-          />
+        {showCartModal && (
+          console.log('Session ID: ', item?.id),
+          <div className={styles.modalBackdrop} onClick={() => setShowCartModal(false)}>
+            <div
+              className={styles.modalContainer}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowCartModal(false)}
+              >
+                &times;
+              </button>
+              <Cart 
+                key={Math.random().toString(36).substring(7)}
+                sessionId={item?.id} // Pass division ID as sessionId
+                context="shared-cart"
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>

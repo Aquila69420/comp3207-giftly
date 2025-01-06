@@ -2,8 +2,7 @@
 import React from "react";
 import ReactCalendar from "react-calendar"; 
 // or any library you want, e.g. react-big-calendar or fullcalendar
-
-import "react-calendar/dist/Calendar.css";
+import "../styles/calendar.css";
 
 const CalendarModal = ({ deadlines, onClose }) => {
   // "deadlines" is array of { occasionID, occasionname, occasiondate, groupID, groupname }
@@ -18,7 +17,7 @@ const CalendarModal = ({ deadlines, onClose }) => {
       if (eventsByDate[dateStr]) {
         // highlight or show short text
         return (
-          <div style={{ backgroundColor: "#007bff", color: "#fff", borderRadius: "4px", fontSize: "0.75rem" }}>
+          <div style={styles.tileContent}>
             {eventsByDate[dateStr].map((evt, idx) => (
               <div key={idx}>{evt.occasionname}</div>
             ))}
@@ -50,7 +49,7 @@ const CalendarModal = ({ deadlines, onClose }) => {
           tileContent={tileContent}
         />
         <div style={styles.modalButtons}>
-          <button onClick={onClose}>Close</button>
+          <button onClick={onClose} style={styles.closeButton}>Close</button>
         </div>
       </div>
     </div>
@@ -89,14 +88,30 @@ const styles = {
   modal: {
     background: "#fff",
     padding: "1rem",
-    borderRadius: "8px",
-    minWidth: "300px",
+    borderRadius: "10px",
+    width: "50%",
   },
   modalTitle: {
     marginTop: 0,
   },
   modalButtons: {
     textAlign: "right",
+  },
+  closeButton: {
+    marginTop: "1rem",
+    borderRadius: "10px",
+    fontSize: "1rem",
+    padding: "0.25rem 0.5rem",
+    border: "none",
+    color: "#fff",
+    backgroundColor: "#085b5e",
+  },
+  tileContent: {
+    backgroundColor: "#0ecfae", 
+    color: "#fff", 
+    padding: "2px",
+    borderRadius: "10px", 
+    fontSize: "0.75rem",
   },
 };
 

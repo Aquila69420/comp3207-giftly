@@ -12,6 +12,7 @@ import {
 } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import "../styles/layout.css";
+import config from '../config';
 
 /**
  * GroupsChat component:
@@ -31,7 +32,7 @@ import "../styles/layout.css";
  *      division={activeDivision}
  *   />
  */
-const GroupsChat = ({ userID, username, group, division }) => {
+const GroupsChat = ({ userID, username, group, division, language }) => {
   const [chatClient, setChatClient] = useState(null);
   const [channel, setChannel] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -51,8 +52,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
         setLoading(true);
 
         // 1) Get a token from your backend
-        //    (Your endpoint: http://localhost:5000/get_token)
-        const res = await fetch('http://localhost:5000/get_token', {
+        const res = await fetch(`${config.backendURL}/get_token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userID, username }),
@@ -77,6 +77,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
             id: userID,
             name: username,
             // you can add more fields if needed
+            language: language
           },
           token
         );
@@ -112,7 +113,7 @@ const GroupsChat = ({ userID, username, group, division }) => {
       }
     };
     // eslint-disable-next-line
-  }, [userID, chatChannelID]);
+  }, [userID, chatChannelID, language]);
 
   if (!chatChannelID) {
     return <div style={{ padding: '1rem' }}>No chat channel found.</div>;

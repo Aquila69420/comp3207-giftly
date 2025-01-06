@@ -11,11 +11,15 @@ from helper import cart
 from helper import sendEmail
 from helper import products
 from helper import groups
+from helper import polls
 import random
 import io
 from PIL import Image
 from helper.groups import GroupsError
 from stream_chat import StreamChat
+from helper.polls import PollsError
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 
 app = func.FunctionApp()
@@ -34,16 +38,114 @@ STREAM_SECRET = os.getenv("STREAM_SECRET", "YOUR_STREAM_SECRET")
 chat_client = StreamChat(api_key=STREAM_KEY, api_secret=STREAM_SECRET)
 
 def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
+    """
+    Add CORS headers to the HTTP response.
+    
+    Parameters
+    ----------
+    response : func.HttpResponse
+        The HTTP response object to which CORS headers will be added.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with added CORS headers.
+    """
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
 
 
+@app.function_name(name="google_login")
+@app.route(route="google/login", methods=[func.HttpMethod.GET])
+def google_login(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Redirect users to Google's OAuth 2.0 authentication page.
+    """
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+    google_redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
+
+    # Google OAuth 2.0 URL
+    auth_url = (
+        f"https://accounts.google.com/o/oauth2/auth"
+        f"?response_type=code"
+        f"&client_id={google_client_id}"
+        f"&redirect_uri={google_redirect_uri}"
+        f"&scope=openid email profile"
+    )
+    return func.HttpResponse(
+        status_code=302,
+        headers={"Location": auth_url},
+    )
+
+
+
+@app.function_name(name="google_callback")
+@app.route(route="google/callback", methods=[func.HttpMethod.POST])
+def google_callback(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Endpoint for handling Google login callback.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the Google credential.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the user data or error message.
+    """
+    try:
+        data = req.get_json()
+        credential = data.get("credential")
+        if not credential:
+            return func.HttpResponse(
+                body=json.dumps({"error": "No credential provided"}),
+                mimetype="application/json",
+                status_code=400,
+            )
+
+        result = login_register.handle_google_login(credential, user_container)
+        if "error" in result:
+            return func.HttpResponse(
+                body=json.dumps(result),
+                mimetype="application/json",
+                status_code=400,
+            )
+
+        return func.HttpResponse(
+            body=json.dumps(result),
+            mimetype="application/json",
+            status_code=200,
+        )
+    except Exception as e:
+        logging.error(f"Google login error: {e}")
+        return func.HttpResponse(
+            body=json.dumps({"error": str(e)}),
+            mimetype="application/json",
+            status_code=500,
+        )
+
+
 
 @app.function_name(name="wishlist_get")
 @app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
 def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Retrieve the wishlist for a given username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with the username.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing the wishlist data in JSON format with CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     output = wishlist.get(username, wishlist_container)
@@ -57,6 +159,19 @@ def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="wishlist_update")
 @app.route(route='wishlist_update', methods=[func.HttpMethod.POST])
 def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Update the wishlist with a new gift for a specific user.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'username' and 'gift'.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the wishlist update operation, including CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     gift = data['gift']
@@ -71,6 +186,20 @@ def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="wishlist_remove")
 @app.route(route='wishlist_remove', methods=[func.HttpMethod.POST])
 def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Remove a gift from a user's wishlist.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'username' and 'gift' keys.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the removal operation in JSON format, 
+        including CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     gift = data['gift']
@@ -85,6 +214,19 @@ def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="save_cart")
 @app.route(route="save_cart", methods=[func.HttpMethod.POST])
 def save_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Save the cart content for a user session.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the cart data.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the result of the save operation.
+    """
     data = req.get_json()
     session_id = data['session_id']
     cart_content = data['cart_content']
@@ -95,16 +237,80 @@ def save_cart(req: func.HttpRequest) -> func.HttpResponse:
         mimetype="application/json",
         status_code=200
     )
-    return add_cors_headers(response) 
+    return add_cors_headers(response)
+
+@app.function_name(name="update_cart")
+@app.route(route="update_cart", methods=[func.HttpMethod.POST])
+def update_cart_http(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Azure Function to handle adding or removing an item from a cart.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the cart update data.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response with the result of the update operation.
+    """
+    try:
+        # Parse the request data
+        data = req.get_json()
+        username = data.get('username')
+        session_id = data.get('session_id')
+        item = data.get('item')
+        action = data.get('action')  # 'add' or 'remove'
+
+        # Validate input
+        if not all([username, session_id, item, action]):
+            return func.HttpResponse(
+                body=json.dumps({"error": "Missing required fields."}),
+                mimetype="application/json",
+                status_code=400
+            )
+
+        # Update the cart
+        output = cart.update(username, session_id, item, action, cart_container)
+
+        # Return response
+        response = func.HttpResponse(
+            body=json.dumps({"response": output}),
+            mimetype="application/json",
+            status_code=200
+        )
+        return add_cors_headers(response)
+    except Exception as e:
+        logging.info(f"update_cart_http error: {e}")
+        return func.HttpResponse(
+            body=json.dumps({"error": "An error occurred."}),
+            mimetype="application/json",
+            status_code=500
+        )
+
 
 @app.function_name(name="load_cart")
 @app.route(route="load_cart", methods=[func.HttpMethod.POST])
 def load_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Load the user's cart based on the provided session ID and username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with 'session_id' and 'username'.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing the cart data or an error message.
+    """
     data = req.get_json()
     session_id = data['session_id']
     username = data['username']
     output = cart.load(username, session_id, cart_container)
-    if output==f"{username} does not have stored cart corresponding to session {session_id}" or output==f"{username} does not have any carts stored":
+    if output==f"{username} does not have stored cart corresponding to session {session_id}" or output==f"{username} does not have any carts stored" or output==f"{username} does not have stored cart named {session_id}":
         response = func.HttpResponse(
             body=json.dumps({"response": "failed", "message": output}),
             mimetype="application/json",
@@ -121,6 +327,19 @@ def load_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="delete_cart")
 @app.route(route="delete_cart", methods=[func.HttpMethod.POST])
 def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Delete a cart based on session ID and username.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing JSON payload with 'session_id' and 'username'.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object with the result of the delete operation in JSON format.
+    """
     data = req.get_json()
     session_id = data['session_id']
     username = data['username']
@@ -135,13 +354,23 @@ def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
 @app.function_name(name="find_user_autocomplete")
 @app.route(route="find_user_autocomplete", methods=[func.HttpMethod.POST])
 def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Find usernames that match the autocomplete query
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with the query parameter
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing a JSON payload with the list of matching usernames or an error message
+    """
     try:
         data = req.get_json()
         query = data.get('query', '')
         if not query:
             return func.HttpResponse(json.dumps({"usernames": []}), status_code=200, mimetype="application/json")
 
-        # Replace with your database query to find matching usernames
         matching_usernames = [
             user['username'] for user in user_container.query_items(
                 query="SELECT c.username FROM c WHERE STARTSWITH(c.username, @query)",
@@ -159,10 +388,22 @@ def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
         logging.error(f"Autocomplete error: {e}")
         return func.HttpResponse("Error processing request", status_code=500)
  
-
 @app.function_name(name="email_verification")
 @app.route(route='email_verification', methods=[func.HttpMethod.POST])
 def email_verification(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Verify the email using the provided username and code.
+    
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request containing the JSON payload with 'username' and 'code'.
+    
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response containing the verification result in JSON format with CORS headers.
+    """
     data = req.get_json()
     username = data['username']
     code = data['code']
@@ -307,7 +548,6 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
     username = data['username'].strip()
-    # TODO: uncomment this line for production
     output = gpt_req.llm_suggestion(prompt, suggestion_container, username)
     fetched_products = products.get_products(output)
     response = func.HttpResponse(
@@ -324,11 +564,10 @@ def product_types(req: func.HttpRequest) -> func.HttpResponse:
     username = data['Username'].strip()
     occassions = [item.strip() for item in data['Occasions'].split(",")]
     recipient = data['Recipient'].strip()
-    price = data['Price'].strip()
     themes = [item.strip() for item in data['Themes'].split(",")]
     input = f"I want a gift for my {recipient} that matches ocassions {occassions}, that suits the themes of {themes}."
     output = gpt_req.llm_suggestion(input, suggestion_container, username)
-    fetched_products = products.get_products_with_price_limitation(output, price)
+    # fetched_products = products.get_products_with_price_limitation(output, price) no longer active
     response = func.HttpResponse(
         body=json.dumps({"response": output}),
         mimetype="application/json",
@@ -487,7 +726,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     groupID = data['groupID']
     groupname = data['groupname']
     try:
-        group = groups.change_groupname(userID, groupID, groupname)
+        group = groups.change_groupname(userID, groupID, groupname, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "group": groups.group_cleaned(group)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -1080,7 +1319,7 @@ def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
     userID = data['userID']
     occasionID = data['occasionID']
     try:
-        oc, divisions = groups.exclusion_gifting(userID, occasionID)
+        oc, divisions = groups.exclusion_gifting(userID, occasionID, chat_client)
         body = json.dumps({"result": True, "msg": "OK", "occasion": groups.occasion_cleaned(oc), "divisions": groups.divisions_cleaned(divisions)})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
@@ -1120,6 +1359,36 @@ def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
     try:
         divisions = groups.get_divisions(userID, occasionID)
         body = json.dumps({"result": True, "msg": "OK", "divisions": groups.divisions_cleaned(divisions)})
+    except GroupsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+
+@app.function_name(name="get_all_groups_occasions_divisions")
+@app.route(route='groups/get_all', methods=[func.HttpMethod.POST])
+def get_all_groups_occasions_divisions(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get all groups, occasions and divisions for a user
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {userID: userID}
+        
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", groups: [], occasions: [], divisions: []}
+        data: {result: False, msg: "User does not exist"}'''
+    data = req.get_json()
+    userID = data['userID']
+    try:
+        result = groups.get_all(userID)
+        body = json.dumps({"result": True, "msg": "OK", "groups": result["grps"], "occasions": result["occs"], "divisions": result["divs"]})
     except GroupsError as e:
         body = json.dumps({"result": False, "msg": str(e)})
     response = func.HttpResponse(
@@ -1177,26 +1446,134 @@ def get_token(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200
     )
 
-# # Create a group channel
-# @app.function_name(name="create_channel")
-# @app.route(route='groups/create_channel', methods=[func.HttpMethod.POST])
-# def create_channel(req: func.HttpRequest) -> func.HttpResponse:
-#     data = req.get_json()
-#     groupID = data['groupID']
-#     channel_name = data['channel_name']
-#     try:
-#         channel = client.create_channel(groupID, channel_name)
-#         return func.HttpResponse(
-#             body=json.dumps({"result": True, "msg": "OK", "channel": channel}),
-#             mimetype="application/json",
-#             status_code=200
-#         )
-#     except Exception as e:
-#         return func.HttpResponse(
-#             body=json.dumps({"result": False, "msg": str(e)}),
-#             mimetype="application/json",
-#             status_code=500
-#         )
+# POLLS
+
+@app.function_name(name="polls_create")
+@app.route(route='polls/create', methods=[func.HttpMethod.POST])
+def polls_create(req: func.HttpRequest) -> func.HttpResponse:
+    '''Create a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, title: title, options: [option1, option2, ...]}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}'''
+    data = req.get_json()
+    username = data['username']
+    title = data['title']
+    options = data['options']
+    try:
+        poll = polls.create_poll(username, title, options)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_vote")
+@app.route(route='polls/vote', methods=[func.HttpMethod.POST])
+def polls_vote(req: func.HttpRequest) -> func.HttpResponse:
+    '''Vote on a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, pollID: pollID, option: option}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}
+        data: {result: False, msg: "Poll does not exist"}
+        data: {result: False, msg: "Option does not exist"}'''
+    data = req.get_json()
+    username = data['username']
+    pollID = data['pollID']
+    option = data['option']
+    try:
+        poll = polls.vote(username, pollID, option)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_get")
+@app.route(route='polls/get', methods=[func.HttpMethod.POST])
+def polls_get(req: func.HttpRequest) -> func.HttpResponse:
+    '''Get a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {pollID: pollID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", polls: [...]}
+        data: {result: False, msg: "Poll does not exist"}'''
+    data = req.get_json()
+    pollID = data['pollID']
+    try:
+        poll = polls.get_poll(pollID)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
+
+@app.function_name(name="polls_close")
+@app.route(route='polls/close', methods=[func.HttpMethod.POST])
+def polls_close(req: func.HttpRequest) -> func.HttpResponse:
+    '''Close a poll
+    
+    # Parameters
+    req: func.HttpRequest
+    with
+        data: {username: username, pollID: pollID}
+
+    # Returns
+    func.HttpResponse
+    with
+        data: {result: True, msg: "OK", poll: {...}}
+        data: {result: False, msg: "User does not exist"}
+        data: {result: False, msg: "Poll does not exist"}
+        data: {result: False, msg: "Poll is already closed"}'''
+    data = req.get_json()
+    username = data['username']
+    pollID = data['pollID']
+    try:
+        poll = polls.close_poll(username, pollID)
+        body = json.dumps({"result": True, "msg": "OK", "poll": poll})
+    except PollsError as e:
+        body = json.dumps({"result": False, "msg": str(e)})
+
+    response = func.HttpResponse(
+        body=body,
+        mimetype="applications/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 ###############GROUPS_INVITATION###############
 @app.function_name(name="groups_invite_generate")

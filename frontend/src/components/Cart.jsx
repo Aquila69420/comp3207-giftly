@@ -4,13 +4,19 @@ import CartItem from "./CartItem";
 import config from "../config";
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
-function Cart({ username }) {
+function Cart({ sessionId, context }) {
   const [cartItems, setCartItems] = useState(JSON.parse(sessionStorage.getItem("cart")) || []);
   const [totalCost, setTotalCost] = useState(0);
   const freecurrencyapi = new Freecurrencyapi(config.currencyConversionAPIKey);
 
+  const username = localStorage.getItem("username");
+
   useEffect(() => {
     const calculateTotalCost = async () => {
+      if (cartItems.length === 0) {
+        setTotalCost(0);
+        return;
+      }
       const newTotalCost = await cartItems.reduce(async (accPromise, item) => {
         const acc = await accPromise;
         let [currency, price] = item.price.split(" "); // Split the price string by space
@@ -21,10 +27,43 @@ function Cart({ username }) {
       }, Promise.resolve(0));
       setTotalCost(newTotalCost);
       console.log('Total cost:', totalCost)
+      console.log('Cart items:', cartItems)
     };
 
     calculateTotalCost();
   }, [cartItems]);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      if (context !== "shared-cart") {
+        return;
+      }
+      try {
+        const response = await fetch(`${config.backendURL}/load_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ username: username, session_id: sessionId }),
+        });
+        const result = await response.json();
+        if (response.ok && result.response !== "failed") {
+          console.log('Response from backend:', result);
+          setCartItems(result.response[sessionId]);
+        } else {
+          setCartItems([]);
+          setTotalCost(0);
+          console.error('Failed to load cart:', result.message);
+        }
+      } catch (err) {
+        console.error('Error loading cart:', err);
+      }
+    };
+
+    loadCart();
+  }, [username, sessionId]);
+
+
 
   const handleSaveCart = async () => {
     setCartItems(JSON.parse(sessionStorage.getItem("cart")))
@@ -40,20 +79,34 @@ function Cart({ username }) {
     });
     const result = await response.json();
     if (result.response !== "failed") {
-      // If cart is already existing, create a new cart
-      const response = await fetch(`${config.backendURL}/save_cart`, {
+      // If cart is already existing, delete and then create a new cart
+      const deleteResponse = await fetch(`${config.backendURL}/delete_cart`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
-          cart_content: cartItems,
-          session_id: sessionId+1,
+          session_id: sessionId,
+          username: username
         }),
       });
-      const result = await response.json();
-      console.log("Response from backend:", result);
+      const deleteResult = await deleteResponse.json();
+      if (deleteResult.response === "Cart deleted") {
+        console.log("Cart deleted successfully");
+        const response = await fetch(`${config.backendURL}/save_cart`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: username,
+            cart_content: cartItems,
+            session_id: sessionId,
+          }),
+        });
+        const result = await response.json();
+        console.log("Response from backend:", result);
+      }
     }
     else {
       const response = await fetch(`${config.backendURL}/save_cart`, {
@@ -91,9 +144,8 @@ function Cart({ username }) {
   }, [cartItems]);
 
   return (
-    <div className={styles.cartContainer}>
       <div className={styles.cartContent}>
-        <p className={styles.cartTitle}>Cart</p>
+        <p className={styles.cartTitle}>Gift Shopping Cart</p>
         <ul className={styles.cartList}>
           <ul className={styles.cartList}>
             {cartItems.length > 0 ? (
@@ -109,19 +161,9 @@ function Cart({ username }) {
             )}
           </ul>
         </ul>
-        {/* <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div> */}
         <div className={styles.totalCost}>Total: £{totalCost.toFixed(2)}</div>
+        <button onClick={handleClear} className={styles.button}>Clear</button>
       </div>
-
-      <div className={styles.buttonsContainer}>
-        <button
-          onClick={handleClear}
-          className={`${styles.button} ${styles.clearButton}`}
-        >
-          Clear
-        </button>
-      </div>
-    </div>
   );
 }
 
