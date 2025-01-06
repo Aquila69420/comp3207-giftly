@@ -4,7 +4,7 @@ import CartItem from "./CartItem";
 import config from "../config";
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
-function Cart({ sessionId, context }) {
+function Cart({ sessionId, context, groupID }) {
   const [cartItems, setCartItems] = useState(JSON.parse(sessionStorage.getItem("cart")) || []);
   const [totalCost, setTotalCost] = useState(0);
   const freecurrencyapi = new Freecurrencyapi(config.currencyConversionAPIKey);
@@ -44,7 +44,7 @@ function Cart({ sessionId, context }) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ username: username, session_id: sessionId }),
+          body: JSON.stringify({ username: groupID, session_id: sessionId }),
         });
         const result = await response.json();
         if (response.ok && result.response !== "failed") {

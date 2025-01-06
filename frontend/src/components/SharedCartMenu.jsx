@@ -41,8 +41,8 @@ export default function SharedCartMenu({onDivisionSelect }) {
     }
   }, [showModal]);
 
-  const handleDivisionSelect = (divisionId) => {
-    onDivisionSelect(divisionId);
+  const handleDivisionSelect = (divisionId, groupID) => {
+    onDivisionSelect(divisionId, groupID);
     setShowModal(false);
   };
 
@@ -89,7 +89,7 @@ export default function SharedCartMenu({onDivisionSelect }) {
                   {data.divisions
                     .filter((div) => div.occasionID === selectedOccasion.id)
                     .map((division) => (
-                      <li key={division.id} onClick={() => handleDivisionSelect(division.id)}>
+                      <li key={division.id} onClick={() => handleDivisionSelect(division.id, selectedGroup.id)}>
                         Division: {division.id}
                       </li>
                     ))}

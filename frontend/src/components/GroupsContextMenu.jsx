@@ -284,6 +284,7 @@ const GroupsContextMenu = ({
                 key={Math.random().toString(36).substring(7)}
                 sessionId={item?.id} // Pass division ID as sessionId
                 context="shared-cart"
+                groupID={item?.groupID}
               />
             </div>
           </div>

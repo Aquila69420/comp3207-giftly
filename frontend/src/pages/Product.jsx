@@ -52,7 +52,8 @@ export default function Product({ previousState }) {
   };
 
   
-  const handleSharedCartDivisionSelect = async (divisionId) => {
+  const handleSharedCartDivisionSelect = async (divisionId, groupId) => {
+
     // Get session id
     const sessionId = divisionId;
 
@@ -64,10 +65,9 @@ export default function Product({ previousState }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ username: username, session_id: sessionId }),
+      body: JSON.stringify({ username: groupId, session_id: sessionId }),
     });
     const result = await response.json();
-    console.log("Response from backend: 1", result);
     const cart = result.response;
     if (result.response !== "failed") {
 
@@ -96,19 +96,17 @@ export default function Product({ previousState }) {
         cartContent.push(item);
       }
 
-
       const response = await fetch(`${config.backendURL}/update_cart`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           session_id: divisionId,
-          username,
+          username: groupId,
           item,
           action,
         }),
       });
       const result = await response.json();
-      console.log("Response from backend: 2", result);
       if (result.response === "Cart updated") {
         alert("Shared cart updated!");
       } else {
@@ -122,13 +120,12 @@ export default function Product({ previousState }) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          username: username,
+          username: groupId,
           cart_content: [item],
           session_id: sessionId,
         }),
       });
       const result = await response.json();
-      console.log("Response from backend:", result);
     }
   }
     
@@ -159,7 +156,6 @@ export default function Product({ previousState }) {
 
     const addToCart = async () => {
       // Add to session storage cart
-      console.log("Adding to cart:", id);
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
       cart.push({ id, url, title, price, image });
       let cartWithKey = "cart" + sessionStorage.getItem("sessionId");
@@ -169,7 +165,6 @@ export default function Product({ previousState }) {
 
     const removeFromCart = async () => {
       // Remove from session storage cart
-      console.log("Removing from cart:", id);
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
       const updatedCart = cart.filter((item) => item.id !== id);
       let cartWithKey = "cart" + sessionStorage.getItem("sessionId");
@@ -211,7 +206,6 @@ export default function Product({ previousState }) {
       });
       const deleteResult = await deleteResponse.json();
       if (deleteResult.response === "Cart deleted") {
-        console.log("Cart deleted successfully");
         const response = await fetch(`${config.backendURL}/save_cart`, {
           method: "POST",
           headers: {
@@ -224,7 +218,6 @@ export default function Product({ previousState }) {
           }),
         });
         const result = await response.json();
-        console.log("Response from backend:", result);
       }
     }
     else {
@@ -240,7 +233,6 @@ export default function Product({ previousState }) {
         }),
       });
       const result = await response.json();
-      console.log("Response from backend:", result);
     }
     setLoading(false);
     navigate("/cart")
