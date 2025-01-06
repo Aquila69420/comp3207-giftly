@@ -52,6 +52,27 @@ function Login() {
           const sessionId = Math.random().toString(36).substring(2);
           sessionStorage.setItem("sessionId", JSON.stringify(sessionId));
         }
+        if (sessionStorage.getItem("groupInviteToken")) {
+          // Extract the token from the session storage
+          const token = JSON.parse(sessionStorage.getItem("groupInviteToken"));
+          // Send token to backend to join the group
+          const response = await fetch(`${config.backendURL}/groups/invite/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: values.username, token: token }),
+          });
+          const data = await response.json();
+          console.log("Join group response:", data);
+          if (data.result) {
+            sessionStorage.removeItem("groupInviteToken");
+            sessionStorage.setItem("groupToJoin", JSON.stringify(data.group));
+            navigate("/groups");
+            return;
+          } 
+          else {
+              console.error("Error joining group:", data.msg);
+          }
+        }
         setLoginError("");
         console.log("Login successful!");
         navigate("/home");
@@ -79,7 +100,27 @@ function Login() {
       if (data.user) {
         localStorage.setItem("username", data.user.username);
         localStorage.setItem("userID", data.user.id);
-        window.location.href = "/home";
+        if (sessionStorage.getItem("groupInviteToken")) {
+          // Extract the token from the session storage
+          const token = JSON.parse(sessionStorage.getItem("groupInviteToken"));
+          // Send token to backend to join the group
+          const response = await fetch(`${config.backendURL}/groups/invite/accept`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: data.user.username, token: token }),
+          });
+          const data = await response.json();
+          console.log("Join group response:", data);
+          if (data.result) {
+            sessionStorage.removeItem("groupInviteToken");
+            sessionStorage.setItem("groupToJoin", JSON.stringify(data.group));
+            navigate("/groups");
+            return;
+          } else {
+            console.error("Error joining group:", data.msg);
+          }
+        }
+        navigate("/home");
       } else {
         console.error("Error from backend:", data.error);
       }

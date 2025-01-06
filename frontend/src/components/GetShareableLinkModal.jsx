@@ -3,7 +3,7 @@
 // If this output is not empty, retrieve the first valid token
 // Else, call group/invite/generate to create a new invitation
 // In either scenario, display the token in the modal, and a button to copy it to clipboard
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "../styles/groups.module.css";
 import InfinityLoader from "./InfinityLoader";
 import { LuCopy, LuCopyCheck  } from "react-icons/lu";
@@ -21,9 +21,7 @@ const GetShareableLinkModal = ({ group, onClose }) => {
         const response = await fetch(`${config.backendURL}/groups/invite/get`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
-            params: JSON.stringify({
-                groupID: group.id,
-            }),
+            params: { 'groupID': group.id },
         });
         const data = await response.json();
         if (data.result && data.tokens.length > 0) {
@@ -40,6 +38,8 @@ const GetShareableLinkModal = ({ group, onClose }) => {
                 body: JSON.stringify({
                     userID: currentUserID,
                     groupID: group.id,
+                    expiryTime: 24 * 60 * 60, // 24 hours
+                    one_time: false,
                 }),
             });
             const data = await response.json();
@@ -53,6 +53,11 @@ const GetShareableLinkModal = ({ group, onClose }) => {
             }
         }
     };
+
+    // Fetch the invite link when the modal is opened
+    useEffect(() => {
+        handleGetLink();
+    }, []);
 
     const handleCopyToClipboard = () => {
         // Copy the inviteLink to clipboard
@@ -68,16 +73,15 @@ const GetShareableLinkModal = ({ group, onClose }) => {
                 <div className={styles.modalInput}>
                     {loading ? (
                         <div className="overlay">
-                        <InfinityLoader loading={loading} />
-                      </div>
+                            <InfinityLoader loading={loading} />
+                        </div>
                     ) : (
-                        <label>{inviteLink}</label>
+                        <label>
+                            {inviteLink.length > 45 ? `${inviteLink.substring(0, 45)}...` : inviteLink}
+                        </label>
                     )}
                 </div>
                 <div className={styles.modalButtons}>
-                    <button onClick={handleGetLink} className={styles.modalCreateButton}>
-                        Get Link
-                    </button>
                     <button onClick={handleCopyToClipboard} className={styles.modalCreateButton}>
                         {copied ? (
                             <div>

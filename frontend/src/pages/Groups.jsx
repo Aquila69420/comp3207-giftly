@@ -39,7 +39,16 @@ const Groups = () => {
           setGroups(data.groups);
 
           if (data.groups.length > 0) {
-            setActiveGroup(data.groups[0]);
+            if (sessionStorage.getItem("groupToJoin")) {
+              console.log("Joining group from session storage:", JSON.parse(sessionStorage.getItem("groupToJoin")));
+              // Extract the group  from session storage and join it
+              setActiveGroup(JSON.parse(sessionStorage.getItem("groupToJoin")));
+              console.log("Current active group:", activeGroup);
+              sessionStorage.removeItem("groupToJoin");
+            }
+            else {
+              setActiveGroup(data.groups[0]);
+            }
           }
         } else {
           setError(data.msg);

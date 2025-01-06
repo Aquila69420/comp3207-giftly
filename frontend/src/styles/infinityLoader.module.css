@@ -11,7 +11,7 @@
   width: 100vw;
   height: 100vh;
   background-color: #5F9389; /* Background color */
-  z-index: 1000; /* Ensure it is on top of other elements */
+  z-index: 1000;
 }
 
 .infinitySvg {
