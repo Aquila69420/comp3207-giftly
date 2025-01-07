@@ -1127,9 +1127,7 @@ def get_calendar(userID):
 
 def get_all(userID):
     """
-    Retrieve all groups, occasions, and divisions for a user. in a structured format
-
-    
+    Retrieve all groups, occasions, and divisions for a user. in a structured format    
 
     Parameters
     ----------
@@ -1155,7 +1153,17 @@ def get_all(userID):
         ocs = get_occasions(userID, groupID)
         for oc in ocs:
             ocID = oc['id']
-            divisions += get_divisions(userID, ocID)
+            # divisions += get_divisions(userID, ocID)
+            for division in get_divisions(userID, ocID):
+                recipients = division['recipients']
+                if len(recipients) == 1:
+                    recipient_doc = user_exists(recipients[0])
+                    division['divisionname'] = f"{recipient_doc['username']}'s Gift"
+                else:
+                    recipient_docs = users_exist(recipients)
+                    recipient_names = [recipient['username'] for recipient in recipient_docs]
+                    division['divisionname'] = " and ".join(recipient_names) + "'s Gift"
+                divisions.append(division)
         occasions += ocs
 
     return {
