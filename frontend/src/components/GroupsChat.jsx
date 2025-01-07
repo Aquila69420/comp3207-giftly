@@ -45,7 +45,7 @@ const GroupsChat = ({ userID, username, group, division, language }) => {
     if (!chatChannelID) return; // No channel, skip
 
     let didCancel = false;
-    const streamKey = '5cs3zw7bzvyk';  // from your environment/config
+    const streamKey = config.streamChatKey;
 
     const initChat = async () => {
       try {
