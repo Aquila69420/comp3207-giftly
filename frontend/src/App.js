@@ -45,14 +45,6 @@ function App() {
         />
         <Route path="/invite" element={<Invite/>} />
         <Route
-          path="/product"
-          element={
-            <Protected>
-              <Product />
-            </Protected>
-          }
-        />
-        <Route
           path="account-settings"
           element={
             <Protected>
