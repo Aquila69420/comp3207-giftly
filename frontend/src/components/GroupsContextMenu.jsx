@@ -310,7 +310,6 @@ const GroupsContextMenu = ({
         )}
 
         {showCartModal && (
-          console.log('Session ID: ', item?.id),
           <div className={styles.modalBackdrop} onClick={() => setShowCartModal(false)}>
             <div
               className={styles.modalContainer}

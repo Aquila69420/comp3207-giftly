@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import styles from "../styles/cart.module.css";
 import CartItem from "./CartItem"; 
 import config from "../config";
 import Freecurrencyapi from '@everapi/freecurrencyapi-js';
 
 function Cart({ sessionId, context, groupID }) {
-  const [cartItems, setCartItems] = useState(JSON.parse(sessionStorage.getItem("cart")) || []);
+
+  const storedCart = sessionStorage.getItem("cart")
+  ? JSON.parse(sessionStorage.getItem("cart"))
+  : [];
+  const [cartItems, setCartItems] = useState(storedCart);
   const [totalCost, setTotalCost] = useState(0);
   const freecurrencyapi = new Freecurrencyapi(config.currencyConversionAPIKey);
 
-  const username = localStorage.getItem("username");
+  const username = (context === "shared-cart") ? groupID : localStorage.getItem("username");
 
   useEffect(() => {
     const calculateTotalCost = async () => {
@@ -26,8 +30,6 @@ function Cart({ sessionId, context, groupID }) {
         return acc + price; // Add the numeric value to the total
       }, Promise.resolve(0));
       setTotalCost(newTotalCost);
-      console.log('Total cost:', totalCost)
-      console.log('Cart items:', cartItems)
     };
 
     calculateTotalCost();
@@ -48,8 +50,9 @@ function Cart({ sessionId, context, groupID }) {
         });
         const result = await response.json();
         if (response.ok && result.response !== "failed") {
-          console.log('Response from backend:', result);
+          // console.log('Response from backend:', result);
           setCartItems(result.response[sessionId]);
+          sessionStorage.setItem("cart", JSON.stringify(result.response[sessionId]));
         } else {
           setCartItems([]);
           setTotalCost(0);
@@ -66,9 +69,10 @@ function Cart({ sessionId, context, groupID }) {
 
 
   const handleSaveCart = async () => {
-    setCartItems(JSON.parse(sessionStorage.getItem("cart")))
+    // Get global cart items
+    // console.log("Cart items before:", cartItems);
+    let cartItems = JSON.parse(sessionStorage.getItem("cart"));
     // Get session id
-    const sessionId = localStorage.getItem("sessionId");
     // First see if cart is already stored
     const response = await fetch(`${config.backendURL}/load_cart`, {
       method: "POST",
@@ -127,8 +131,15 @@ function Cart({ sessionId, context, groupID }) {
 
   const handleClear = () => {
     setCartItems([]);
-    sessionStorage.setItem("cart", JSON.stringify([]))
+    setTotalCost(0);
+    sessionStorage.setItem("cart", JSON.stringify([]));
+    if (context === "shared-cart") {
+      handleSaveCart();
+    }     
   };
+
+  
+  
 
   useEffect(() => {
     // Save cart when user navigates away from the current page
@@ -154,6 +165,8 @@ function Cart({ sessionId, context, groupID }) {
               key={index}
               item={item}
               index={index}
+              context={context}
+              onUpdate={handleSaveCart}
               />
               ))
             ) : (
