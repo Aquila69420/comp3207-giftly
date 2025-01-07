@@ -28,6 +28,7 @@
 }
 
 .cartList {
+  max-height: calc(100vh - 150px);
   list-style-type: none;
   padding: 0;
   margin: 0;
