@@ -43,26 +43,13 @@ export default function Product({ previousState }) {
     });
   };
 
-  const checkProductInCarts = async () => {
-    const response = await fetch(`${config.backendURL}/load_all_carts`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username: username }),
-    });
-    const data = await response.json();
-    if (data.response.result) {
-      const carts = data.response.carts;
-      for (const[key, value] of Object.entries(carts)) {
-        // console.log(key, value);
-        for (const item of value) {
-          console.log("Item: ",item.id);
-          if (item.id === id) {
-            setCart(true);
-            console.log("Item found in cart", cart);
-            return;
-          }
+  const checkProductInCart = async () => {
+    const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+    if (cart.length > 0) {
+      for (const item of cart) {
+        if (item.id === id) {
+          setCart(true);
+          return;
         }
       }
     }
@@ -173,13 +160,16 @@ export default function Product({ previousState }) {
 
 
   useEffect(() => {
+    if (!sessionStorage.getItem("sessionId")) {
+      sessionStorage.setItem("sessionID", JSON.stringify(Math.random().toString(36).substring(2)));
+    }
     if (!data.id) {
       getProductInfoById();
     }
   }, [data.id]);
 
   useEffect(() => {
-    checkProductInCarts();
+    checkProductInCart();
     checkProductInWishlist();
     console.log("Wishlist status: ", favorite);
   }, [favorite, cart, data.id]);

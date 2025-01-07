@@ -16,6 +16,9 @@ function Cart({ sessionId, context, groupID }) {
   const username = (context === "shared-cart") ? groupID : localStorage.getItem("username");
 
   useEffect(() => {
+    if (!sessionStorage.getItem("sessionId")) {
+      (context === "shared-cart") ? sessionStorage.setItem("sessionId", JSON.stringify(groupID)) : sessionStorage.setItem("sessionID", JSON.stringify(Math.random().toString(36).substring(2)));
+    }
     const calculateTotalCost = async () => {
       if (cartItems.length === 0) {
         setTotalCost(0);
