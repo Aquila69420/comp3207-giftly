@@ -67,7 +67,6 @@ const LanguagePicker = ({ onLanguageChange }) => {
   const defaultLanguage = useState(
     languages.find((lang) => lang.code === defaultLanguageCode) || languages[0]
   )
-  console.log('default lang', defaultLanguage)
   const [selectedLanguage, setSelectedLanguage] = useState({
     code: defaultLanguage[0].code,
     label: defaultLanguage[0].label,

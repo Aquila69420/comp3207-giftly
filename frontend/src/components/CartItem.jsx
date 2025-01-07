@@ -4,7 +4,7 @@ import { IoCartOutline, IoCart } from "react-icons/io5";
 import {FaHeart, FaRegHeart } from "react-icons/fa";
 import config from "../config";
 
-const CartItem = ({ item, index }) => {
+const CartItem = ({ item, index, context, onUpdate }) => {
     const [cart, setCart] = useState(true);
     const { id, url, title, price, image } = item;
     const [favorite, setFavorite] = useState(false);
@@ -52,6 +52,9 @@ const CartItem = ({ item, index }) => {
             const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
             cart.push({id, url, title, price, image});
             sessionStorage.setItem("cart", JSON.stringify(cart));
+            if (context === "shared-cart") {
+                onUpdate();
+            }
         };
         
         const removeFromCart = async () => {
@@ -60,6 +63,9 @@ const CartItem = ({ item, index }) => {
             const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
             const updatedCart = cart.filter((item) => item.id !== id);
             sessionStorage.setItem("cart", JSON.stringify(updatedCart));
+            if (context === "shared-cart") {
+                onUpdate();
+            }
         };
       
         cart ? await removeFromCart() : await addToCart();
