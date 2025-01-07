@@ -33,7 +33,7 @@ This project demonstrates proficiency in modern cloud application development pr
 
 The frontend of the Giftly web app is optimized using the following techniques:
 
-- **Code Splitting**: Implemented using React's lazy loading and Suspense to load components only when needed, reducing initial load time.
+- **Code Splitting**: Implemented using React's lazy loading to load components only when needed, reducing initial load time.
 - **Minification**: JavaScript and CSS files are minified to reduce the size of the assets being sent to the client.
 - **Caching**: Leveraged browser caching to store static assets, reducing the need to re-download them on subsequent visits.
 - **Responsive Design**: Ensured the app is mobile-friendly and performs well on various devices by using responsive design principles.
