@@ -300,9 +300,9 @@ export default function Product({ previousState }) {
                 userId={userId}
                 onDivisionSelect={handleSharedCartDivisionSelect}
               />
-              <button className={styles.navButton1}>
+              {/* <button className={styles.navButton1}>
                 <div>Share With Group</div> <FaShare size={30} />
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

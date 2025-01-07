@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaUsers, FaChevronRight } from "react-icons/fa";
-import { Modal, Button } from "react-bootstrap";
+import { FaUsers, FaChevronRight, FaChevronDown } from "react-icons/fa";
+import { Modal } from "react-bootstrap";
 import config from "../config";
 import styles from "../styles/product.module.css";
 
@@ -41,6 +41,15 @@ export default function SharedCartMenu({onDivisionSelect }) {
     }
   }, [showModal]);
 
+  const getDivisionLabel = (division) => {
+    if (!division.recipients || division.recipients.length === 0) {
+      return "Loading...";
+    }
+    console.log("Getting label for division:", division);
+
+    return division.divisionname
+  };
+
   const handleDivisionSelect = (divisionId, groupID) => {
     onDivisionSelect(divisionId, groupID);
     setShowModal(false);
@@ -48,13 +57,17 @@ export default function SharedCartMenu({onDivisionSelect }) {
 
   return (
     <>
-      <Button className={styles.navButton1} onClick={() => setShowModal(true)}>
+      <button className={styles.navButton1} onClick={() => setShowModal(true)}>
         Add to Shared Cart
         <FaUsers size={30} />
-      </Button>
+      </button>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
+      <Modal
+        show={showModal}
+        onHide={() => setShowModal(false)}
+        dialogClassName={styles.modal}
+      >
+        <Modal.Header closeButton dialogClassName={styles.modalHeader}>
           <Modal.Title>Select a Division</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -65,32 +78,32 @@ export default function SharedCartMenu({onDivisionSelect }) {
               {!selectedGroup && (
                 <ul>
                   {data.groups.map((group) => (
-                    <li key={group.id} onClick={() => setSelectedGroup(group)}>
-                      {group.groupname} <FaChevronRight />
+                    <li key={group.id} className={styles.groupItem} onClick={() => setSelectedGroup(group)}>
+                      {group.groupname} {selectedGroup === group ? <FaChevronDown className={styles.chevron}/> : <FaChevronRight className={styles.chevron}/>}
                     </li>
                   ))}
                 </ul>
               )}
               {selectedGroup && !selectedOccasion && (
                 <ul>
-                  <Button onClick={() => setSelectedGroup(null)}>Back</Button>
+                  <button className={styles.backButton} onClick={() => setSelectedGroup(null)}>Back to choose group</button>
                   {data.occasions
                     .filter((oc) => oc.groupID === selectedGroup.id)
                     .map((occasion) => (
-                      <li key={occasion.id} onClick={() => setSelectedOccasion(occasion)}>
-                        {occasion.occasionname} <FaChevronRight />
+                      <li key={occasion.id} className={styles.occasionItem} onClick={() => setSelectedOccasion(occasion)}>
+                        {occasion.occasionname} {selectedOccasion === occasion ? <FaChevronDown className={styles.chevron}/> : <FaChevronRight className={styles.chevron}/>}
                       </li>
                     ))}
                 </ul>
               )}
               {selectedOccasion && (
                 <ul>
-                  <Button onClick={() => setSelectedOccasion(null)}>Back</Button>
+                  <button className={styles.backButton} onClick={() => setSelectedOccasion(null)}>Back to choose occasion</button>
                   {data.divisions
                     .filter((div) => div.occasionID === selectedOccasion.id)
                     .map((division) => (
                       <li key={division.id} onClick={() => handleDivisionSelect(division.id, selectedGroup.id)}>
-                        Division: {division.id}
+                        Division: {getDivisionLabel(division)}
                       </li>
                     ))}
                 </ul>

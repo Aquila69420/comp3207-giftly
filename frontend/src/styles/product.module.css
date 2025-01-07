@@ -102,7 +102,7 @@
   border: none;
   cursor: pointer;
   font-size: 2rem;
-  color: #2196f3;
+  color: #527D74;
   transition: transform 0.2s ease-in-out;
 }
 
@@ -168,4 +168,49 @@
     flex-direction: column; /* Stack buttons */
     gap: 10px; /* Reduce gap for smaller screens */
   }
+}
+
+.modal {
+  color: #085b5e;
+}
+
+.modalHeader {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.backButton {
+  background-color: #527D74;
+  color: white;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: none;
+  padding: 10px;
+}
+
+.groupItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+
+.chevron {
+  transition: transform 0.5s;
+}
+.chevron:hover,
+.chevron:active,
+.chevron.clicked {
+  transform: rotate(90deg);
+  transition: transform 0.5s;
+  transform-origin: center;
+}
+
+.occasionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
