@@ -51,6 +51,35 @@ def save(username, session_id, cart_content, container):
         logging.info(f"cart save error: {e}")
         return "database error"
 
+def load_all_carts(username, container):
+    """
+    Load all carts for a user
+    
+    Parameters
+    ----------
+    username : str
+        The username of the user
+    container : azure.cosmos.CosmosClient
+        The container object to interact with the database
+    
+    Returns
+    -------
+    dict or str
+        The carts of the user or the status of the operation
+    """
+    try:
+        user_cart_data = list(container.query_items(
+            query="SELECT * FROM c WHERE c.username=@username",
+            parameters=[{'name': '@username', 'value': username}],
+            enable_cross_partition_query=False
+        ))
+        if user_cart_data: return {'result': True, 'carts': user_cart_data[0]['carts']}
+        else: return {'result': False, 'message': f"{username} does not have any carts stored"}
+    except Exception as e:
+        logging.info(f"carts load error: {e}")
+        return "database error"
+    
+
 def load(username, session_id, container):
     """
     Load cart content from database
@@ -131,7 +160,6 @@ def delete(username, session_id, container):
     except Exception as e:
         logging.info(f"cart load error: {e}")
         return "database error"
-    
 
 def update(username, session_id, item, action, container):
     """

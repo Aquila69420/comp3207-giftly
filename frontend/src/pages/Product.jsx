@@ -9,7 +9,6 @@ import InfinityLoader from "../components/InfinityLoader";
 import { FaShare } from "react-icons/fa";
 import SharedCartMenu from "../components/SharedCartMenu";
 
-
 export default function Product({ previousState }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -20,12 +19,54 @@ export default function Product({ previousState }) {
   const [title, setTitle] = useState(data.title || "");
   const [image, setImage] = useState(data.image || "");
   const [price, setPrice] = useState(data.price || "");
-  const [favorite, setFavorite] = useState(false);
-  const [cart, setCart] = useState(false);
+  const [favorite, setFavorite] = useState(false); // Check if product is already in wishlist first to set this value
+  const [cart, setCart] = useState(false); // Check if product is already in cart first to set this value
   const username = localStorage.getItem("username");
   const userId = localStorage.getItem("userID");
   const [loading, setLoading] = useState(false);
 
+  const checkProductInWishlist = async () => {
+    const response = await fetch(`${config.backendURL}/wishlist_get`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username }),
+    });
+    const data = await response.json();
+    const gifts = data.response;
+    gifts.forEach((gift) => {
+      if (gift === id) {
+        setFavorite(true);
+        return;
+      }
+    });
+  };
+
+  const checkProductInCarts = async () => {
+    const response = await fetch(`${config.backendURL}/load_all_carts`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ username: username }),
+    });
+    const data = await response.json();
+    if (data.response.result) {
+      const carts = data.response.carts;
+      for (const[key, value] of Object.entries(carts)) {
+        // console.log(key, value);
+        for (const item of value) {
+          console.log("Item: ",item.id);
+          if (item.id === id) {
+            setCart(true);
+            console.log("Item found in cart", cart);
+            return;
+          }
+        }
+      }
+    }
+  };
 
   const getProductInfoById = async () => {
     const productId = searchParams.get("id");
@@ -137,6 +178,12 @@ export default function Product({ previousState }) {
     }
   }, [data.id]);
 
+  useEffect(() => {
+    checkProductInCarts();
+    checkProductInWishlist();
+    console.log("Wishlist status: ", favorite);
+  }, [favorite, cart, data.id]);
+
   const updateWishlistStatus = async () => {
     setFavorite(!favorite);
     const updateWishlist = favorite
@@ -162,6 +209,15 @@ export default function Product({ previousState }) {
     const addToCart = async () => {
       // Add to session storage cart
       const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+      // only push if item is not already in cart
+      if (cart.length > 0) {
+        for (const item of cart) {
+          if (item.id === id) {
+            alert("Item already in cart");
+            return;
+          }
+        }
+      }
       cart.push({ id, url, title, price, image });
       let cartWithKey = "cart" + sessionStorage.getItem("sessionId");
       sessionStorage.setItem("cart", JSON.stringify(cart));
@@ -181,6 +237,7 @@ export default function Product({ previousState }) {
 
   const saveCart = async () => {
     const cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+    console.log("Cart items before:", cart);
     if (cart.length === 0) {
       alert("Please add items to your cart first.");
       return;

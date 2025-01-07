@@ -289,6 +289,31 @@ def update_cart_http(req: func.HttpRequest) -> func.HttpResponse:
             status_code=500
         )
 
+@app.function_name(name="load_all_carts")
+@app.route(route="load_all_carts", methods=[func.HttpMethod.POST])
+def load_all_carts(req: func.HttpRequest) -> func.HttpResponse:
+    """
+    Load all carts for a user.
+
+    Parameters
+    ----------
+    req : func.HttpRequest
+        The HTTP request object containing the JSON payload with the 'username'.
+
+    Returns
+    -------
+    func.HttpResponse
+        The HTTP response object containing the cart data or an error message.
+    """
+    data = req.get_json()
+    username = data['username']
+    output = cart.load_all_carts(username, cart_container)
+    response = func.HttpResponse(
+        body=json.dumps({"response": output}),
+        mimetype="application/json",
+        status_code=200
+    )
+    return add_cors_headers(response)
 
 @app.function_name(name="load_cart")
 @app.route(route="load_cart", methods=[func.HttpMethod.POST])
