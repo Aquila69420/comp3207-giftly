@@ -20,15 +20,27 @@ Instructions:
 
 -> cd backend
 
-2) install python libraries 
+2) create a virtual environment with a version of python 3.11 or before and activate
+
+-> python -m venv venv
+
+Then for Windows 
+
+-> .\venv\Scripts\Activate.ps1
+
+or for Linux/Unix
+
+-> source venv/bin/activate 
+
+3) install python libraries 
 
 -> pip install -r requirements.txt
 
-3) Deploy 
+4) Deploy 
 
 func azure functionapp publish giftly 
 
-4) Add Environment Variables
+5) Add Environment Variables
 
 Use our local.setting.json to add evironment Variables, go to settings for the function app and add all of them
 you can use advance edit.
