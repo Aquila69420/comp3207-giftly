@@ -1,18 +1,16 @@
 import base64
 import json
 import requests
-
-with open('./local.settings.json', 'r') as file:
-    settings = json.load(file)
+import os
 
 sandbox_settings = {
-    'client_id': settings.get('Values').get('Ebay_Sandbox_Client_ID'),
-    'client_secret': settings.get('Values').get('Ebay_Sandbox_Client_Secret'),
+    'client_id': os.getenv('Ebay_Sandbox_Client_ID'),
+    'client_secret': os.getenv('Ebay_Sandbox_Client_Secret'),
 }
 
 production_settings = {
-    'client_id': settings.get('Values').get('Ebay_Production_Client_ID'),
-    'client_secret': settings.get('Values').get('Ebay_Production_Client_Secret'),
+    'client_id': os.getenv('Ebay_Production_Client_ID'),
+    'client_secret': os.getenv('Ebay_Production_Client_Secret'),
 }
 
 # Demo response JSON file for testing

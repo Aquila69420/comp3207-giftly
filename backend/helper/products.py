@@ -22,12 +22,25 @@ def get_products(products):
     # format the output to include link, price per unit, name
     # combine the searches and output as dict with each vendor
     # return the value
-    print('Searching vendors for products...')
     results = {}
-    results['ebay'] = ebay.parse_search_results(ebay.search(products))
-    results['amazon'] = parse_amazon_products(amazon(products))
-    results['google'] = parse_google_products(google(products))
-    results['walmart'] = parse_walmart_products(walmart(products))
+    try:
+        results['ebay'] = ebay.parse_search_results(ebay.search(products))
+        results['amazon'] = parse_amazon_products(amazon(products))
+        results['google'] = parse_google_products(google(products))
+        results['walmart'] = parse_walmart_products(walmart(products))
+    except:
+        with open('./ebay_search.json') as f:
+            demo_ebay_response = json.load(f)
+        with open('./amazon_search.json') as f:
+            demo_amazon_response = json.load(f)
+        with open('./google_search.json') as f:
+            demo_google_response = json.load(f)
+        with open('./walmart_search.json') as f:
+            demo_walmart_response = json.load(f)
+        results['ebay'] = ebay.parse_search_results(demo_ebay_response['itemSummaries'])
+        results['amazon'] = parse_amazon_products(demo_amazon_response['results'][0]['content']['results']['organic'])
+        results['google'] = parse_google_products(demo_google_response['results'][0]['content']['results']['organic'])
+        results['walmart'] = parse_walmart_products(demo_walmart_response['results'][0]['content']['results'])
     return results
 
 def get_products_with_price_limitation(products, price):

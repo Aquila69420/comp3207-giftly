@@ -22,7 +22,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 
 
-app = func.FunctionApp()
+app = func.FunctionApp(auth_level=func.AuthLevel.ANONYMOUS)
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
@@ -58,7 +58,7 @@ def add_cors_headers(response: func.HttpResponse) -> func.HttpResponse:
 
 
 @app.function_name(name="google_login")
-@app.route(route="google/login", methods=[func.HttpMethod.GET])
+@app.route(route="google/login", methods=[func.HttpMethod.GET], auth_level=func.AuthLevel.ANONYMOUS)
 def google_login(req: func.HttpRequest) -> func.HttpResponse:
     """
     Redirect users to Google's OAuth 2.0 authentication page.
@@ -82,7 +82,7 @@ def google_login(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="google_callback")
-@app.route(route="google/callback", methods=[func.HttpMethod.POST])
+@app.route(route="google/callback", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def google_callback(req: func.HttpRequest) -> func.HttpResponse:
     """
     Endpoint for handling Google login callback.
@@ -131,7 +131,7 @@ def google_callback(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="wishlist_get")
-@app.route(route='wishlist_get', methods=[func.HttpMethod.POST])
+@app.route(route='wishlist_get', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
     """
     Retrieve the wishlist for a given username.
@@ -157,7 +157,7 @@ def wishlist_get(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="wishlist_update")
-@app.route(route='wishlist_update', methods=[func.HttpMethod.POST])
+@app.route(route='wishlist_update', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
     """
     Update the wishlist with a new gift for a specific user.
@@ -184,7 +184,7 @@ def wishlist_update(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="wishlist_remove")
-@app.route(route='wishlist_remove', methods=[func.HttpMethod.POST])
+@app.route(route='wishlist_remove', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
     """
     Remove a gift from a user's wishlist.
@@ -212,7 +212,7 @@ def wishlist_remove(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="save_cart")
-@app.route(route="save_cart", methods=[func.HttpMethod.POST])
+@app.route(route="save_cart", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def save_cart(req: func.HttpRequest) -> func.HttpResponse:
     """
     Save the cart content for a user session.
@@ -240,7 +240,7 @@ def save_cart(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="update_cart")
-@app.route(route="update_cart", methods=[func.HttpMethod.POST])
+@app.route(route="update_cart", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def update_cart_http(req: func.HttpRequest) -> func.HttpResponse:
     """
     Azure Function to handle adding or removing an item from a cart.
@@ -290,7 +290,7 @@ def update_cart_http(req: func.HttpRequest) -> func.HttpResponse:
         )
 
 @app.function_name(name="load_all_carts")
-@app.route(route="load_all_carts", methods=[func.HttpMethod.POST])
+@app.route(route="load_all_carts", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def load_all_carts(req: func.HttpRequest) -> func.HttpResponse:
     """
     Load all carts for a user.
@@ -316,7 +316,7 @@ def load_all_carts(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="load_cart")
-@app.route(route="load_cart", methods=[func.HttpMethod.POST])
+@app.route(route="load_cart", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def load_cart(req: func.HttpRequest) -> func.HttpResponse:
     """
     Load the user's cart based on the provided session ID and username.
@@ -350,7 +350,7 @@ def load_cart(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="delete_cart")
-@app.route(route="delete_cart", methods=[func.HttpMethod.POST])
+@app.route(route="delete_cart", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
     """
     Delete a cart based on session ID and username.
@@ -377,7 +377,7 @@ def delete_cart(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="find_user_autocomplete")
-@app.route(route="find_user_autocomplete", methods=[func.HttpMethod.POST])
+@app.route(route="find_user_autocomplete", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
     """
     Find usernames that match the autocomplete query
@@ -414,7 +414,7 @@ def find_user_autocomplete(req: func.HttpRequest) -> func.HttpResponse:
         return func.HttpResponse("Error processing request", status_code=500)
  
 @app.function_name(name="email_verification")
-@app.route(route='email_verification', methods=[func.HttpMethod.POST])
+@app.route(route='email_verification', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def email_verification(req: func.HttpRequest) -> func.HttpResponse:
     """
     Verify the email using the provided username and code.
@@ -441,7 +441,7 @@ def email_verification(req: func.HttpRequest) -> func.HttpResponse:
 
     
 @app.function_name(name="update_user_details")
-@app.route(route='update_user_details', methods=[func.HttpMethod.POST])
+@app.route(route='update_user_details', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def update_user_details(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     field = data['field']
@@ -468,7 +468,7 @@ def update_user_details(req: func.HttpRequest) -> func.HttpResponse:
 
 # BODGE for userID
 @app.function_name(name="get_user_id")
-@app.route(route='get_user_id', methods=[func.HttpMethod.POST])
+@app.route(route='get_user_id', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def get_user_id(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
@@ -491,7 +491,7 @@ def get_user_id(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="get_username")
-@app.route(route='get_username', methods=[func.HttpMethod.POST])
+@app.route(route='get_username', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def get_username(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     userID = data['userID']
@@ -514,7 +514,7 @@ def get_username(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="get_usernames")
-@app.route(route='get_usernames', methods=[func.HttpMethod.POST])
+@app.route(route='get_usernames', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def get_usernames(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     userIDs = data['userIDs']
@@ -541,7 +541,7 @@ def get_usernames(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="send_notifications")
-@app.route(route='send_notifications', methods=[func.HttpMethod.POST])
+@app.route(route='send_notifications', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def send_notifications(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
@@ -554,7 +554,7 @@ def send_notifications(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="login")
-@app.route(route='login', methods=[func.HttpMethod.POST])
+@app.route(route='login', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def login(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
@@ -568,7 +568,7 @@ def login(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="product_text")
-@app.route(route='product_text', methods=[func.HttpMethod.POST])
+@app.route(route='product_text', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def product_text(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     prompt = data['prompt']
@@ -583,7 +583,7 @@ def product_text(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="product_types")
-@app.route(route='product_types', methods=[func.HttpMethod.POST])
+@app.route(route='product_types', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def product_types(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['Username'].strip()
@@ -604,7 +604,7 @@ def product_types(req: func.HttpRequest) -> func.HttpResponse:
 #############################GROUP FUNCTIONS#############################
 
 @app.function_name(name="groups_create")
-@app.route(route='groups/create', methods=[func.HttpMethod.POST])
+@app.route(route='groups/create', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     '''User Initialises a Group with a Group Name
     
@@ -635,7 +635,7 @@ def groups_create(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_delete")
-@app.route(route='groups/delete', methods=[func.HttpMethod.POST])
+@app.route(route='groups/delete', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
     '''User Deletes a Group that they are an admin for
     
@@ -666,7 +666,7 @@ def groups_delete(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_add_user")
-@app.route(route='groups/add_user', methods=[func.HttpMethod.POST])
+@app.route(route='groups/add_user', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     '''User Adds a Different User to Group
     
@@ -702,7 +702,7 @@ def groups_add_user(req:func.HttpRequest) -> func.HttpResponse:
     
 
 @app.function_name(name="groups_get")
-@app.route(route='groups/get', methods=[func.HttpMethod.POST])
+@app.route(route='groups/get', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     '''Get the groups that a user is a part of
     
@@ -731,7 +731,7 @@ def groups_get(req:func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_change_groupname")
-@app.route(route='groups/change_groupname', methods=[func.HttpMethod.POST])
+@app.route(route='groups/change_groupname', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     '''Admin can change the name of a group
     
@@ -763,7 +763,7 @@ def groups_change_groupname(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_kick")
-@app.route(route='groups/kick', methods=[func.HttpMethod.POST])
+@app.route(route='groups/kick', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     '''The admin of a group removes a different user from the group
     
@@ -797,7 +797,7 @@ def groups_kick(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_leave")
-@app.route(route='groups/leave', methods=[func.HttpMethod.POST])
+@app.route(route='groups/leave', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     '''A user of a group leaves the group
     
@@ -831,7 +831,7 @@ def groups_leave(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_create")
-@app.route(route='groups/occasions/create', methods=[func.HttpMethod.POST])
+@app.route(route='groups/occasions/create', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     '''A user of a group can create an occasion
     
@@ -868,7 +868,7 @@ def groups_occasions_create(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_datechange")
-@app.route(route='groups/occasions/datechange', methods=[func.HttpMethod.POST])
+@app.route(route='groups/occasions/datechange', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_occasions_datechange(req: func.HttpRequest) -> func.HttpResponse:
     '''Change the date of an occasion via occasionDate
     
@@ -901,7 +901,7 @@ def groups_occasions_datechange(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="groups_occasions_delete")
-@app.route(route='groups/occasions/delete', methods=[func.HttpMethod.POST])
+@app.route(route='groups/occasions/delete', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_occasions_delete(req: func.HttpRequest) -> func.HttpResponse:
     '''Remove an occasion and all its divisions via its occasionID
     
@@ -930,7 +930,7 @@ def groups_occasions_delete(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_get")
-@app.route(route='groups/occasions/get', methods=[func.HttpMethod.POST])
+@app.route(route='groups/occasions/get', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     '''Get all occasions for a particular group and userID
     
@@ -960,7 +960,7 @@ def groups_occasions_get(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_occasions_leave")
-@app.route(route='groups/occasions/leave', methods=[func.HttpMethod.POST])
+@app.route(route='groups/occasions/leave', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     '''Any user in an occasion can leave the occasion
     
@@ -990,7 +990,7 @@ def groups_occasions_leave(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_secret_santa")
-@app.route(route='groups/secret_santa', methods=[func.HttpMethod.POST])
+@app.route(route='groups/secret_santa', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Secret Santa
 
@@ -1021,7 +1021,7 @@ def groups_secret_santa(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_group_gifting")
-@app.route(route='groups/group_gifting', methods=[func.HttpMethod.POST])
+@app.route(route='groups/group_gifting', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate Group Gifting for a target recipient(s)
     
@@ -1054,7 +1054,7 @@ def groups_group_gifting(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="process_audio")
-@app.route(route="process_audio", methods=[func.HttpMethod.POST])
+@app.route(route="process_audio", methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def process_audio(req: func.HttpRequest) -> func.HttpResponse:
     from azure.cognitiveservices.speech import SpeechConfig, SpeechRecognizer, AudioConfig, audio
     import azure.cognitiveservices.speech as speechsdk
@@ -1134,7 +1134,7 @@ def process_audio(req: func.HttpRequest) -> func.HttpResponse:
 ##### DHRUVS CHANGES BELOW 
 
 @app.function_name(name="register")
-@app.route(route='register', methods=[func.HttpMethod.POST])
+@app.route(route='register', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def register(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     logging.info(f"Register info: {data}")
@@ -1156,7 +1156,7 @@ def register(req: func.HttpRequest) -> func.HttpResponse:
 
 # Forgot passsword route
 @app.function_name(name="fetch_user_details")
-@app.route(route='fetch_user_details', methods=[func.HttpMethod.POST])
+@app.route(route='fetch_user_details', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     email = data['email']
@@ -1177,7 +1177,7 @@ def fetch_user_details(req: func.HttpRequest) -> func.HttpResponse:
     
 
 @app.function_name(name='register_product_or_get_id')
-@app.route(route='register_product_or_get_id', methods=[func.HttpMethod.POST])
+@app.route(route='register_product_or_get_id', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     product_info = {
@@ -1218,7 +1218,7 @@ def register_product_or_get_id(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name='get_product_by_id')
-@app.route(route='get_product_by_id', methods=[func.HttpMethod.GET])
+@app.route(route='get_product_by_id', methods=[func.HttpMethod.GET], auth_level=func.AuthLevel.ANONYMOUS)
 def get_product_by_id(req: func.HttpRequest) -> func.HttpResponse:
     id = req.params.get('id')
     try:
@@ -1263,7 +1263,7 @@ def allowed_file(file):
         return format and size_in_mb < 20 and width > 50 and height > 50 and width < 16000 and height < 16000
 
 @app.function_name(name="product_img")
-@app.route(route='product_img', methods=[func.HttpMethod.POST])
+@app.route(route='product_img', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def product_img(req: func.HttpRequest) -> func.HttpResponse:
     try:
         data = req.form
@@ -1318,7 +1318,7 @@ def product_img(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name(name="groups_exclusion_gifting")
-@app.route(route='groups/exclusion_gifting', methods=[func.HttpMethod.POST])
+@app.route(route='groups/exclusion_gifting', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
     '''Initiate exclusion gifting of n divisions where n is the number of users in the occasion
     
@@ -1357,13 +1357,13 @@ def groups_exclusion_gifting(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="groups_white_elephant")
-@app.route(route='groups/white_elephant', methods=[func.HttpMethod.POST])
+@app.route(route='groups/white_elephant', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_white_elephant(req: func.HttpRequest) -> func.HttpResponse:
     #TODO: code if required
     pass
 
 @app.function_name(name="groups_divisions_get")
-@app.route(route='groups/divisions/get', methods=[func.HttpMethod.POST])
+@app.route(route='groups/divisions/get', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
     '''Get all divisions relevant to a user from an occasion
     
@@ -1395,7 +1395,7 @@ def groups_divisions_get(req: func.HttpRequest) -> func.HttpResponse:
 
 
 @app.function_name(name="get_all_groups_occasions_divisions")
-@app.route(route='groups/get_all', methods=[func.HttpMethod.POST])
+@app.route(route='groups/get_all', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def get_all_groups_occasions_divisions(req: func.HttpRequest) -> func.HttpResponse:
     '''Get all groups, occasions and divisions for a user
     
@@ -1424,7 +1424,7 @@ def get_all_groups_occasions_divisions(req: func.HttpRequest) -> func.HttpRespon
     return add_cors_headers(response)
 
 @app.function_name(name='groups_calendar_get')
-@app.route(route='groups/calendar/get', methods=[func.HttpMethod.POST])
+@app.route(route='groups/calendar/get', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_calendar_get(req: func.HttpRequest) -> func.HttpResponse:
     '''Get all occasion dates for a user
     
@@ -1453,7 +1453,7 @@ def groups_calendar_get(req: func.HttpRequest) -> func.HttpResponse:
 
 # STREAM Chat
 @app.function_name(name="get_token")
-@app.route(route='get_token', methods=[func.HttpMethod.POST])
+@app.route(route='get_token', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def get_token(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
@@ -1473,7 +1473,7 @@ def get_token(req: func.HttpRequest) -> func.HttpResponse:
 
 ###############GROUPS_INVITATION###############
 @app.function_name(name="groups_invite_generate")
-@app.route(route='groups/invite/generate', methods=[func.HttpMethod.POST])
+@app.route(route='groups/invite/generate', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_generate(req: func.HttpRequest) -> func.HttpResponse:
     '''Generate a URL to invite a user to a group
     
@@ -1511,7 +1511,7 @@ def groups_invite_generate(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name("groups_invite_validate")
-@app.route(route='groups/invite/validate', methods=[func.HttpMethod.POST])
+@app.route(route='groups/invite/validate', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_validate(req: func.HttpRequest) -> func.HttpResponse:
     '''Validate and Use an invitation token
     
@@ -1543,7 +1543,7 @@ def groups_invite_validate(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name("groups_invite_revoke")
-@app.route(route='groups/invite/revoke', methods=[func.HttpMethod.POST])
+@app.route(route='groups/invite/revoke', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_revoke(req: func.HttpRequest) -> func.HttpResponse:
     '''Revoke an invitation via the token
     
@@ -1574,7 +1574,7 @@ def groups_invite_revoke(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name("groups_invite_accept")
-@app.route(route='groups/invite/accept', methods=[func.HttpMethod.POST])
+@app.route(route='groups/invite/accept', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_accept(req: func.HttpRequest) -> func.HttpResponse:
     '''User accepts invite via token
     
@@ -1605,7 +1605,7 @@ def groups_invite_accept(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name("groups_invite_get")
-@app.route(route='groups/invite/get', methods=[func.HttpMethod.GET])
+@app.route(route='groups/invite/get', methods=[func.HttpMethod.GET], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_get(req: func.HttpRequest) -> func.HttpResponse:
     '''Get invitation tokens for a group
     
@@ -1631,7 +1631,7 @@ def groups_invite_get(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response)
 
 @app.function_name("groups_invite_clear_expired")
-@app.route(route='groups/invite/clear_expired', methods=[func.HttpMethod.POST])
+@app.route(route='groups/invite/clear_expired', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
 def groups_invite_clear_expired(req: func.HttpRequest) -> func.HttpResponse:
     '''Clear invitations container of expired or revoked invitations
     

@@ -6,19 +6,18 @@ from pprint import pprint
 
 # TODO: replace with new credentials, account expires on 26/12/2024
 # TODO: Add demo response JSON files to gitignore for production/final submission
-with open('./local.settings.json', 'r') as file:
-    settings = json.load(file)
-username = settings.get('Values').get('Oxylabs_API_username')
-password = settings.get('Values').get('Oxylabs_API_password')
+
+username = os.getenv('Oxylabs_API_username')
+password = os.getenv('Oxylabs_API_password')
 
 # Demo response JSON files for testing
-with open('./amazon_search.json') as f:
-    demo_amazon_response = json.load(f)
-with open('./google_search.json') as f:
-    demo_google_response = json.load(f)
-with open('./walmart_search.json') as f:
-# with open('backend/walmart_search.json') as f:
-    demo_walmart_response = json.load(f)
+# with open('./amazon_search.json') as f:
+#     demo_amazon_response = json.load(f)
+# with open('./google_search.json') as f:
+#     demo_google_response = json.load(f)
+# with open('./walmart_search.json') as f:
+# # with open('backend/walmart_search.json') as f:
+#     demo_walmart_response = json.load(f)
 
 def amazon(query):
     """
@@ -34,15 +33,15 @@ def amazon(query):
     list
         A list of top Amazon products, including the top Amazon's choice and top organic results.
     """
-    # response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
-    #     'source': 'amazon_search',
-    #     'domain': 'co.uk',
-    #     'query': query,
-    #     'start_page': 1,
-    #     'pages': 1,
-    #     'parse': True,
-    # }).json()
-    response = demo_amazon_response
+    response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
+        'source': 'amazon_search',
+        'domain': 'co.uk',
+        'query': query,
+        'start_page': 1,
+        'pages': 1,
+        'parse': True,
+    }).json()
+    # response = demo_amazon_response
     amazons_choices = response['results'][0]['content']['results']['amazons_choices']
     organic = response['results'][0]['content']['results']['organic']
     top_organic = organic if len(amazons_choices) > 0 else organic # top 2 organic results if there is an amazon's choice else top 3
@@ -96,21 +95,21 @@ def google(query):
     list
         A list of products retrieved from the Google Shopping search results.
     """
-    # response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
-    #     'source': 'google_shopping_search',
-    #     'domain': 'co.uk',
-    #     'query': query,
-    #     'start_page': 1,
-    #     'pages': 1,
-    #     'parse': True,
-    #     'context': [
-    #         {
-    #             'key': 'results_language',
-    #             'value': 'en'
-    #         }
-    #     ]
-    # }).json()
-    response = demo_google_response
+    response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
+        'source': 'google_shopping_search',
+        'domain': 'co.uk',
+        'query': query,
+        'start_page': 1,
+        'pages': 1,
+        'parse': True,
+        'context': [
+            {
+                'key': 'results_language',
+                'value': 'en'
+            }
+        ]
+    }).json()
+    # response = demo_google_response
     products = response['results'][0]['content']['results']['organic']
     return products
 
@@ -155,12 +154,12 @@ def walmart(query):
     list
         A list of products retrieved from the Walmart search results.
     """
-    # response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
-    #     'source': 'universal',
-    #     'url': 'https://www.walmart.com/search?q={}'.format(query),
-    #     'parse': True,
-    # }).json()
-    response = demo_walmart_response
+    response = requests.request('POST','https://realtime.oxylabs.io/v1/queries',auth=(username, password), json={
+        'source': 'universal',
+        'url': 'https://www.walmart.com/search?q={}'.format(query),
+        'parse': True,
+    }).json()
+    # response = demo_walmart_response
     products = response['results'][0]['content']['results']
     return products
 
