@@ -1,0 +1,75 @@
+######################################################
+BACKEND DEPLOYMENT
+######################################################
+
+So for the backend, we have used Azure Function app
+
+Make sure you have an azure account and you can run az and func commands from the cli tools for azure
+
+If you cant please download them
+
+az:
+https://learn.microsoft.com/en-us/cli/azure/install-azure-cli-windows?tabs=azure-cli
+
+func: 
+https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local?tabs=windows%2Cisolated-process%2Cnode-v4%2Cpython-v2%2Chttp-trigger%2Ccontainer-apps&pivots=programming-language-python#install-the-azure-functions-core-tools
+
+Instructions:
+
+1) navigate to the backend folder (this is at the root of the project)
+
+-> cd backend
+
+2) install python libraries 
+
+-> pip install -r requirements.txt
+
+3) Deploy 
+
+func azure functionapp publish giftly 
+
+4) Add Environment Variables
+
+Use our local.setting.json to add evironment Variables, go to settings for the function app and add all of them
+you can use advance edit.
+
+5) Keep the link for your backend function app handy as you will need it for the frontend
+
+######################################################
+FRONTEND DEPLOYMENT
+######################################################
+
+So for the frontend, we have used React JS and GAE.
+
+Instructions:
+
+1) Change you directory to frontend (this is at the root of the project)
+
+-> cd frontend
+
+2) Install libraries and frameworks (eg react, react-router, etc) in the frontend directory
+
+-> npm i or npm install
+
+3) Navigate to src/config.json
+
+-> cd src/config.json
+
+Navigate to the config file in the frontend and change the backendURL to the url for your function app
+
+-> backendURL="<Your-Function-App-Url>" (ie https://giftly.azurewebsites.net)
+
+4) Navigate to /frontend folder
+
+-> cd ..
+
+5) Deployment using Google Cloud 
+
+Please setup a google cloud app with GAE using the lectures or following a tutorial, make sure 
+to setup a budget, etc like in the slides. 
+
+Make sure you can do gcloud app deploy on the terminal and just check you are logged in.
+
+-> gcloud app deploy
+
+6) you should have access to the site

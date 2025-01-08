@@ -22,7 +22,7 @@ from google.oauth2 import id_token
 from google.auth.transport import requests
 
 
-app = func.FunctionApp(auth_level=func.AuthLevel.ANONYMOUS)
+app = func.FunctionApp()
 client = CosmosClient.from_connection_string(os.getenv("AzureCosmosDBConnectionString"))
 database = client.get_database_client(os.getenv("DatabaseName"))
 user_container = database.get_container_client(os.getenv("UserContainer"))
@@ -554,7 +554,7 @@ def send_notifications(req: func.HttpRequest) -> func.HttpResponse:
     return add_cors_headers(response) 
 
 @app.function_name(name="login")
-@app.route(route='login', methods=[func.HttpMethod.POST], auth_level=func.AuthLevel.ANONYMOUS)
+@app.route(route='login', methods=[func.HttpMethod.POST, func.HttpMethod.OPTIONS], auth_level=func.AuthLevel.ANONYMOUS)
 def login(req: func.HttpRequest) -> func.HttpResponse:
     data = req.get_json()
     username = data['username']
