@@ -155,7 +155,7 @@ The frontend is built using React JS and deployed using Google App Engine (GAE).
 
 7. **Enable CORS on Azure Function App**
 
-   Now you have the link for the website for the frontend, You need to enable CORS on Azure
+   Now you have the link for the website for the frontend, You need to enable CORS on Azure in the setting of the function app
 
 ---
 
