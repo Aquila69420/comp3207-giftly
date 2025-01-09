@@ -88,4 +88,6 @@ Make sure you can do gcloud app deploy on the terminal and just check you are lo
 
 7) Enable CORS on Azure Function App
 
-Now you have the link for the website for the frontend, You need to enable CORS on Azure in the setting of the function app
+Now you have the link for the website for the frontend, You need to enable CORS on Azure in the setting of the function app in azure
+
+Happy deploying!
