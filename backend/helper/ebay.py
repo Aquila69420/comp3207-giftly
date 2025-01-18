@@ -52,11 +52,13 @@ def search_query(access_token, query):
     dict
         The search results
     """
+    # query = query.trim().split()[0]
+    print("Searching for: ", query)
     search_url_sandbox = "https://api.sandbox.ebay.com/buy/browse/v1/item_summary/search"
     search_url_production = "https://api.ebay.com/buy/browse/v1/item_summary/search"
     response = requests.get(search_url_production, headers={"Authorization": f"Bearer {access_token}","Content-Type": "application/json","X-EBAY-C-MARKETPLACE-ID": "EBAY_UK"}, params={"q": query,"limit": 50, "offset": 0}) # Specify UK market in X-EBAY-C-MARKETPLACE-ID
     if response.status_code == 200:
-        return response.json()
+        return response.json()['itemSummaries']
     else:
         print(f"Error {response.status_code}: {response.text}")
         raise Exception(f"Error {response.status_code}: {response.text}")
@@ -76,11 +78,11 @@ def search(query):
         The search results
     """
     try: 
-        # products = search_query(get_oauth_token(), query)['itemSummaries']
-        products = demo_ebay_response['itemSummaries']
+        products = search_query(get_oauth_token(), query)
         return products
     except Exception as e : 
-        return e
+        print("Error occurred while fetching search results. Using demo data. ", e)
+        return demo_ebay_response['itemSummaries']
     
 def parse_search_results(products):
     products_info = []

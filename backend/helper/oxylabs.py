@@ -1,23 +1,8 @@
 import requests
-from urllib.parse import quote
-import json
 import os
-from pprint import pprint
-
-# TODO: replace with new credentials, account expires on 26/12/2024
-# TODO: Add demo response JSON files to gitignore for production/final submission
 
 username = os.getenv('Oxylabs_API_username')
 password = os.getenv('Oxylabs_API_password')
-
-# Demo response JSON files for testing
-# with open('./amazon_search.json') as f:
-#     demo_amazon_response = json.load(f)
-# with open('./google_search.json') as f:
-#     demo_google_response = json.load(f)
-# with open('./walmart_search.json') as f:
-# # with open('backend/walmart_search.json') as f:
-#     demo_walmart_response = json.load(f)
 
 def amazon(query):
     """
@@ -41,19 +26,12 @@ def amazon(query):
         'pages': 1,
         'parse': True,
     }).json()
-    # response = demo_amazon_response
-    amazons_choices = response['results'][0]['content']['results']['amazons_choices']
-    organic = response['results'][0]['content']['results']['organic']
-    top_organic = organic if len(amazons_choices) > 0 else organic # top 2 organic results if there is an amazon's choice else top 3
-    top_amazon_choice = amazons_choices[0]
-
-    # If the top amazon choice is one of the organic products, get the next organic product
-    index = 2
-    while top_amazon_choice in top_organic and index < len(organic):
-        top_organic.remove(top_amazon_choice)
-        top_organic.append(organic[index])
-        index += 1
-    products = [top_amazon_choice] + top_organic
+    try:
+        amazons_choices = response['results'][0]['content']['results']['amazons_choices']
+        organic = response['results'][0]['content']['results']['organic']
+        products = amazons_choices + organic if amazons_choices else organic
+    except Exception:
+        products = []
     return products
 
 def parse_amazon_products(products):
@@ -109,7 +87,6 @@ def google(query):
             }
         ]
     }).json()
-    # response = demo_google_response
     products = response['results'][0]['content']['results']['organic']
     return products
 
@@ -159,7 +136,6 @@ def walmart(query):
         'url': 'https://www.walmart.com/search?q={}'.format(query),
         'parse': True,
     }).json()
-    # response = demo_walmart_response
     products = response['results'][0]['content']['results']
     return products
 
