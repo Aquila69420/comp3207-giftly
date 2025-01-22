@@ -30,10 +30,10 @@ def get_products(products):
         products = split_products[1]
         ebay_product = products.split()[0]
         products = quote_plus(products)
-        results['ebay'] = ebay.parse_search_results(ebay.search(quote_plus(ebay_product)))
         results['amazon'] = parse_amazon_products(amazon(products))
         results['google'] = parse_google_products(google(products))
         results['walmart'] = parse_walmart_products(walmart(products))
+        results['ebay'] = ebay.parse_search_results(ebay.search(quote_plus(ebay_product)))
     except Exception as e:
         print("Error occurred while fetching search results. Using demo data. ", e)
         with open('./ebay_search.json') as f:
